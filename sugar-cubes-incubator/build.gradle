@@ -1,0 +1,9 @@
+configureJavaModule(project)
+
+dependencies {
+
+    compile project(':sugar-cubes-rex')
+
+    compileOnly libs.spring_core
+
+}

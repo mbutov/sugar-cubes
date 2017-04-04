@@ -1,0 +1,11 @@
+configureJavaModule(project)
+includeIntoLibrary(project)
+
+dependencies {
+
+    compileOnly libs.objenesis
+
+    testCompile libs.guava
+    testCompile libs.commons_lang3
+
+}

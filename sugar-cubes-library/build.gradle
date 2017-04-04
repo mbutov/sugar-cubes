@@ -1,0 +1,63 @@
+configureJavaModule(project)
+
+/**
+ * Modules to include into library.
+ */
+def modules = [
+
+    'sugar-cubes-cloner',
+    'sugar-cubes-rex',
+    'sugar-cubes-builder',
+    'sugar-cubes-proxy',
+    'sugar-cubes-valueholder',
+    'sugar-cubes-tuple',
+
+]
+
+task copyClassesAndResourcesFromModules(dependsOn: modules.collect { ":${it}:compileJava" }) {
+
+    outputs.dir sourceSets.main.output.classesDir
+    outputs.dir sourceSets.main.output.resourcesDir
+
+    def moduleProjects = modules.collect { project(":${it}") }
+
+    rootProject.afterEvaluate {
+
+        moduleProjects.each { moduleProject ->
+
+            dependencies.compileOnly moduleProject
+
+            def sourceDirectories = []
+
+            sourceDirectories += moduleProject.sourceSets.main.java.srcDirs
+            sourceDirectories += moduleProject.sourceSets.main.resources.srcDirs
+
+            sourceDirectories.each { d ->
+                project.tasks.processResources.inputs.dir d
+            }
+
+        }
+
+    }
+
+    doLast {
+
+        moduleProjects.each { moduleProject ->
+
+            copy {
+                from moduleProject.sourceSets.main.output.classesDir
+                into sourceSets.main.output.classesDir
+            }
+
+            copy {
+                from moduleProject.sourceSets.main.output.resourcesDir
+                into sourceSets.main.output.resourcesDir
+            }
+
+        }
+
+    }
+
+}
+
+tasks.jar.dependsOn(copyClassesAndResourcesFromModules)

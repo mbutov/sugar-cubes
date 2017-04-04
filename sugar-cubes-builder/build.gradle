@@ -1,0 +1,2 @@
+configureJavaModule(project)
+includeIntoLibrary(project)
