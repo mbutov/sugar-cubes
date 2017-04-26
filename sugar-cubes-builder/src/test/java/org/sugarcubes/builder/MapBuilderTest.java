@@ -15,7 +15,7 @@ public class MapBuilderTest {
     @Test
     public void testMap() throws Exception {
 
-        Map<Integer, String> map = MapBuilder.<Integer, String>sortedMap()
+        Map<Integer, String> map = MapBuilder.<Integer, String>treeMap()
             .put(2, "two")
             .put(1, "one")
             .put(3, "three")
