@@ -19,10 +19,22 @@ public class Laser {
     private static final Pattern LAMBDA_CLASS_NAME_PATTERN = Pattern.compile(".*\\$\\$Lambda\\$\\d+/\\d+$");
 
     public static boolean isLambdaClass(Class cl) {
-        return LAMBDA_CLASS_NAME_PATTERN.matcher(cl.getName()).matches() &&
-            Object.class.equals(cl.getSuperclass()) &&
-            Arrays.stream(cl.getInterfaces()).flatMap(c -> Arrays.stream(c.getMethods())).filter(m -> !m.isDefault()).count() == 1 &&
-            cl.isSynthetic() && !cl.isLocalClass() && !cl.isAnonymousClass();
+        if (!LAMBDA_CLASS_NAME_PATTERN.matcher(cl.getName()).matches()) {
+            return false;
+        }
+        if (!Object.class.equals(cl.getSuperclass())) {
+            return false;
+        }
+        if (!cl.isSynthetic() || cl.isLocalClass() || cl.isAnonymousClass()) {
+            return false;
+        }
+        long methodCount = Arrays.stream(cl.getInterfaces()).flatMap(c -> Arrays.stream(c.getMethods()))
+            .filter(m -> !m.isDefault()).count();
+        if (methodCount != 1) {
+            return false;
+        }
+        // todo: maybe something else?
+        return true;
     }
 
     public static boolean isNonSerializableLambda(Object obj) {

@@ -10,3 +10,5 @@ include 'sugar-cubes-tuple'
 include 'sugar-cubes-library'
 
 include 'sugar-cubes-incubator'
+
+include 'fernflower'

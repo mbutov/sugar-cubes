@@ -1,0 +1,48 @@
+
+apply plugin: 'java'
+
+buildDir 'out'
+
+task downloadAndExtractFernflower {
+
+    doLast {
+
+        File fernflowerZip = file("${buildDir}/fernflower.zip")
+
+        if (!fernflowerZip.file) {
+            fernflowerZip.parentFile.mkdirs()
+            new URL('https://github.com/fesh0r/fernflower/archive/master.zip').withInputStream { input ->
+                fernflowerZip.withOutputStream { output ->
+                    output << input
+                }
+            }
+        }
+
+        ant.unzip(src: fernflowerZip, dest: buildDir)
+
+        ant.move(todir: projectDir, ) {
+            fileset(dir: "${buildDir}/fernflower-master")
+        }
+
+    }
+
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = []
+        }
+    }
+    test {
+        java {
+            srcDirs = []
+        }
+        resources {
+            srcDirs = []
+        }
+    }
+}

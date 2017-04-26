@@ -4,6 +4,8 @@ dependencies {
 
     compile project(':sugar-cubes-rex')
 
+    compile 'xom:xom:1.2.5'
+
     compileOnly libs.spring_core
 
 }
@@ -12,7 +14,7 @@ task decompile {
     doLast {
         file('src/decompiled/java').mkdirs()
         javaexec {
-            classpath '/home/mbutov/work/fernflower/fernflower.jar'
+            classpath project(':fernflower').jar.archivePath
             main = 'org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler'
             args '/home/mbutov/work/sugar-cubes/sugar-cubes-incubator/build/classes/test',
                 '/home/mbutov/work/sugar-cubes/sugar-cubes-incubator/src/decompiled/java'

@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 /**
  * Extension of {@link ObjectOutputStream} which can write non-serializable lambdas.
+ * Uses "serializable proxy" pattern.
  *
  * @author Maxim Butov
  */

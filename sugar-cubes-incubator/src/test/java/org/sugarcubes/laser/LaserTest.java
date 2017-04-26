@@ -26,6 +26,7 @@ public class LaserTest {
     }
 
     private static Object functionMethod(Object arg) {
+        return arg;
     }
 
     interface SSuplier extends Supplier, Serializable {}
