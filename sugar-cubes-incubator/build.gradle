@@ -10,14 +10,13 @@ dependencies {
 
 }
 
-task decompile {
+task decompile (dependsOn: ':fernflower:compileJava') {
     doLast {
         file('src/decompiled/java').mkdirs()
         javaexec {
-            classpath project(':fernflower').jar.archivePath
+            classpath project(':fernflower').sourceSets.main.output.classesDir
             main = 'org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler'
-            args '/home/mbutov/work/sugar-cubes/sugar-cubes-incubator/build/classes/test',
-                '/home/mbutov/work/sugar-cubes/sugar-cubes-incubator/src/decompiled/java'
+            args '-rbr=0', '-lac=0', "${sourceSets.test.output.classesDir}", file('src/decompiled/java').path
         }
     }
 }
