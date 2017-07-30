@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 import org.sugarcubes.rex.Rex;
 
 /**
- * Extension of {@link Callable}, which has a save version of {@link #call()} - {@link #execute()},
+ * Extension of {@link Callable}, which has a safe version of {@link #call()} - {@link #execute()},
  * and may be converted to {@link Runnable}.
  *
  * This class is also parametrized with exception.

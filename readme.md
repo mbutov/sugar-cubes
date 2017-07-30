@@ -9,7 +9,7 @@ The library requires Java 8 or higher.
     
 ### sugar-cubes-library
     
-This is a bundle for all other sub-modules. If you don't have problems with space just add this dependency into your projects:
+This is a bundle for all other sub-modules. If you don't have problems with disk space, just add this dependency into your projects:
     
     compile 'org.sugarcubes:sugar-cubes-library:0.1.0-SNAPSHOT'
     
