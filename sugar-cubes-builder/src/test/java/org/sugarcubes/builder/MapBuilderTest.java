@@ -1,8 +1,9 @@
 package org.sugarcubes.builder;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,8 +22,8 @@ public class MapBuilderTest {
             .put(3, "three")
             .get();
 
-        Assert.assertEquals(new HashSet(Arrays.asList(1, 2, 3)), map.keySet());
-        Assert.assertArrayEquals(Arrays.asList("one", "two", "three").toArray(), map.values().toArray());
+        Assert.assertEquals(new TreeSet<>(Arrays.asList(1, 2, 3)), map.keySet());
+        Assert.assertEquals(Arrays.asList("one", "two", "three"), new ArrayList<>(map.values()));
         
     }
 

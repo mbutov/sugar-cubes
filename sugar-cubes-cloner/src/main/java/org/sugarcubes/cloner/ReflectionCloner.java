@@ -39,7 +39,7 @@ public class ReflectionCloner extends AbstractCloner {
 
     /**
      * Default constructor. Uses {@link ObjenesisObjectFactory} if Objenesis library is present, or
-     * {@link ReflectionObjectFactory} oterwise.
+     * {@link ReflectionObjectFactory} otherwise.
      */
     public ReflectionCloner() {
         this(ObjenesisUtils.isObjenesisAvailable() ? new ObjenesisObjectFactory() : new ReflectionObjectFactory());
@@ -147,7 +147,7 @@ public class ReflectionCloner extends AbstractCloner {
 
     @Override
     protected Object doClone(Object object) {
-        return doClone(object, new IdentityHashMap());
+        return doClone(object, new IdentityHashMap<>());
     }
 
     /**
@@ -159,17 +159,17 @@ public class ReflectionCloner extends AbstractCloner {
      *
      * @return clone
      */
-    protected Object doClone(Object object, Map cloned) {
+    protected Object doClone(Object object, Map<Object, Object> cloned) {
         if (object == null || isImmutable(object.getClass())) {
             return object;
         }
         else {
-            Object clone = cloned.get(object);
-            if (clone == null) {
-                clone = object.getClass().isArray() ? doCloneArray(object, cloned) : doCloneObject(object, cloned);
-            }
-            return clone;
+            return cloned.computeIfAbsent(object, obj -> doCloneObjectOrArray(obj, cloned));
         }
+    }
+
+    protected Object doCloneObjectOrArray(Object object, Map<Object, Object> cloned) {
+        return object.getClass().isArray() ? doCloneArray(object, cloned) : doCloneObject(object, cloned);
     }
 
     /**
@@ -178,7 +178,7 @@ public class ReflectionCloner extends AbstractCloner {
      * @param cloned map of previously cloned objects
      * @return clone
      */
-    protected Object doCloneArray(Object object, Map cloned) {
+    protected Object doCloneArray(Object object, Map<Object, Object> cloned) {
         Class componentType = object.getClass().getComponentType();
         int length = Array.getLength(object);
         Object clone = Array.newInstance(componentType, length);
@@ -202,14 +202,14 @@ public class ReflectionCloner extends AbstractCloner {
      * @param cloned map of previously cloned objects
      * @return clone
      */
-    protected Object doCloneObject(Object object, Map cloned) {
+    protected Object doCloneObject(Object object, Map<Object, Object> cloned) {
         Object clone = getObjectFactory().newInstance(object.getClass());
         cloned.put(object, clone);
         copyFields(object, clone, cloned);
         return clone;
     }
 
-    protected void copyFields(Object from, Object into, Map cloned) {
+    protected void copyFields(Object from, Object into, Map<Object, Object> cloned) {
         for (Field field : getCopyableFields(from.getClass())) {
             copyField(from, into, field, cloned);
         }
@@ -261,7 +261,7 @@ public class ReflectionCloner extends AbstractCloner {
         }
     }
 
-    protected void copyField(Object from, Object into, Field field, Map cloned) {
+    protected void copyField(Object from, Object into, Field field, Map<Object, Object> cloned) {
         try {
             Object value = field.get(from);
             Object valueClone = isImmutable(field.getType()) ? value : doClone(value, cloned);

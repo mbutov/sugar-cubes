@@ -15,6 +15,7 @@ public abstract class AbstractClonerTests {
 
         final int x = 1;
         final String y = "2";
+        final Object z = null;
 
         byte[] xxx = {1, 2, 3,};
         Object[] yyy = {1, "2", 3.0, new int[] {4}, Collections.singletonMap(5, 5.0),};
@@ -41,6 +42,7 @@ public abstract class AbstractClonerTests {
 
         Assert.assertEquals(b1.x, b2.x);
         Assert.assertSame(b1.y, b2.y);
+        Assert.assertNull(b1.z);
 
         Assert.assertArrayEquals(b1.xxx, b2.xxx);
         Assert.assertArrayEquals(b1.yyy, b2.yyy);

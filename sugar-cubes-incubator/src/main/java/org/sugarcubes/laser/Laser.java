@@ -36,17 +36,20 @@ public class Laser {
         if (!cl.isSynthetic() || cl.isLocalClass() || cl.isAnonymousClass()) {
             return false;
         }
-        if (getFunctionalInterfaceMethod(cl) == null) {
+        if (findFunctionalInterfaceMethod(cl) == null) {
             return false;
         }
         // todo: maybe something else?
         return true;
     }
 
-    public static Method getFunctionalInterfaceMethod(Class lambdaClass) {
+    public static Method findFunctionalInterfaceMethod(Class lambdaClass) {
         if (Object.class.equals(lambdaClass.getSuperclass())) {
-            List<Method> methods = Arrays.stream(lambdaClass.getInterfaces()).flatMap(c -> Arrays.stream(c.getMethods()))
-                .filter(m -> !m.isDefault()).collect(Collectors.toList());
+            List<Method> methods = Arrays.stream(lambdaClass.getInterfaces())
+                .map(Class::getMethods)
+                .flatMap(Arrays::stream)
+                .filter(m -> !m.isDefault())
+                .collect(Collectors.toList());
             if (methods.size() == 1) {
                 return methods.iterator().next();
             }
@@ -54,12 +57,16 @@ public class Laser {
         return null;
     }
 
+    public static boolean isSerializable(Object obj) {
+        return obj instanceof Serializable;
+    }
+
     public static boolean isNonSerializableLambda(Object obj) {
-        return isLambda(obj) && !(obj instanceof Serializable);
+        return isLambda(obj) && !isSerializable(obj);
     }
 
     public static <T> T serializable(T lambda) {
-        if (lambda == null || lambda instanceof Serializable) {
+        if (lambda == null || isSerializable(lambda)) {
             return lambda;
         }
         Class<?> lambdaClass = lambda.getClass();

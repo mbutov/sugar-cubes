@@ -6,6 +6,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.util.SerializationUtils;
 
@@ -15,8 +16,6 @@ import org.springframework.util.SerializationUtils;
 public class LaserTest {
 
     public LaserTest() {}
-
-    private LaserTest(Object obj) {}
 
     private static Object supplierMethod() {
         return new Object();
@@ -35,19 +34,18 @@ public class LaserTest {
 
     private final Supplier lambda1 = LaserTest::supplierMethod;
     private final Consumer lambda2 = LaserTest::comsumerMethod;
-    private final Supplier lambda3 = () -> {
-        return new Object();
-    };
+    private final Supplier lambda3 = () -> new Object();
+
     private final Supplier sLambda1 = (Supplier & Serializable) LaserTest::supplierMethod;
     private final Consumer sLambda2 = (Consumer & Serializable) LaserTest::comsumerMethod;
-    private final Supplier sLambda3 = (Supplier & Serializable) () -> {
-        return new Object();
-    };
+    private final Supplier sLambda3 = (Supplier & Serializable) () -> new Object();
+
     private final Consumer innerAnonymous = new Consumer() {
         @Override
         public void accept(Object o) {
         }
     };
+    
     private final Serializable sInnerAnonymous = new Serializable() {
     };
 
@@ -83,6 +81,7 @@ public class LaserTest {
 
     }
 
+    @Ignore
     @Test
     public void testSerializables() throws Exception {
         

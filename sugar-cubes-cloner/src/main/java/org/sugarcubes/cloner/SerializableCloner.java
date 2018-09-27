@@ -6,6 +6,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 /**
+ * The implementation of {@link Cloner} which uses Java serialization for cloning.
+ *
  * @author Maxim Butov
  */
 public class SerializableCloner extends AbstractCloner {

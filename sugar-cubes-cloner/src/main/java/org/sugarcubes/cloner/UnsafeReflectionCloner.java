@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import sun.misc.Unsafe;
 
@@ -34,6 +35,7 @@ public class UnsafeReflectionCloner extends ReflectionCloner {
     /**
      * Functional interface for the field copy operation.
      */
+    @FunctionalInterface
     private interface UnsafeCopyOperation {
 
         /**
@@ -44,60 +46,41 @@ public class UnsafeReflectionCloner extends ReflectionCloner {
     }
 
     /**
+     * 3-arguments consumer.
+     */
+    @FunctionalInterface
+    private interface ThreeConsumer<T, U, V> {
+
+        /**
+         * Performs this operation on the given arguments.
+         *
+         * @param t the first input argument
+         * @param u the second input argument
+         * @param v the third input argument
+         */
+        void accept(T t, U u, V v);
+
+    }
+
+    private static <X> UnsafeCopyOperation getCopyOperation(ThreeConsumer<Object, Long, X> put, BiFunction<Object, Long, X> get) {
+        return (from, offset, into) -> put.accept(into, offset, get.apply(from, offset));
+    }
+
+    /**
      * Mapping of primitive types to copy operations.
      */
     private static final Map<Class, UnsafeCopyOperation> OPERATIONS;
 
     static {
         Map<Class, UnsafeCopyOperation> operations = new HashMap<>();
-        operations.put(boolean.class, new UnsafeCopyOperation() {
-            @Override
-            public void copy(Object from, long offset, Object into) {
-                UNSAFE.putBoolean(into, offset, UNSAFE.getBoolean(from, offset));
-            }
-        });
-        operations.put(byte.class, new UnsafeCopyOperation() {
-            @Override
-            public void copy(Object from, long offset, Object into) {
-                UNSAFE.putByte(into, offset, UNSAFE.getByte(from, offset));
-            }
-        });
-        operations.put(char.class, new UnsafeCopyOperation() {
-            @Override
-            public void copy(Object from, long offset, Object into) {
-                UNSAFE.putChar(into, offset, UNSAFE.getChar(from, offset));
-            }
-        });
-        operations.put(short.class, new UnsafeCopyOperation() {
-            @Override
-            public void copy(Object from, long offset, Object into) {
-                UNSAFE.putShort(into, offset, UNSAFE.getShort(from, offset));
-            }
-        });
-        operations.put(int.class, new UnsafeCopyOperation() {
-            @Override
-            public void copy(Object from, long offset, Object into) {
-                UNSAFE.putInt(into, offset, UNSAFE.getInt(from, offset));
-            }
-        });
-        operations.put(long.class, new UnsafeCopyOperation() {
-            @Override
-            public void copy(Object from, long offset, Object into) {
-                UNSAFE.putLong(into, offset, UNSAFE.getLong(from, offset));
-            }
-        });
-        operations.put(float.class, new UnsafeCopyOperation() {
-            @Override
-            public void copy(Object from, long offset, Object into) {
-                UNSAFE.putFloat(into, offset, UNSAFE.getFloat(from, offset));
-            }
-        });
-        operations.put(double.class, new UnsafeCopyOperation() {
-            @Override
-            public void copy(Object from, long offset, Object into) {
-                UNSAFE.putDouble(into, offset, UNSAFE.getDouble(from, offset));
-            }
-        });
+        operations.put(boolean.class, getCopyOperation(UNSAFE::putBoolean, UNSAFE::getBoolean));
+        operations.put(byte.class, getCopyOperation(UNSAFE::putByte, UNSAFE::getByte));
+        operations.put(char.class, getCopyOperation(UNSAFE::putChar, UNSAFE::getChar));
+        operations.put(short.class, getCopyOperation(UNSAFE::putShort, UNSAFE::getShort));
+        operations.put(int.class, getCopyOperation(UNSAFE::putInt, UNSAFE::getInt));
+        operations.put(long.class, getCopyOperation(UNSAFE::putLong, UNSAFE::getLong));
+        operations.put(float.class, getCopyOperation(UNSAFE::putFloat, UNSAFE::getFloat));
+        operations.put(double.class, getCopyOperation(UNSAFE::putDouble, UNSAFE::getDouble));
         OPERATIONS = Collections.unmodifiableMap(operations);
     }
 
@@ -107,7 +90,7 @@ public class UnsafeReflectionCloner extends ReflectionCloner {
     }
 
     @Override
-    protected void copyField(Object from, Object into, Field field, Map cloned) {
+    protected void copyField(Object from, Object into, Field field, Map<Object, Object> cloned) {
         long offset = UNSAFE.objectFieldOffset(field);
         UnsafeCopyOperation operation = OPERATIONS.get(field.getType());
         if (operation != null) {

@@ -24,17 +24,18 @@ public class ReflectionObjectFactory implements ObjectFactory {
      * @return no-arg constructor
      */
     private <T> Constructor<T> getNoArgConstructor(Class<T> clazz) {
-        Constructor<T> constructor = constructorCache.get(clazz);
-        if (constructor == null) {
-            try {
-                constructor = clazz.getDeclaredConstructor();
-            }
-            catch (NoSuchMethodException e) {
-                throw new ClonerException("There's no no-arg constructor for the " + clazz, e);
-            }
-            constructor.setAccessible(true);
-            constructorCache.put(clazz, constructor);
+        return constructorCache.computeIfAbsent(clazz, this::getDeclaredNoArgConstructor);
+    }
+
+    private <T> Constructor<T> getDeclaredNoArgConstructor(Class<T> clazz) {
+        Constructor<T> constructor;
+        try {
+            constructor = clazz.getDeclaredConstructor();
         }
+        catch (NoSuchMethodException e) {
+            throw new ClonerException("There's no no-arg constructor for the " + clazz, e);
+        }
+        constructor.setAccessible(true);
         return constructor;
     }
 
