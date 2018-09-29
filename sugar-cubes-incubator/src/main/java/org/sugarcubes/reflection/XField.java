@@ -7,32 +7,28 @@ import java.lang.reflect.Field;
  *
  * @author Maxim Butov
  */
-public class XField<T> {
+public class XField<T> extends XReflectionObject<Field> implements XModifiers {
 
-    private final Field javaField;
-
-    public XField(Field javaField) {
-        this.javaField = XReflection.prepare(javaField);
+    public XField(Field reflectionObject) {
+        super(reflectionObject);
     }
 
-    public Field getJavaField() {
-        return javaField;
+    @Override
+    public String getName() {
+        return getReflectionObject().getName();
+    }
+
+    @Override
+    public int getModifiers() {
+        return getReflectionObject().getModifiers();
     }
 
     public T get(Object obj) {
-        return XReflection.execute(() -> javaField.get(obj));
+        return XReflection.execute(() -> getReflectionObject().get(obj));
     }
 
     public void set(Object obj, T value) {
-        XReflection.execute(() -> javaField.set(obj, value));
-    }
-
-    public T getStatic() {
-        return get(null);
-    }
-
-    public void setStatic(T value) {
-        set(null, value);
+        XReflection.execute(() -> getReflectionObject().set(obj, value));
     }
 
 }

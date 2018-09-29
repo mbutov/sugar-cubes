@@ -1,7 +1,7 @@
 package org.sugarcubes.reflection;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -10,29 +10,28 @@ import java.util.stream.Stream;
  *
  * @author Maxim Butov
  */
-public class XClass<T> implements XModifiers {
+public class XClass<T> extends XReflectionObject<Class<T>> implements XModifiers {
 
-    private final Class<T> javaClass;
-
-    public XClass(Class<T> javaClass) {
-        this.javaClass = Objects.requireNonNull(javaClass);
-    }
-
-    public Class<T> getJavaClass() {
-        return javaClass;
+    protected XClass(Class<T> javaObject) {
+        super(javaObject);
     }
 
     @Override
     public int getModifiers() {
-        return javaClass.getModifiers();
+        return getReflectionObject().getModifiers();
+    }
+
+    @Override
+    public String getName() {
+        return getReflectionObject().getName();
     }
 
     public XClass<?> getSuperClass() {
-        return Optional.ofNullable(javaClass.getSuperclass()).map(XClass::new).orElse(XNullClass.INSTANCE);
+        return Optional.ofNullable(getReflectionObject().getSuperclass()).map(XClass::new).orElse(XNullClass.INSTANCE);
     }
 
     public Stream<XClass<?>> getInterfaces() {
-        return Arrays.stream(Optional.ofNullable(javaClass.getInterfaces()).orElse(new Class[0])).map(XClass::new);
+        return Arrays.stream(Optional.ofNullable(getReflectionObject().getInterfaces()).orElse(new Class[0])).map(XClass::new);
     }
 
     public Stream<XClass<?>> getAllInterfaces() {
@@ -40,28 +39,40 @@ public class XClass<T> implements XModifiers {
     }
 
     public XClassPackage getPackage() {
-        return new XClassPackage(javaClass);
+        return new XClassPackage(this);
     }
 
     public Stream<XConstructor<T>> getConstructors() {
-        return Arrays.stream(javaClass.getDeclaredConstructors())
-            .map(c -> new XConstructor(c));
+        return Arrays.stream((Constructor<T>[]) getReflectionObject().getDeclaredConstructors())
+            .map(XConstructor::new);
     }
 
-    public Stream<XField> getFields() {
-        return Arrays.stream(javaClass.getDeclaredFields()).map(XField::new);
+    public Stream<XField<?>> getFields() {
+        return Arrays.stream(getReflectionObject().getDeclaredFields()).map(XField::new);
     }
 
-    public Stream<XField> getAllFields() {
+    public Stream<XField<?>> getAllFields() {
         return Stream.concat(getFields(), getSuperClass().getAllFields());
     }
 
     public Stream<XMethod<?>> getMethods() {
-        return Arrays.stream(javaClass.getDeclaredMethods()).map(XMethod::new);
+        return Arrays.stream(getReflectionObject().getDeclaredMethods()).map(XMethod::new);
     }
 
     public Stream<XMethod<?>> getAllMethods() {
         return Stream.concat(getMethods(), getSuperClass().getAllMethods());
+    }
+
+    public Optional<XConstructor<T>> findConstructor(Class... types) {
+        return getConstructors().filter(constructor -> constructor.matches(types)).findAny();
+    }
+
+    public <X> Optional<XMethod<X>> findMethod(String name, Class... types) {
+        return getAllMethods()
+            .filter(method -> method.getName().equals(name))
+            .filter(method -> method.matches(types))
+            .map(method -> (XMethod<X>) method)
+            .findAny();
     }
 
 }

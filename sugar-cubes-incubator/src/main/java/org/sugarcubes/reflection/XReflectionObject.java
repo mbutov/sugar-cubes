@@ -1,22 +1,46 @@
 package org.sugarcubes.reflection;
 
-import java.lang.reflect.AccessibleObject;
+import java.util.Objects;
 
 /**
  * todo: document it and adjust author
  *
  * @author Q-MBU
  */
-public class XReflectionObject<T extends AccessibleObject> {
+public abstract class XReflectionObject<T> {
 
-    private final T javaObject;
+    private final T reflectionObject;
 
-    public XReflectionObject(T javaObject) {
-        this.javaObject = javaObject;
+    protected XReflectionObject(T reflectionObject) {
+        this.reflectionObject = Objects.requireNonNull(reflectionObject);
     }
 
-    public T getJavaObject() {
-        return javaObject;
+    public T getReflectionObject() {
+        return reflectionObject;
     }
 
+    public abstract String getName();
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof XReflectionObject)) {
+            return false;
+        }
+        XReflectionObject that = (XReflectionObject) obj;
+        return reflectionObject.equals(that.reflectionObject);
+    }
+
+    @Override
+    public int hashCode() {
+        return reflectionObject.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" + reflectionObject + '}';
+    }
+    
 }

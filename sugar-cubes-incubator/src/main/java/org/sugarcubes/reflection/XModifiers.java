@@ -29,6 +29,10 @@ public interface XModifiers {
         return isModifier(Modifier::isProtected);
     }
 
+    default boolean isPackage() {
+        return !(isPublic() | isPrivate() | isProtected());
+    }
+
     default boolean isStatic() {
         return isModifier(Modifier::isStatic);
     }

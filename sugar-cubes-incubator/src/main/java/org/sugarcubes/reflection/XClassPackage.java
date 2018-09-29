@@ -7,11 +7,15 @@ package org.sugarcubes.reflection;
  */
 public class XClassPackage extends XPackage {
 
-    private final Class javaClass;
+    private final XClass xClass;
 
-    public XClassPackage(Class javaClass) {
-        super(javaClass.getPackage().getName());
-        this.javaClass = javaClass;
+    public XClassPackage(XClass<?> xClass) {
+        super(xClass.getReflectionObject().getPackage());
+        this.xClass = xClass;
+    }
+
+    public XClass getXClass() {
+        return xClass;
     }
 
 }

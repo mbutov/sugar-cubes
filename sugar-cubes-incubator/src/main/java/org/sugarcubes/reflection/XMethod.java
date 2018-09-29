@@ -7,24 +7,29 @@ import java.lang.reflect.Method;
  *
  * @author Maxim Butov
  */
-public class XMethod<T> extends XExecutable<T> {
+public class XMethod<T> extends XReflectionObject<Method> implements XModifiers, XExecutable<T> {
 
-    private final Method javaMethod;
-
-    public XMethod(Method javaMethod) {
-        this.javaMethod = XReflection.prepare(javaMethod);
+    public XMethod(Method javaObject) {
+        super(javaObject);
     }
 
-    public Method getJavaMethod() {
-        return javaMethod;
+    @Override
+    public int getModifiers() {
+        return getReflectionObject().getModifiers();
     }
 
-    public T execute(Object _this, Object... args) {
-        return XReflection.execute(() -> javaMethod.invoke(_this, args));
+    @Override
+    public String getName() {
+        return getReflectionObject().getName();
     }
 
-    public T executeStatic(Object... args) {
-        return execute(null, args);
+    @Override
+    public Class[] getParameterTypes() {
+        return getReflectionObject().getParameterTypes();
+    }
+
+    public T invoke(Object obj, Object... args) {
+        return XReflection.execute(() -> getReflectionObject().invoke(obj, args));
     }
 
 }

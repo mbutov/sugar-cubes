@@ -24,6 +24,11 @@ public class XNullClass extends XClass<Object> {
     }
 
     @Override
+    public String getName() {
+        return "null";
+    }
+
+    @Override
     public XClass<?> getSuperClass() {
         return INSTANCE;
     }
@@ -39,7 +44,7 @@ public class XNullClass extends XClass<Object> {
     }
 
     @Override
-    public Class<Object> getJavaClass() {
+    public Class<Object> getReflectionObject() {
         throw new UnsupportedOperationException();
     }
 

@@ -5,16 +5,18 @@ package org.sugarcubes.reflection;
  *
  * @author Maxim Butov
  */
-public class XPackage {
+public class XPackage extends XReflectionObject<Package> {
 
-    private final String name;
+    public XPackage(Package reflectionObject) {
+        super(reflectionObject);
+    }
 
     public XPackage(String name) {
-        this.name = name;
+        this(Package.getPackage(name));
     }
 
     public String getName() {
-        return name;
+        return getReflectionObject().getName();
     }
 
 }
