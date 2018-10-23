@@ -64,12 +64,12 @@ public class XNullClass extends XClass<Object> {
     }
 
     @Override
-    public Stream<XField> getFields() {
+    public Stream<XField<?>> getFields() {
         return Stream.empty();
     }
 
     @Override
-    public Stream<XField> getAllFields() {
+    public Stream<XField<?>> getAllFields() {
         return Stream.empty();
     }
 

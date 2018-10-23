@@ -63,16 +63,19 @@ public class XClass<T> extends XReflectionObject<Class<T>> implements XModifiers
         return Stream.concat(getMethods(), getSuperClass().getAllMethods());
     }
 
+    public Optional<XField<T>> findField(String name) {
+        return (Optional) getAllFields().filter(XPredicates.withName(name)).findFirst();
+    }
+
     public Optional<XConstructor<T>> findConstructor(Class... types) {
-        return getConstructors().filter(constructor -> constructor.matches(types)).findAny();
+        return getConstructors().filter(XPredicates.matching(types)).findAny();
     }
 
     public <X> Optional<XMethod<X>> findMethod(String name, Class... types) {
-        return getAllMethods()
-            .filter(method -> method.getName().equals(name))
-            .filter(method -> method.matches(types))
-            .map(method -> (XMethod<X>) method)
-            .findAny();
+        return (Optional) getAllMethods()
+            .filter(XPredicates.withName(name))
+            .filter(XPredicates.matching(types))
+            .findFirst();
     }
 
 }

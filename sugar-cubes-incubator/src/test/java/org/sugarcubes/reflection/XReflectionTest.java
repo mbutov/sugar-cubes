@@ -18,6 +18,10 @@ public class XReflectionTest {
 
     }
 
+    public static class B {
+
+    }
+
     @Test
     public void testClasses() {
 

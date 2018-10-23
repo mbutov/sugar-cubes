@@ -6,7 +6,6 @@ import java.util.function.Function;
 /**
  * todo: document it and adjust author
  *
- * @author Q-MBU
  * @author Maxim Butov
  */
 public interface XModifiers {
