@@ -31,7 +31,7 @@ public interface XExecutable<T> {
         return true;
     }
 
-    default boolean matches(Class... types) {
+    default boolean hasParameterTypes(Class... types) {
         return Arrays.equals(types, getParameterTypes());
     }
 

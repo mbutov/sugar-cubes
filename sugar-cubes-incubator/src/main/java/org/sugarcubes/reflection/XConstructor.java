@@ -1,7 +1,6 @@
 package org.sugarcubes.reflection;
 
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 
 /**
  * todo: document it and adjust author
@@ -10,8 +9,9 @@ import java.util.Arrays;
  */
 public class XConstructor<T> extends XReflectionObject<Constructor<T>> implements XExecutable<T> {
 
-    public XConstructor(Constructor<T> reflectionObject) {
+    XConstructor(Constructor<T> reflectionObject) {
         super(reflectionObject);
+        XReflectionUtils.tryToMakeAccessible(reflectionObject);
     }
 
     @Override
@@ -25,7 +25,7 @@ public class XConstructor<T> extends XReflectionObject<Constructor<T>> implement
     }
 
     public T newInstance(Object... args) {
-        return XReflection.execute(() -> getReflectionObject().newInstance(args));
+        return XReflectionUtils.execute(() -> getReflectionObject().newInstance(args));
     }
 
 }

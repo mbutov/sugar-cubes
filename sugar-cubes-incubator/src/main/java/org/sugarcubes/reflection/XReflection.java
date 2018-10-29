@@ -1,8 +1,8 @@
 package org.sugarcubes.reflection;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.Callable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * todo: document it and adjust author
@@ -11,54 +11,20 @@ import java.util.concurrent.Callable;
  */
 public class XReflection {
 
-    interface XRunnable {
-
-        void run() throws Exception;
-
-        default Callable<Void> toCallable() {
-            return () -> {
-                run();
-                return null;
-            };
-        }
-
+    public static <X> XClass<X> of(Class<X> clazz) {
+        return new XClass<>(clazz);
     }
 
-    public static void execute(XRunnable runnable) {
-        execute(runnable.toCallable());
+    public static <X> XConstructor<X> of(Constructor<X> constructor) {
+        return new XConstructor<>(constructor);
     }
 
-    public static <X, Y extends X> Y execute(Callable<X> callable) {
-        try {
-
-            try {
-                return (Y) callable.call();
-            }
-            catch (InvocationTargetException e) {
-                throw e.getCause();
-            }
-            catch (ReflectiveOperationException e) {
-                throw new XReflectiveOperationException(e);
-            }
-
-        }
-        catch (RuntimeException | Error e) {
-            throw e;
-        }
-        catch (Throwable e) {
-            throw new XInvocationException(e);
-        }
-
+    public static <X> XField<X> of(Field field) {
+        return new XField<>(field);
     }
 
-    public static <T extends AccessibleObject> T prepare(T obj) {
-        try {
-            obj.setAccessible(true);
-        }
-        catch (SecurityException e) {
-            // ignore
-        }
-        return obj;
+    public static <X> XMethod<X> of(Method method) {
+        return new XMethod<>(method);
     }
 
 }

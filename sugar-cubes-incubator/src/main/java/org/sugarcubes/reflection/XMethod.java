@@ -1,5 +1,6 @@
 package org.sugarcubes.reflection;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 
 /**
@@ -9,8 +10,9 @@ import java.lang.reflect.Method;
  */
 public class XMethod<T> extends XReflectionObject<Method> implements XModifiers, XExecutable<T> {
 
-    public XMethod(Method javaObject) {
-        super(javaObject);
+    public XMethod(Method reflectionObject) {
+        super(reflectionObject);
+        XReflectionUtils.tryToMakeAccessible(reflectionObject);
     }
 
     @Override
@@ -29,7 +31,18 @@ public class XMethod<T> extends XReflectionObject<Method> implements XModifiers,
     }
 
     public T invoke(Object obj, Object... args) {
-        return XReflection.execute(() -> getReflectionObject().invoke(obj, args));
+        return XReflectionUtils.execute(() -> getReflectionObject().invoke(obj, args));
+    }
+
+    private T invokeDefault(Object proxy, Method method, Object[] args) {
+        MethodHandles.Lookup lookup = XReflection.of(MethodHandles.Lookup.class)
+            .<MethodHandles.Lookup>getField("IMPL_LOOKUP")
+            .get(null);
+        return XReflectionUtils.execute(() -> lookup
+            .in(method.getDeclaringClass())
+            .unreflectSpecial(method, method.getDeclaringClass())
+            .bindTo(proxy)
+            .invokeWithArguments(args));
     }
 
 }

@@ -9,12 +9,12 @@ import java.util.stream.Stream;
  */
 public class XNullClass extends XClass<Object> {
 
-    private static final class Null {
-
-    }
+    private static final Class<Object> NULL = (Class) new Object() {
+        // "null" class
+    }.getClass();
 
     private XNullClass() {
-        super((Class) Null.class);
+        super(NULL);
     }
 
     public static XClass INSTANCE = new XNullClass();
@@ -29,21 +29,6 @@ public class XNullClass extends XClass<Object> {
     }
 
     @Override
-    public XClass<?> getSuperClass() {
-        return INSTANCE;
-    }
-
-    @Override
-    public Stream<XClass<?>> getInterfaces() {
-        return Stream.empty();
-    }
-
-    @Override
-    public Stream<XClass<?>> getAllInterfaces() {
-        return Stream.empty();
-    }
-
-    @Override
     public Class<Object> getReflectionObject() {
         throw new UnsupportedOperationException();
     }
@@ -54,12 +39,37 @@ public class XNullClass extends XClass<Object> {
     }
 
     @Override
+    public XClass<?> getSuperclass() {
+        return INSTANCE;
+    }
+
+    @Override
     public int getModifiers() {
         return 0;
     }
 
     @Override
+    public Stream<XClass<?>> getDeclaredInterfaces() {
+        return Stream.empty();
+    }
+
+    @Override
+    public Stream<XClass<?>> getInterfaces() {
+        return Stream.empty();
+    }
+
+    @Override
+    public Stream<XConstructor<Object>> getDeclaredConstructors() {
+        return Stream.empty();
+    }
+
+    @Override
     public Stream<XConstructor<Object>> getConstructors() {
+        return Stream.empty();
+    }
+
+    @Override
+    public Stream<XField<?>> getDeclaredFields() {
         return Stream.empty();
     }
 
@@ -69,17 +79,12 @@ public class XNullClass extends XClass<Object> {
     }
 
     @Override
-    public Stream<XField<?>> getAllFields() {
+    public Stream<XMethod<?>> getDeclaredMethods() {
         return Stream.empty();
     }
 
     @Override
     public Stream<XMethod<?>> getMethods() {
-        return Stream.empty();
-    }
-
-    @Override
-    public Stream<XMethod<?>> getAllMethods() {
         return Stream.empty();
     }
 

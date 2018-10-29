@@ -1,7 +1,6 @@
 package org.sugarcubes.reflection;
 
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -16,13 +15,9 @@ public interface XPredicates {
         return xReflectionObject -> xReflectionObject.getName().equals(name);
     }
 
-    static Predicate<XExecutable> matching(Class... types) {
+    static Predicate<XExecutable<?>> withParameterTypes(Class... types) {
         Objects.requireNonNull(types);
-        return xExecutable -> xExecutable.matches(types);
-    }
-
-    static <X> Function<Object, X> cast() {
-        return x -> (X) x;
+        return xExecutable -> xExecutable.hasParameterTypes(types);
     }
 
 }

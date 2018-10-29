@@ -9,7 +9,7 @@ public class XClassPackage extends XPackage {
 
     private final XClass xClass;
 
-    public XClassPackage(XClass<?> xClass) {
+    XClassPackage(XClass<?> xClass) {
         super(xClass.getReflectionObject().getPackage());
         this.xClass = xClass;
     }

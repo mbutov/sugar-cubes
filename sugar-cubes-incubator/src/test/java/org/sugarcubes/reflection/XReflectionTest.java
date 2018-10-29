@@ -25,11 +25,29 @@ public class XReflectionTest {
     @Test
     public void testClasses() {
 
-        XClass<A> xClass = new XClass(A.class);
+        XClass<A> xClass = XReflection.of(A.class);
         A a = new A();
 
-        xClass.getAllFields().forEach(System.out::println);
-        xClass.getAllFields().filter(XModifiers::isPublic).forEach(System.out::println);
+        xClass.getConstructors().forEach(System.out::println);
+        xClass.getFields().forEach(System.out::println);
+        xClass.getMethods().forEach(System.out::println);
+
+    }
+
+    public static class C {
+
+        private final int c = 111;
+
+    }
+
+    @Test
+    public void testFinal() {
+
+        XField<Integer> xField = XReflection.of(C.class).getField("c");
+        xField.clearFinal();
+        C obj = new C();
+        xField.set(obj, 1);
+        System.out.println(xField.get(obj));
 
     }
 
