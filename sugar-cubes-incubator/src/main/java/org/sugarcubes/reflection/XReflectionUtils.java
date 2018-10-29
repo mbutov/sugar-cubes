@@ -70,51 +70,45 @@ class XReflectionUtils {
 
     private static class CollectorState<X> {
 
-        Optional<X> value;
+        boolean isSet;
+        X value;
 
         void accumulate(X next) {
-            if (value == null) {
-                value = Optional.ofNullable(next);
-            }
-            else {
+            if (isSet) {
                 throw new IllegalStateException("Too many elements");
             }
+            isSet = true;
+            value = next;
         }
 
         CollectorState<X> combine(CollectorState<X> other) {
-            if (value != null && other.value != null) {
+            if (isSet && other.isSet) {
                 throw new IllegalStateException("Too many elements");
             }
-            if (value == null) {
-                value = other.value;
-            }
-            return this;
+            return isSet ? this : other;
         }
 
         Optional<X> toOptional() {
-            return value != null ? value : Optional.empty();
+            return Optional.ofNullable(value);
         }
 
-        X toValue() {
-            return toOptional().orElseThrow(() -> new IllegalStateException("No elements"));
+        X toOnlyElement() {
+            if (!isSet) {
+                throw new IllegalStateException("No elements");
+            }
+            return value;
         }
 
     }
 
     static <X> Collector<X, CollectorState<X>, Optional<X>> toOptional() {
-        return Collector.of(CollectorState::new, CollectorState::accumulate, CollectorState::combine, CollectorState::toOptional);
+        return Collector.of(CollectorState::new, CollectorState::accumulate, CollectorState::combine, CollectorState::toOptional,
+            Collector.Characteristics.UNORDERED);
     }
 
-    static <X> Collector<X, Optional<X>, Optional<X>> toOptional2() {
-        return Collector.of(Optional::empty,
-            (o, x) -> {
-                if (o.isPresent()) {
-                    throw new IllegalStateException();
-                }
-            },
-            (o1, o2) -> {
-                throw new IllegalStateException();
-            });
+    static <X> Collector<X, CollectorState<X>, X> toOnlyElement() {
+        return Collector.of(CollectorState::new, CollectorState::accumulate, CollectorState::combine, CollectorState::toOnlyElement,
+            Collector.Characteristics.UNORDERED);
     }
 
 }
