@@ -3,24 +3,28 @@ package org.sugarcubes.reflection;
 import java.util.stream.Stream;
 
 /**
- * todo: document it and adjust author
+ * A special kind of {@link XClass} meaning "no class".
  *
- * @author Q-MBU
+ * The objective of this class is do not return {@code null} in {@link XClass#getSuperclass()} method,
+ * which simplifies expressions.
+ *
+ * @author Maxim Butov
  */
-public class XNullClass extends XClass<Object> {
+public final class XNullClass extends XClass<Object> {
 
     private static final Class<Object> NULL = (Class) new Object() {
-        // "null" class
+        // special "null" class
     }.getClass();
 
     private XNullClass() {
         super(NULL);
     }
 
-    public static XClass INSTANCE = new XNullClass();
+    public static XClass<Object> INSTANCE = new XNullClass();
 
-    public static boolean isNull(XClass xClass) {
-        return INSTANCE.equals(xClass);
+    @Override
+    public boolean isNull() {
+        return true;
     }
 
     @Override

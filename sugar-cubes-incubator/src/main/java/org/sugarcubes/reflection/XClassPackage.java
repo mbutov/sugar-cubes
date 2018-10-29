@@ -1,7 +1,7 @@
 package org.sugarcubes.reflection;
 
 /**
- * todo: document it and adjust author
+ * Wrapper for {@link Package}.
  *
  * @author Maxim Butov
  */

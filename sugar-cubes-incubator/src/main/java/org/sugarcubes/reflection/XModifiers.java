@@ -4,7 +4,7 @@ import java.lang.reflect.Modifier;
 import java.util.function.Function;
 
 /**
- * todo: document it and adjust author
+ * Modifiers-related methods.
  *
  * @author Maxim Butov
  */

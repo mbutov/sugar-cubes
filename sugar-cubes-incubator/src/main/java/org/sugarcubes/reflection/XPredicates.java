@@ -4,13 +4,13 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * todo: document it and adjust author
+ * Predicates which simplify filtering of class members.
  *
- * @author Q-MBU
+ * @author Maxim Butov
  */
 public interface XPredicates {
 
-    static Predicate<XReflectionObject> withName(String name) {
+    static Predicate<XReflectionObjectImpl> withName(String name) {
         Objects.requireNonNull(name);
         return xReflectionObject -> xReflectionObject.getName().equals(name);
     }

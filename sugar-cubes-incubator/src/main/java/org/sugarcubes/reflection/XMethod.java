@@ -4,13 +4,14 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 
 /**
- * todo: document it and adjust author
+ * Wrapper for {@link Method}.
  *
  * @author Maxim Butov
  */
-public class XMethod<T> extends XReflectionObject<Method> implements XModifiers, XExecutable<T> {
+public class XMethod<T> extends XReflectionObjectImpl<Method>
+    implements XExecutable<T>, XMember<Method>, XModifiers {
 
-    public XMethod(Method reflectionObject) {
+    XMethod(Method reflectionObject) {
         super(reflectionObject);
         XReflectionUtils.tryToMakeAccessible(reflectionObject);
     }

@@ -3,7 +3,7 @@ package org.sugarcubes.reflection;
 import java.util.Arrays;
 
 /**
- * todo: document it and adjust author
+ * Common part of constructor and method.
  *
  * @author Maxim Butov
  */

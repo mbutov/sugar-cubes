@@ -3,11 +3,12 @@ package org.sugarcubes.reflection;
 import java.lang.reflect.Constructor;
 
 /**
- * todo: document it and adjust author
+ * Wrapper for {@link Constructor}.
  *
  * @author Maxim Butov
  */
-public class XConstructor<T> extends XReflectionObject<Constructor<T>> implements XExecutable<T> {
+public class XConstructor<T> extends XReflectionObjectImpl<Constructor<T>>
+    implements XExecutable<T>, XMember<Constructor<T>>, XModifiers {
 
     XConstructor(Constructor<T> reflectionObject) {
         super(reflectionObject);
@@ -17,6 +18,11 @@ public class XConstructor<T> extends XReflectionObject<Constructor<T>> implement
     @Override
     public String getName() {
         return getReflectionObject().getName();
+    }
+
+    @Override
+    public int getModifiers() {
+        return getReflectionObject().getModifiers();
     }
 
     @Override

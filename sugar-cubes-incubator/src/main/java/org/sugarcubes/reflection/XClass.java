@@ -6,11 +6,11 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * todo: document it and adjust author
+ * Wrapper for {@link Class}.
  *
  * @author Maxim Butov
  */
-public class XClass<T> extends XReflectionObject<Class<T>> implements XModifiers {
+public class XClass<T> extends XReflectionObjectImpl<Class<T>> implements XModifiers {
 
     XClass(Class<T> reflectionObject) {
         super(reflectionObject);
@@ -27,7 +27,12 @@ public class XClass<T> extends XReflectionObject<Class<T>> implements XModifiers
     }
 
     public XClass<?> getSuperclass() {
-        return Optional.ofNullable(getReflectionObject().getSuperclass()).map(XClass::new).orElse(XNullClass.INSTANCE);
+        return Optional.ofNullable(getReflectionObject().getSuperclass()).map(XClass::new)
+            .orElse((XClass) XNullClass.INSTANCE);
+    }
+
+    public boolean isNull() {
+        return false;
     }
 
     public Stream<XClass<?>> getDeclaredInterfaces() {

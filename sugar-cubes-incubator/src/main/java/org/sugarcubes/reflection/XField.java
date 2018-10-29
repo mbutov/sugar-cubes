@@ -4,11 +4,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 /**
- * todo: document it and adjust author
+ * Wrapper for {@link Field}.
  *
  * @author Maxim Butov
  */
-public class XField<T> extends XReflectionObject<Field> implements XModifiers {
+public class XField<T> extends XReflectionObjectImpl<Field> implements XMember<Field>, XModifiers {
 
     XField(Field reflectionObject) {
         super(reflectionObject);

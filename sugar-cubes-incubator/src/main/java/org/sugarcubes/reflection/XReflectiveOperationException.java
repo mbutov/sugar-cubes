@@ -1,9 +1,12 @@
 package org.sugarcubes.reflection;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
 
 /**
- * todo: document it and adjust author
+ * An exception wrapping all {@link ReflectiveOperationException} but {@link InvocationTargetException}.
+ *
+ * Can be also created without cause exception indicating that XReflection API is not used properly.
  *
  * @author Maxim Butov
  */

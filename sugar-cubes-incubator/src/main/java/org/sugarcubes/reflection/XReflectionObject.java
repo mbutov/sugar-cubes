@@ -1,46 +1,14 @@
 package org.sugarcubes.reflection;
 
-import java.util.Objects;
-
 /**
- * todo: document it and adjust author
+ * Base interface for reflection objects wrappers.
  *
- * @author Q-MBU
+ * @author Maxim Butov
  */
-public abstract class XReflectionObject<T> {
+public interface XReflectionObject<T> {
 
-    private final T reflectionObject;
+    T getReflectionObject();
 
-    protected XReflectionObject(T reflectionObject) {
-        this.reflectionObject = Objects.requireNonNull(reflectionObject);
-    }
+    String getName();
 
-    public T getReflectionObject() {
-        return reflectionObject;
-    }
-
-    public abstract String getName();
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof XReflectionObject)) {
-            return false;
-        }
-        XReflectionObject that = (XReflectionObject) obj;
-        return reflectionObject.equals(that.reflectionObject);
-    }
-
-    @Override
-    public int hashCode() {
-        return reflectionObject.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" + reflectionObject + '}';
-    }
-    
 }

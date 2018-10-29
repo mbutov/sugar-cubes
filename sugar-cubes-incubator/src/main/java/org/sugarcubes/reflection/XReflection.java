@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * todo: document it and adjust author
+ * Factoty for xreflection objects.
  *
  * @author Maxim Butov
  */
