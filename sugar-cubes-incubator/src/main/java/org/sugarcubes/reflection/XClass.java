@@ -90,8 +90,7 @@ public class XClass<T> extends XReflectionObjectImpl<Class<T>> implements XModif
 
     public <X> Optional<XMethod<X>> findMethod(String name, Class... types) {
         return (Optional) getMethods()
-            .filter(XPredicates.withName(name))
-            .filter(XPredicates.withParameterTypes(types))
+            .filter(method -> method.hasNameAndParameterTypes(name, types))
             .findFirst();
     }
 

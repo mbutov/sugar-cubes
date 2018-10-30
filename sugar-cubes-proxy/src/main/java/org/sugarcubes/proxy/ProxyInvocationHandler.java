@@ -37,7 +37,7 @@ public class ProxyInvocationHandler extends SmartInvocationHandler implements Se
             throw Rex.of(throwable)
                 .replaceWithCauseIf(InvocationTargetException.class)
                 .throwIfUnchecked()
-                .throwIf( method)
+                .throwIf(method)
                 .throwUnchecked();
         }
     }

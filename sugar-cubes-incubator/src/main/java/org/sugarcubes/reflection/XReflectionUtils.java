@@ -2,8 +2,6 @@ package org.sugarcubes.reflection;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Optional;
-import java.util.stream.Collector;
 
 /**
  * Internal utilities.
@@ -66,49 +64,6 @@ class XReflectionUtils {
             // ignore
         }
         return obj;
-    }
-
-    private static class CollectorState<X> {
-
-        boolean isSet;
-        X value;
-
-        void accumulate(X next) {
-            if (isSet) {
-                throw new IllegalStateException("Too many elements");
-            }
-            isSet = true;
-            value = next;
-        }
-
-        CollectorState<X> combine(CollectorState<X> other) {
-            if (isSet && other.isSet) {
-                throw new IllegalStateException("Too many elements");
-            }
-            return isSet ? this : other;
-        }
-
-        Optional<X> toOptional() {
-            return Optional.ofNullable(value);
-        }
-
-        X toOnlyElement() {
-            if (!isSet) {
-                throw new IllegalStateException("No elements");
-            }
-            return value;
-        }
-
-    }
-
-    static <X> Collector<X, CollectorState<X>, Optional<X>> toOptional() {
-        return Collector.of(CollectorState::new, CollectorState::accumulate, CollectorState::combine, CollectorState::toOptional,
-            Collector.Characteristics.UNORDERED);
-    }
-
-    static <X> Collector<X, CollectorState<X>, X> toOnlyElement() {
-        return Collector.of(CollectorState::new, CollectorState::accumulate, CollectorState::combine, CollectorState::toOnlyElement,
-            Collector.Characteristics.UNORDERED);
     }
 
 }

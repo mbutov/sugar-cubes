@@ -31,6 +31,10 @@ public class XMethod<T> extends XReflectionObjectImpl<Method>
         return getReflectionObject().getParameterTypes();
     }
 
+    public boolean hasNameAndParameterTypes(String name, Class... types) {
+        return hasName(name) && hasParameterTypes(types);
+    }
+
     public T invoke(Object obj, Object... args) {
         return XReflectionUtils.execute(() -> getReflectionObject().invoke(obj, args));
     }

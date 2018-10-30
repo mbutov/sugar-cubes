@@ -11,4 +11,8 @@ public interface XReflectionObject<T> {
 
     String getName();
 
+    default boolean hasName(String name) {
+        return getName().equals(name);
+    }
+
 }

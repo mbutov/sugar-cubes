@@ -10,14 +10,14 @@ import java.util.function.Predicate;
  */
 public interface XPredicates {
 
-    static Predicate<XReflectionObjectImpl> withName(String name) {
+    static Predicate<XReflectionObject> withName(String name) {
         Objects.requireNonNull(name);
-        return xReflectionObject -> xReflectionObject.getName().equals(name);
+        return obj -> obj.hasName(name);
     }
 
     static Predicate<XExecutable<?>> withParameterTypes(Class... types) {
         Objects.requireNonNull(types);
-        return xExecutable -> xExecutable.hasParameterTypes(types);
+        return obj -> obj.hasParameterTypes(types);
     }
 
 }

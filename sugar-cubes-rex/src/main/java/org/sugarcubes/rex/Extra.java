@@ -38,7 +38,7 @@ public class Extra implements Function<Throwable, RuntimeException> {
      * Does not translate, throws an exception.
      */
     public static final Function<Throwable, RuntimeException> ERROR = ex -> {
-        throw new IllegalStateException("Cannot translate " + ex);
+        throw new IllegalStateException("Cannot translate an exception", ex);
     };
 
     /**
