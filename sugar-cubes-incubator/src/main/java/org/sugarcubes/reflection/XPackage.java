@@ -5,14 +5,10 @@ package org.sugarcubes.reflection;
  *
  * @author Maxim Butov
  */
-public abstract class XPackage extends XReflectionObjectImpl<Package> {
+abstract class XPackage extends XReflectionObjectImpl<Package> implements XAnnotated<Package> {
 
     XPackage(Package reflectionObject) {
         super(reflectionObject);
-    }
-
-    public XPackage(String name) {
-        this(Package.getPackage(name));
     }
 
     public String getName() {

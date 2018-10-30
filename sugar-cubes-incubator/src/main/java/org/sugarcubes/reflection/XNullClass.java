@@ -28,6 +28,11 @@ public final class XNullClass extends XClass<Object> {
     }
 
     @Override
+    public Stream<XClass<?>> getInheritance() {
+        return Stream.empty();
+    }
+
+    @Override
     public String getName() {
         return "null";
     }
@@ -38,7 +43,7 @@ public final class XNullClass extends XClass<Object> {
     }
 
     @Override
-    public XClassPackage getPackage() {
+    XPackage getPackage() {
         throw new UnsupportedOperationException();
     }
 

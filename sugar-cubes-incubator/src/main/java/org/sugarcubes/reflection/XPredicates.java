@@ -8,14 +8,14 @@ import java.util.function.Predicate;
  *
  * @author Maxim Butov
  */
-public interface XPredicates {
+public class XPredicates {
 
-    static Predicate<XReflectionObject> withName(String name) {
+    public static Predicate<XReflectionObject> withName(String name) {
         Objects.requireNonNull(name);
         return obj -> obj.hasName(name);
     }
 
-    static Predicate<XExecutable<?>> withParameterTypes(Class... types) {
+    public static Predicate<XExecutable<?>> withParameterTypes(Class... types) {
         Objects.requireNonNull(types);
         return obj -> obj.hasParameterTypes(types);
     }

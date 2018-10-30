@@ -8,21 +8,11 @@ import java.lang.reflect.Constructor;
  * @author Maxim Butov
  */
 public class XConstructor<T> extends XReflectionObjectImpl<Constructor<T>>
-    implements XExecutable<T>, XMember<Constructor<T>>, XModifiers {
+    implements XAnnotated<Constructor<T>>, XExecutable<T>, XMember<Constructor<T>>, XModifiers {
 
     XConstructor(Constructor<T> reflectionObject) {
         super(reflectionObject);
         XReflectionUtils.tryToMakeAccessible(reflectionObject);
-    }
-
-    @Override
-    public String getName() {
-        return getReflectionObject().getName();
-    }
-
-    @Override
-    public int getModifiers() {
-        return getReflectionObject().getModifiers();
     }
 
     @Override

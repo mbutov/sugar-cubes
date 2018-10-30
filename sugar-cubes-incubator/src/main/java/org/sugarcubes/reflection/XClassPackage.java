@@ -5,7 +5,7 @@ package org.sugarcubes.reflection;
  *
  * @author Maxim Butov
  */
-public class XClassPackage extends XPackage {
+class XClassPackage extends XPackage {
 
     private final XClass xClass;
 

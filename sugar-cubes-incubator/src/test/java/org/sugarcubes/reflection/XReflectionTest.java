@@ -1,5 +1,9 @@
 package org.sugarcubes.reflection;
 
+import java.math.BigDecimal;
+import java.util.stream.Collectors;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -36,18 +40,29 @@ public class XReflectionTest {
 
     public static class C {
 
-        private final int c = 111;
+        private final int c = -1;
 
     }
 
     @Test
     public void testFinal() {
 
-        XField<Integer> xField = XReflection.of(C.class).getField("c");
-        xField.clearFinal();
         C obj = new C();
-        xField.set(obj, 1);
-        System.out.println(xField.get(obj));
+
+        XField<Integer> xField = XReflection.of(obj.getClass()).getField("c");
+        xField.clearFinal();
+
+        Integer newValue = Integer.valueOf(1);
+        xField.set(obj, newValue);
+        
+        Assert.assertEquals(newValue, xField.get(obj));
+
+    }
+
+    @Test
+    public void zzz() {
+
+        System.out.println(XReflection.of(BigDecimal.class).getInheritance().collect(Collectors.toList()));
 
     }
 

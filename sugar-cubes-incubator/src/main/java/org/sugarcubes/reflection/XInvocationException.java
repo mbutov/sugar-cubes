@@ -1,7 +1,7 @@
 package org.sugarcubes.reflection;
 
 /**
- * Wrapper for checked exception happened during constructor/method execution.
+ * Wrapper for exception happened during constructor/method execution.
  *
  * @author Maxim Butov
  */

@@ -1,5 +1,8 @@
 package org.sugarcubes.reflection;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collector;
 
@@ -12,48 +15,65 @@ public class XCollectors {
 
     static class CollectorState<X> {
 
-        boolean isSet;
-        X value;
-
-        void checkIsSet(boolean expected) {
-            if (isSet != expected) {
-                throw new IllegalStateException(isSet ? "Many elements" : "No elements");
-            }
-        }
+        List<X> values = new LinkedList<>();
 
         void accumulate(X next) {
-            checkIsSet(false);
-            isSet = true;
-            value = next;
+            if (!values.isEmpty()) {
+                throw new IllegalStateException("Too many elements");
+            }
+            values.add(next);
         }
 
         CollectorState<X> combine(CollectorState<X> other) {
-            if (other.isSet) {
-                checkIsSet(false);
-                return other;
-            }
+            other.values.forEach(this::accumulate);
             return this;
         }
 
         Optional<X> toOptional() {
-            return Optional.ofNullable(value);
+            return values.stream().findAny();
         }
 
-        X toOnlyElement() {
-            checkIsSet(true);
-            return value;
+        X onlyElement() {
+            return toOptional().orElseThrow(() -> new NoSuchElementException("No elements found."));
         }
 
     }
 
+    private static final Collector<Object, CollectorState<Object>, Optional> TO_OPTIONAL_COLLECTOR = Collector.of(
+        CollectorState::new,
+        CollectorState::accumulate,
+        CollectorState::combine,
+        CollectorState::toOptional,
+        Collector.Characteristics.UNORDERED);
+
+    private static final Collector<Object, CollectorState<Object>, Object> ONLY_ELEMENT_COLLECTOR = Collector.of(
+        CollectorState::new,
+        CollectorState::accumulate,
+        CollectorState::combine,
+        CollectorState::onlyElement,
+        Collector.Characteristics.UNORDERED);
+
+    /**
+     * Collector which can be applied to stream of zero or one element. Returns empty or filled in {@link Optional}.
+     *
+     * @return optional
+     *
+     * @throws IllegalStateException if stream contains more than one element
+     */
     public static <X> Collector<X, CollectorState<X>, Optional<X>> toOptional() {
-        return Collector.of(CollectorState::new, CollectorState::accumulate, CollectorState::combine, CollectorState::toOptional,
-            Collector.Characteristics.UNORDERED);
+        return (Collector) TO_OPTIONAL_COLLECTOR;
     }
 
-    public static <X> Collector<X, CollectorState<X>, X> toOnlyElement() {
-        return Collector.of(CollectorState::new, CollectorState::accumulate, CollectorState::combine, CollectorState::toOnlyElement,
-            Collector.Characteristics.UNORDERED);
+    /**
+     * Collector which can be applied to stream of single element.
+     *
+     * @return the single element of stream
+     *
+     * @throws NoSuchElementException if stream contains no elements
+     * @throws IllegalStateException if stream contains more than one element
+     */
+    public static <X> Collector<X, CollectorState<X>, X> onlyElement() {
+        return (Collector) ONLY_ELEMENT_COLLECTOR;
     }
 
 }

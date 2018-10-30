@@ -7,10 +7,20 @@ import java.lang.reflect.Member;
  *
  * @author Maxim Butov
  */
-public interface XMember<T extends Member> extends XReflectionObject<T> {
+public interface XMember<T extends Member> extends XModifiers, XReflectionObject<T> {
+
+    @Override
+    default String getName() {
+        return getReflectionObject().getName();
+    }
+
+    @Override
+    default int getModifiers() {
+        return getReflectionObject().getModifiers();
+    }
 
     default XClass<?> getDeclaringClass() {
-        return new XClass<>(getReflectionObject().getDeclaringClass());
+        return XReflection.of(getReflectionObject().getDeclaringClass());
     }
 
 }

@@ -10,7 +10,7 @@ import java.util.stream.Stream;
  *
  * @author Maxim Butov
  */
-public class XClass<T> extends XReflectionObjectImpl<Class<T>> implements XModifiers {
+public class XClass<T> extends XReflectionObjectImpl<Class<T>> implements XAnnotated<Class<T>>, XModifiers {
 
     XClass(Class<T> reflectionObject) {
         super(reflectionObject);
@@ -27,29 +27,33 @@ public class XClass<T> extends XReflectionObjectImpl<Class<T>> implements XModif
     }
 
     public XClass<?> getSuperclass() {
-        return Optional.ofNullable(getReflectionObject().getSuperclass()).map(XClass::new)
-            .orElse((XClass) XNullClass.INSTANCE);
+        Class<?> superclass = getReflectionObject().getSuperclass();
+        return superclass != null ? XReflection.of(superclass) : XNullClass.INSTANCE;
     }
 
     public boolean isNull() {
         return false;
     }
 
+    public Stream<XClass<?>> getInheritance() {
+        return Stream.concat(Stream.of(this), getSuperclass().getInheritance());
+    }
+
     public Stream<XClass<?>> getDeclaredInterfaces() {
-        return Arrays.stream(getReflectionObject().getInterfaces()).map(XClass::new);
+        return Arrays.stream(getReflectionObject().getInterfaces()).map(XReflection::of);
     }
 
     public Stream<XClass<?>> getInterfaces() {
         return Stream.concat(getDeclaredInterfaces(), getSuperclass().getInterfaces()).distinct();
     }
 
-    public XClassPackage getPackage() {
+    XPackage getPackage() {
         return new XClassPackage(this);
     }
 
     public Stream<XConstructor<T>> getDeclaredConstructors() {
         return Arrays.stream((Constructor<T>[]) getReflectionObject().getDeclaredConstructors())
-            .map(XConstructor::new);
+            .map(XReflection::of);
     }
 
     public Stream<XConstructor<T>> getConstructors() {
@@ -57,7 +61,7 @@ public class XClass<T> extends XReflectionObjectImpl<Class<T>> implements XModif
     }
 
     public Stream<XField<?>> getDeclaredFields() {
-        return Arrays.stream(getReflectionObject().getDeclaredFields()).map(XField::new);
+        return Arrays.stream(getReflectionObject().getDeclaredFields()).map(XReflection::of);
     }
 
     public Stream<XField<?>> getFields() {
@@ -65,7 +69,7 @@ public class XClass<T> extends XReflectionObjectImpl<Class<T>> implements XModif
     }
 
     public Stream<XMethod<?>> getDeclaredMethods() {
-        return Arrays.stream(getReflectionObject().getDeclaredMethods()).map(XMethod::new);
+        return Arrays.stream(getReflectionObject().getDeclaredMethods()).map(XReflection::of);
     }
 
     public Stream<XMethod<?>> getMethods() {

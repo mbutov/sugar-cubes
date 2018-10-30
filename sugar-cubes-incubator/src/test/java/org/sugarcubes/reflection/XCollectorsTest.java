@@ -1,9 +1,12 @@
 package org.sugarcubes.reflection;
 
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
+import static org.sugarcubes.reflection.XCollectors.onlyElement;
+import static org.sugarcubes.reflection.XCollectors.toOptional;
 
 /**
  * @author Maxim Butov
@@ -12,10 +15,10 @@ public class XCollectorsTest {
 
     @Test
     public void testToOptional() {
-        Assert.assertFalse(Stream.empty().collect(XCollectors.toOptional()).isPresent());
-        Assert.assertEquals(Integer.valueOf(0), Stream.of(0).collect(XCollectors.toOptional()).get());
+        Assert.assertFalse(Stream.empty().collect(toOptional()).isPresent());
+        Assert.assertEquals("x", Stream.of("x").collect(toOptional()).get());
         try {
-            Stream.of(0, 1).collect(XCollectors.toOptional());
+            Stream.of("x", "y").collect(toOptional());
             Assert.fail();
         }
         catch (IllegalStateException e) {
@@ -26,14 +29,14 @@ public class XCollectorsTest {
     @Test
     public void testToOnlyElement() {
         try {
-            Stream.empty().collect(XCollectors.toOnlyElement());
+            Stream.empty().collect(onlyElement());
         }
-        catch (IllegalStateException e) {
+        catch (NoSuchElementException e) {
             // ok
         }
-        Assert.assertEquals(Integer.valueOf(0), Stream.of(0).collect(XCollectors.toOnlyElement()));
+        Assert.assertEquals("x", Stream.of("x").collect(onlyElement()));
         try {
-            Stream.of(0, 1).collect(XCollectors.toOnlyElement());
+            Stream.of("x", "y").collect(onlyElement());
             Assert.fail();
         }
         catch (IllegalStateException e) {

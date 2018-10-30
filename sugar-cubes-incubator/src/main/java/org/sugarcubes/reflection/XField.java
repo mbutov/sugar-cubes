@@ -8,21 +8,12 @@ import java.lang.reflect.Modifier;
  *
  * @author Maxim Butov
  */
-public class XField<T> extends XReflectionObjectImpl<Field> implements XMember<Field>, XModifiers {
+public class XField<T> extends XReflectionObjectImpl<Field>
+    implements XAnnotated<Field>, XMember<Field>, XModifiers {
 
     XField(Field reflectionObject) {
         super(reflectionObject);
         XReflectionUtils.tryToMakeAccessible(reflectionObject);
-    }
-
-    @Override
-    public String getName() {
-        return getReflectionObject().getName();
-    }
-
-    @Override
-    public int getModifiers() {
-        return getReflectionObject().getModifiers();
     }
 
     public T get(Object obj) {

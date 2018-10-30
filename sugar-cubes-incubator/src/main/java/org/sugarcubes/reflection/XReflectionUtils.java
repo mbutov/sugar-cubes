@@ -18,7 +18,7 @@ class XReflectionUtils {
 
     interface XRunnable {
 
-        void run() throws Exception;
+        void run() throws Throwable;
 
         default XCallable<Void> toCallable() {
             return () -> {
@@ -35,35 +35,29 @@ class XReflectionUtils {
 
     static <X, Y extends X> Y execute(XCallable<X> callable) {
         try {
-
-            try {
-                return (Y) callable.call();
-            }
-            catch (InvocationTargetException e) {
-                throw e.getCause();
-            }
-            catch (ReflectiveOperationException e) {
-                throw new XReflectiveOperationException(e);
-            }
-
+            return (Y) callable.call();
         }
-        catch (RuntimeException | Error e) {
+        catch (InvocationTargetException e) {
+            throw new XInvocationException(e.getCause());
+        }
+        catch (ReflectiveOperationException e) {
+            throw new XReflectiveOperationException(e);
+        }
+        catch (Error | RuntimeException e) {
             throw e;
         }
         catch (Throwable e) {
-            throw new XInvocationException(e);
+            throw new XReflectiveOperationException("Unexpected throwable", e);
         }
-
     }
 
-    static <T extends AccessibleObject> T tryToMakeAccessible(T obj) {
+    static <T extends AccessibleObject> void tryToMakeAccessible(T obj) {
         try {
             obj.setAccessible(true);
         }
         catch (SecurityException e) {
             // ignore
         }
-        return obj;
     }
 
 }

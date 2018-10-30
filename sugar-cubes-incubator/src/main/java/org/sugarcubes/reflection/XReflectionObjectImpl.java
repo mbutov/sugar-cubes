@@ -15,11 +15,10 @@ public abstract class XReflectionObjectImpl<T> implements XReflectionObject<T> {
         this.reflectionObject = Objects.requireNonNull(reflectionObject);
     }
 
+    @Override
     public T getReflectionObject() {
         return reflectionObject;
     }
-
-    public abstract String getName();
 
     @Override
     public boolean equals(Object obj) {

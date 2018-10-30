@@ -17,16 +17,6 @@ public class XMethod<T> extends XReflectionObjectImpl<Method>
     }
 
     @Override
-    public int getModifiers() {
-        return getReflectionObject().getModifiers();
-    }
-
-    @Override
-    public String getName() {
-        return getReflectionObject().getName();
-    }
-
-    @Override
     public Class[] getParameterTypes() {
         return getReflectionObject().getParameterTypes();
     }
@@ -39,11 +29,12 @@ public class XMethod<T> extends XReflectionObjectImpl<Method>
         return XReflectionUtils.execute(() -> getReflectionObject().invoke(obj, args));
     }
 
-    private T invokeDefault(Object proxy, Method method, Object[] args) {
-        MethodHandles.Lookup lookup = XReflection.of(MethodHandles.Lookup.class)
-            .<MethodHandles.Lookup>getField("IMPL_LOOKUP")
-            .get(null);
-        return XReflectionUtils.execute(() -> lookup
+    private static final MethodHandles.Lookup LOOKUP = XReflection.of(MethodHandles.Lookup.class)
+        .<MethodHandles.Lookup>getField("IMPL_LOOKUP")
+        .get(null);
+
+    private static <X> X invokeDefault(Object proxy, Method method, Object[] args) {
+        return XReflectionUtils.execute(() -> LOOKUP
             .in(method.getDeclaringClass())
             .unreflectSpecial(method, method.getDeclaringClass())
             .bindTo(proxy)

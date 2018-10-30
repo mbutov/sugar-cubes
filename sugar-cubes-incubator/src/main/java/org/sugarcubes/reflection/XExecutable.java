@@ -11,6 +11,10 @@ public interface XExecutable<T> {
 
     Class[] getParameterTypes();
 
+    default boolean hasParameterTypes(Class... types) {
+        return Arrays.equals(types, getParameterTypes());
+    }
+
     default boolean argumentsMatch(Object... args) {
         Class[] parameterTypes = getParameterTypes();
         if (args.length != parameterTypes.length) {
@@ -29,10 +33,6 @@ public interface XExecutable<T> {
             }
         }
         return true;
-    }
-
-    default boolean hasParameterTypes(Class... types) {
-        return Arrays.equals(types, getParameterTypes());
     }
 
 }

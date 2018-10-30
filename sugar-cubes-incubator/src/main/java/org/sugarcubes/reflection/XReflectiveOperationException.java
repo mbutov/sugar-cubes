@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 /**
  * An exception wrapping all {@link ReflectiveOperationException} but {@link InvocationTargetException}.
  *
- * Can be also created without cause exception indicating that XReflection API is not used properly.
+ * Can be also created without causing exception indicating that XReflection API is not used properly.
  *
  * @author Maxim Butov
  */
@@ -18,6 +18,10 @@ public class XReflectiveOperationException extends RuntimeException {
 
     public XReflectiveOperationException(String message) {
         super(message);
+    }
+
+    public XReflectiveOperationException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     public static Supplier<XReflectiveOperationException> withMessage(String message) {
