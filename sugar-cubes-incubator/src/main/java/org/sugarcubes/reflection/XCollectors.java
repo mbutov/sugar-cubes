@@ -30,8 +30,9 @@ public class XCollectors {
         CollectorState<X> combine(CollectorState<X> other) {
             if (other.isSet) {
                 checkIsSet(false);
+                return other;
             }
-            return isSet ? this : other;
+            return this;
         }
 
         Optional<X> toOptional() {
