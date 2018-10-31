@@ -47,10 +47,6 @@ public class XClass<T> extends XReflectionObjectImpl<Class<T>> implements XAnnot
         return Stream.concat(getDeclaredInterfaces(), getSuperclass().getInterfaces()).distinct();
     }
 
-    XPackage getPackage() {
-        return new XClassPackage(this);
-    }
-
     public Stream<XConstructor<T>> getDeclaredConstructors() {
         return Arrays.stream((Constructor<T>[]) getReflectionObject().getDeclaredConstructors())
             .map(XReflection::of);

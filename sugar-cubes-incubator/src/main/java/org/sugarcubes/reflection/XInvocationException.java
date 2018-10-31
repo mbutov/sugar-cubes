@@ -5,7 +5,7 @@ package org.sugarcubes.reflection;
  *
  * @author Maxim Butov
  */
-public class XInvocationException extends RuntimeException {
+public class XInvocationException extends XReflectiveOperationException {
 
     public XInvocationException(Throwable cause) {
         super(cause);

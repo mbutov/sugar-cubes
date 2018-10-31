@@ -1,9 +1,9 @@
 package org.sugarcubes.reflection;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.stream.Collector;
 
 /**
@@ -15,7 +15,7 @@ public class XCollectors {
 
     static class CollectorState<X> {
 
-        List<X> values = new LinkedList<>();
+        Queue<X> values = new LinkedList<>();
 
         void accumulate(X next) {
             if (!values.isEmpty()) {
@@ -34,7 +34,10 @@ public class XCollectors {
         }
 
         X onlyElement() {
-            return toOptional().orElseThrow(() -> new NoSuchElementException("No elements found."));
+            if (values.isEmpty()) {
+                throw new NoSuchElementException("No elements found.");
+            }
+            return values.element();
         }
 
     }
