@@ -10,9 +10,9 @@ import java.util.stream.Stream;
  *
  * @author Maxim Butov
  */
-public class XClass<T> extends XReflectionObjectImpl<Class<T>> implements XAnnotated<Class<T>>, XModifiers {
+public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnotated<Class<C>>, XModifiers {
 
-    XClass(Class<T> reflectionObject) {
+    XClass(Class<C> reflectionObject) {
         super(reflectionObject);
     }
 
@@ -47,12 +47,12 @@ public class XClass<T> extends XReflectionObjectImpl<Class<T>> implements XAnnot
         return Stream.concat(getDeclaredInterfaces(), getSuperclass().getInterfaces()).distinct();
     }
 
-    public Stream<XConstructor<T>> getDeclaredConstructors() {
-        return Arrays.stream((Constructor<T>[]) getReflectionObject().getDeclaredConstructors())
+    public Stream<XConstructor<C>> getDeclaredConstructors() {
+        return Arrays.stream((Constructor<C>[]) getReflectionObject().getDeclaredConstructors())
             .map(XReflection::of);
     }
 
-    public Stream<XConstructor<T>> getConstructors() {
+    public Stream<XConstructor<C>> getConstructors() {
         return getDeclaredConstructors();
     }
 
@@ -72,11 +72,11 @@ public class XClass<T> extends XReflectionObjectImpl<Class<T>> implements XAnnot
         return Stream.concat(getDeclaredMethods(), getSuperclass().getMethods());
     }
 
-    public Optional<XConstructor<T>> findConstructor(Class... types) {
+    public Optional<XConstructor<C>> findConstructor(Class... types) {
         return getDeclaredConstructors().filter(XPredicates.withParameterTypes(types)).findAny();
     }
 
-    public XConstructor<T> getConstructor(Class... types) {
+    public XConstructor<C> getConstructor(Class... types) {
         return findConstructor(types).orElseThrow(XReflectiveOperationException.withMessage("Constructor not found"));
     }
 

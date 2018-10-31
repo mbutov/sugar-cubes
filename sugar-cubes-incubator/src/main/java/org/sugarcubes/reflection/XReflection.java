@@ -26,7 +26,7 @@ public class XReflection {
         V value = reference != null ? reference.get() : null;
         if (value == null) {
             value = mappingFunction.apply(key);
-            CACHE.put(key, new WeakReference<>(value));
+            cache.put(key, new WeakReference<>(value));
         }
         return value;
     }

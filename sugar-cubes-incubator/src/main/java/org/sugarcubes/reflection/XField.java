@@ -8,7 +8,7 @@ import java.lang.reflect.Modifier;
  *
  * @author Maxim Butov
  */
-public class XField<T> extends XReflectionObjectImpl<Field>
+public class XField<F> extends XReflectionObjectImpl<Field>
     implements XAnnotated<Field>, XMember<Field>, XModifiers {
 
     XField(Field reflectionObject) {
@@ -16,11 +16,11 @@ public class XField<T> extends XReflectionObjectImpl<Field>
         XReflectionUtils.tryToMakeAccessible(reflectionObject);
     }
 
-    public T get(Object obj) {
+    public F get(Object obj) {
         return XReflectionUtils.execute(() -> getReflectionObject().get(obj));
     }
 
-    public void set(Object obj, T value) {
+    public void set(Object obj, F value) {
         XReflectionUtils.execute(() -> getReflectionObject().set(obj, value));
     }
 
@@ -34,7 +34,7 @@ public class XField<T> extends XReflectionObjectImpl<Field>
         if (modifier == 0 || (modifier & (modifier - 1)) != 0) {
             throw new IllegalArgumentException("Invalid modifier 0x" + Integer.toHexString(modifier));
         }
-        int modifiers = getModifiers();
+        int modifiers = MODIFIERS.get(getReflectionObject());
         boolean oldValue = (modifiers & modifier) != 0;
         if (oldValue != newValue) {
             if (newValue) {

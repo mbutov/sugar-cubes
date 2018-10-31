@@ -21,12 +21,20 @@ public interface XAnnotated<T extends AnnotatedElement> extends XReflectionObjec
         return Optional.ofNullable(getReflectionObject().getDeclaredAnnotation(annotationClass));
     }
 
+    default <X extends Annotation> Stream<X> getDeclaredAnnotationsByType(Class<X> annotationClass) {
+        return Arrays.stream(getReflectionObject().getDeclaredAnnotationsByType(annotationClass));
+    }
+
     default Stream<? extends Annotation> getAnnotations() {
         return Arrays.stream(getReflectionObject().getAnnotations());
     }
 
     default <X extends Annotation> Optional<X> getAnnotation(Class<X> annotationClass) {
         return Optional.ofNullable(getReflectionObject().getAnnotation(annotationClass));
+    }
+
+    default <X extends Annotation> Stream<X> getAnnotationsByType(Class<X> annotationClass) {
+        return Arrays.stream(getReflectionObject().getAnnotationsByType(annotationClass));
     }
 
 }
