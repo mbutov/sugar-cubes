@@ -38,11 +38,6 @@ public final class XNullClass extends XClass<Object> {
     }
 
     @Override
-    public Class<Object> getReflectionObject() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public XClass<?> getSuperclass() {
         return INSTANCE;
     }

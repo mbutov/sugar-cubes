@@ -1,5 +1,6 @@
 package org.sugarcubes.reflection;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -7,9 +8,9 @@ import java.util.Objects;
  *
  * @author Maxim Butov
  */
-public abstract class XReflectionObjectImpl<T> implements XReflectionObject<T> {
+public abstract class XReflectionObjectImpl<T> implements XReflectionObject<T>, Serializable {
 
-    private final T reflectionObject;
+    private transient T reflectionObject;
 
     XReflectionObjectImpl(T reflectionObject) {
         this.reflectionObject = Objects.requireNonNull(reflectionObject);
@@ -17,7 +18,14 @@ public abstract class XReflectionObjectImpl<T> implements XReflectionObject<T> {
 
     @Override
     public T getReflectionObject() {
+        if (reflectionObject == null) {
+            reflectionObject = reloadReflectionObject();
+        }
         return reflectionObject;
+    }
+
+    protected T reloadReflectionObject() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -25,21 +33,21 @@ public abstract class XReflectionObjectImpl<T> implements XReflectionObject<T> {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof XReflectionObjectImpl)) {
+        if (!(obj instanceof XReflectionObject)) {
             return false;
         }
-        XReflectionObjectImpl that = (XReflectionObjectImpl) obj;
-        return reflectionObject.equals(that.reflectionObject);
+        XReflectionObject that = (XReflectionObject) obj;
+        return getReflectionObject().equals(that.getReflectionObject());
     }
 
     @Override
     public int hashCode() {
-        return reflectionObject.hashCode();
+        return getReflectionObject().hashCode();
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{" + reflectionObject + '}';
+        return getClass().getSimpleName() + "{" + getReflectionObject() + '}';
     }
     
 }

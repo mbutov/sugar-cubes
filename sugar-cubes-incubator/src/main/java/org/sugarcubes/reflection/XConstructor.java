@@ -2,6 +2,9 @@ package org.sugarcubes.reflection;
 
 import java.lang.reflect.Constructor;
 
+import static org.sugarcubes.reflection.XReflectionUtils.execute;
+import static org.sugarcubes.reflection.XReflectionUtils.tryToMakeAccessible;
+
 /**
  * Wrapper for {@link Constructor}.
  *
@@ -10,9 +13,23 @@ import java.lang.reflect.Constructor;
 public class XConstructor<T> extends XReflectionObjectImpl<Constructor<T>>
     implements XAnnotated<Constructor<T>>, XExecutable<T>, XMember<Constructor<T>>, XModifiers {
 
+    private final Class<T> declaringClass;
+    private final Class[] parameterTypes;
+
     XConstructor(Constructor<T> reflectionObject) {
+
         super(reflectionObject);
-        XReflectionUtils.tryToMakeAccessible(reflectionObject);
+
+        tryToMakeAccessible(reflectionObject);
+
+        this.declaringClass = reflectionObject.getDeclaringClass();
+        this.parameterTypes = reflectionObject.getParameterTypes();
+
+    }
+
+    @Override
+    protected Constructor<T> reloadReflectionObject() {
+        return tryToMakeAccessible(execute(() -> declaringClass.getDeclaredConstructor(parameterTypes)));
     }
 
     @Override
@@ -21,7 +38,7 @@ public class XConstructor<T> extends XReflectionObjectImpl<Constructor<T>>
     }
 
     public T newInstance(Object... args) {
-        return XReflectionUtils.execute(() -> getReflectionObject().newInstance(args));
+        return execute(() -> getReflectionObject().newInstance(args));
     }
 
 }

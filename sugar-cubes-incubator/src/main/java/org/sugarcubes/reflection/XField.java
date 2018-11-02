@@ -3,6 +3,9 @@ package org.sugarcubes.reflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import static org.sugarcubes.reflection.XReflectionUtils.execute;
+import static org.sugarcubes.reflection.XReflectionUtils.tryToMakeAccessible;
+
 /**
  * Wrapper for {@link Field}.
  *
@@ -11,17 +14,31 @@ import java.lang.reflect.Modifier;
 public class XField<F> extends XReflectionObjectImpl<Field>
     implements XAnnotated<Field>, XMember<Field>, XModifiers {
 
+    private final Class declaringClass;
+    private final String name;
+
     XField(Field reflectionObject) {
+
         super(reflectionObject);
-        XReflectionUtils.tryToMakeAccessible(reflectionObject);
+
+        tryToMakeAccessible(reflectionObject);
+
+        this.declaringClass = reflectionObject.getDeclaringClass();
+        this.name = reflectionObject.getName();
+
+    }
+
+    @Override
+    protected Field reloadReflectionObject() {
+        return tryToMakeAccessible(execute(() -> declaringClass.getDeclaredField(name)));
     }
 
     public F get(Object obj) {
-        return XReflectionUtils.execute(() -> getReflectionObject().get(obj));
+        return execute(() -> getReflectionObject().get(obj));
     }
 
     public void set(Object obj, F value) {
-        XReflectionUtils.execute(() -> getReflectionObject().set(obj, value));
+        execute(() -> getReflectionObject().set(obj, value));
     }
 
     private static final XField<Integer> MODIFIERS = XReflection.of(Field.class).getField("modifiers");

@@ -8,6 +8,8 @@ dependencies {
 
     compileOnly libs.spring_core
 
+    testCompile libs.spring
+
 }
 
 task decompile (dependsOn: ':fernflower:compileJava') {
