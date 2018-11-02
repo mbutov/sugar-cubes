@@ -11,26 +11,27 @@ import static org.sugarcubes.reflection.XReflectionUtils.tryToMakeAccessible;
  *
  * @author Maxim Butov
  */
-public class XField<F> extends XReflectionObjectImpl<Field>
+public class XField<F> extends XReloadableReflectionObject<Field>
     implements XAnnotated<Field>, XMember<Field>, XModifiers {
 
     private final Class declaringClass;
     private final String name;
 
+    private int modifiers;
+
     XField(Field reflectionObject) {
-
-        super(reflectionObject);
-
-        tryToMakeAccessible(reflectionObject);
-
         this.declaringClass = reflectionObject.getDeclaringClass();
         this.name = reflectionObject.getName();
-
+        this.modifiers = reflectionObject.getModifiers();
     }
 
     @Override
-    protected Field reloadReflectionObject() {
-        return tryToMakeAccessible(execute(() -> declaringClass.getDeclaredField(name)));
+    protected Field loadReflectionObject() {
+        Field field = execute(() -> tryToMakeAccessible(declaringClass.getDeclaredField(name)));
+        if (getModifiers() != modifiers) {
+            setModifiers(modifiers);
+        }
+        return field;
     }
 
     public F get(Object obj) {
@@ -44,6 +45,7 @@ public class XField<F> extends XReflectionObjectImpl<Field>
     private static final XField<Integer> MODIFIERS = XReflection.of(Field.class).getField("modifiers");
 
     public void setModifiers(int modifiers) {
+        this.modifiers = modifiers;
         MODIFIERS.set(getReflectionObject(), modifiers);
     }
 

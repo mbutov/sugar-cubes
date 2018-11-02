@@ -1,7 +1,6 @@
 package org.sugarcubes.reflection;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * todo: document it and adjust author
@@ -9,24 +8,6 @@ import java.util.Objects;
  * @author Maxim Butov
  */
 public abstract class XReflectionObjectImpl<T> implements XReflectionObject<T>, Serializable {
-
-    private transient T reflectionObject;
-
-    XReflectionObjectImpl(T reflectionObject) {
-        this.reflectionObject = Objects.requireNonNull(reflectionObject);
-    }
-
-    @Override
-    public T getReflectionObject() {
-        if (reflectionObject == null) {
-            reflectionObject = reloadReflectionObject();
-        }
-        return reflectionObject;
-    }
-
-    protected T reloadReflectionObject() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public boolean equals(Object obj) {

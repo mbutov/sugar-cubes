@@ -15,12 +15,11 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     private final Class<C> _class;
 
     XClass(Class<C> _class) {
-        super(_class);
         this._class = _class;
     }
 
     @Override
-    protected Class<C> reloadReflectionObject() {
+    public Class<C> getReflectionObject() {
         return _class;
     }
 
