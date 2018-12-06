@@ -17,11 +17,11 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Base abstract class for cloners.
@@ -44,46 +44,45 @@ public abstract class AbstractCloner implements Cloner {
      * Some immutable classes.
      */
     private static final Set<Class> IMMUTABLE_CLASSES = Collections.unmodifiableSet(
-        new HashSet<>(
-            Arrays.asList(
+        Stream.of(
 
-                String.class,
+            String.class,
 
-                Boolean.class,
-                Byte.class,
-                Short.class,
-                Character.class,
-                Integer.class,
-                Long.class,
-                Float.class,
-                Double.class,
+            Boolean.class,
+            Byte.class,
+            Short.class,
+            Character.class,
+            Integer.class,
+            Long.class,
+            Float.class,
+            Double.class,
 
-                BigInteger.class,
-                BigDecimal.class,
+            BigInteger.class,
+            BigDecimal.class,
 
-                Duration.class,
-                Instant.class,
-                LocalDate.class,
-                LocalDateTime.class,
-                LocalTime.class,
-                MonthDay.class,
-                OffsetDateTime.class,
-                OffsetTime.class,
-                Period.class,
-                Year.class,
-                YearMonth.class,
-                ZonedDateTime.class,
-                ZoneOffset.class,
+            Duration.class,
+            Instant.class,
+            LocalDate.class,
+            LocalDateTime.class,
+            LocalTime.class,
+            MonthDay.class,
+            OffsetDateTime.class,
+            OffsetTime.class,
+            Period.class,
+            Year.class,
+            YearMonth.class,
+            ZonedDateTime.class,
+            ZoneOffset.class,
 
-                URI.class,
-                URL.class,
+            URI.class,
+            URL.class,
 
-                Pattern.class
+            Pattern.class
 
-            )));
+        ).collect(Collectors.toSet()));
 
     /**
-     * Checks whether the object if class is immutable (i.e. may be cloned by reference).
+     * Checks whether the object of class is immutable (i.e. may be cloned by reference).
      *
      * @param clazz class to check
      * @return true if the object of the class is immutable

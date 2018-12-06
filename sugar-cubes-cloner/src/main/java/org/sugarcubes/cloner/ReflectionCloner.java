@@ -4,11 +4,14 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link Cloner} which copies objects fields using Reflection API.
@@ -23,14 +26,9 @@ public class ReflectionCloner extends AbstractCloner {
     private final ObjectFactory objectFactory;
 
     /**
-     * Copy of {@link Modifier#SYNTHETIC} value.
-     */
-    private static final int SYNTHETIC_MODIFIER = 0x00001000;
-
-    /**
      * Set of modifiers which are excluded when copying.
      */
-    private int excludedModifiers = Modifier.STATIC | Modifier.TRANSIENT;
+    private int excludedModifiers = Modifier.STATIC;
 
     /**
      * Cache with (class, fields to copy) entries.
@@ -63,86 +61,26 @@ public class ReflectionCloner extends AbstractCloner {
     }
 
     /**
-     * Checks if the modifier is excluded from copying.
+     * Sets the modifiers excluded (so the fields with this modifiers will not be copied).
+     * This method clears previously set modifiers.
+     * Example: {@code Cloner cloner = new ReflectionCloner().excludeOnly(Modifier.STATIC | Modifier.TRANSIENT); }
      *
-     * @param modifier modifier to check, should be one of {@link Modifier} constant
-     *
-     * @return true if the modifier excluded
-     *
-     * @see #isFinalExcluded()
-     * @see #isTransientExcluded()
-     * @see #isSyntheticExcluded()
+     * @param modifiers modifier, combination of {@link Modifier} constants
      */
-    public boolean isModifierExcluded(int modifier) {
-        return (excludedModifiers & modifier) == modifier;
+    public ReflectionCloner excludeOnly(int modifiers) {
+        excludedModifiers = modifiers;
+        return this;
     }
 
     /**
-     * Sets the modifier excluded (so the fields with this modifier will not be copied) or not.
+     * Sets the modifier excluded (so the fields with this modifier will not be copied).
+     * This method does not clear previously set modifiers.
+     * Example: {@code Cloner cloner = new ReflectionCloner().exclude(Modifier.STATIC).exclude(Modifier.TRANSIENT); }
      *
      * @param modifier modifier, one of {@link Modifier} constant
-     * @param value true to exclude, false to include
-     *
-     * @see #setFinalExcluded(boolean)
-     * @see #setTransientExcluded(boolean)
-     * @see #setSyntheticExcluded(boolean)
      */
-    public void setModifierExcluded(int modifier, boolean value) {
-        if (value) {
-            excludedModifiers |= modifier;
-        }
-        else {
-            excludedModifiers &= ~modifier;
-        }
-        fieldCache.clear();
-    }
-
-    /**
-     * @return true if the final fields are not copied
-     */
-    public boolean isFinalExcluded() {
-        return isModifierExcluded(Modifier.FINAL);
-    }
-
-    /**
-     * Sets the exclusion mode for final fields.
-     *
-     * @param finalExcluded true to exclude final fields, false to include
-     */
-    public void setFinalExcluded(boolean finalExcluded) {
-        setModifierExcluded(Modifier.FINAL, finalExcluded);
-    }
-
-    /**
-     * @return true if the transient fields are not copied
-     */
-    public boolean isTransientExcluded() {
-        return isModifierExcluded(Modifier.TRANSIENT);
-    }
-
-    /**
-     * Sets the exclusion mode for transient fields.
-     *
-     * @param transientExcluded true to exclude final fields, false to include
-     */
-    public void setTransientExcluded(boolean transientExcluded) {
-        setModifierExcluded(Modifier.TRANSIENT, transientExcluded);
-    }
-
-    /**
-     * @return true if the synthetic fields are not copied
-     */
-    public boolean isSyntheticExcluded() {
-        return isModifierExcluded(SYNTHETIC_MODIFIER);
-    }
-
-    /**
-     * Sets the exclusion mode for synthetic fields.
-     *
-     * @param syntheticExcluded true to exclude final fields, false to include
-     */
-    public void setSyntheticExcluded(boolean syntheticExcluded) {
-        setModifierExcluded(SYNTHETIC_MODIFIER, syntheticExcluded);
+    public ReflectionCloner exclude(int modifier) {
+        return excludeOnly(excludedModifiers | modifier);
     }
 
     @Override
@@ -174,8 +112,10 @@ public class ReflectionCloner extends AbstractCloner {
 
     /**
      * Clones the array.
+     *
      * @param object array
      * @param cloned map of previously cloned objects
+     *
      * @return clone
      */
     protected Object doCloneArray(Object object, Map<Object, Object> cloned) {
@@ -187,10 +127,8 @@ public class ReflectionCloner extends AbstractCloner {
             System.arraycopy(object, 0, clone, 0, length);
         }
         else {
-            Object[] sourceArray = (Object[]) object;
-            Object[] cloneArray = (Object[]) clone;
             for (int k = 0; k < length; k++) {
-                cloneArray[k] = doClone(sourceArray[k], cloned);
+                Array.set(clone, k, doClone(Array.get(object, k), cloned));
             }
         }
         return clone;
@@ -198,8 +136,10 @@ public class ReflectionCloner extends AbstractCloner {
 
     /**
      * Clones non-array object.
+     *
      * @param object object
      * @param cloned map of previously cloned objects
+     *
      * @return clone
      */
     protected Object doCloneObject(Object object, Map<Object, Object> cloned) {
@@ -215,25 +155,40 @@ public class ReflectionCloner extends AbstractCloner {
         }
     }
 
+    protected void copyField(Object from, Object into, Field field, Map<Object, Object> cloned) {
+        try {
+            Object value = field.get(from);
+            Object valueClone = isImmutable(field.getType()) ? value : doClone(value, cloned);
+            field.set(into, valueClone);
+        }
+        catch (IllegalAccessException e) {
+            throw new ClonerException(e);
+        }
+    }
+
+    protected boolean isCopyable(Field field) {
+        return (field.getModifiers() & excludedModifiers) != 0;
+    }
+
     protected boolean shouldBeExcluded(int modifiers) {
         return (excludedModifiers & modifiers) != 0;
     }
 
     protected Collection<Field> getCopyableFields(Class clazz) {
-        Collection<Field> fields = fieldCache.get(clazz);
-        if (fields == null) {
-            fields = new ArrayList<>();
-            for (Class c = clazz; c != null; c = c.getSuperclass()) {
-                for (Field field : c.getDeclaredFields()) {
-                    int modifiers = field.getModifiers();
-                    if (!shouldBeExcluded(modifiers)) {
-                        setWritable(field, modifiers);
-                        fields.add(field);
-                    }
-                }
-            }
-            fieldCache.put(clazz, fields);
+        return fieldCache.computeIfAbsent(clazz, this::findCopyableFields);
+    }
+
+    protected List<Field> findCopyableFields(Class clazz) {
+        List<Class> inheritance = new ArrayList<>();
+        for (Class c = clazz; c != null; c = c.getSuperclass()) {
+            inheritance.add(c);
         }
+        List<Field> fields = inheritance.stream()
+            .map(Class::getDeclaredFields)
+            .flatMap(Arrays::stream)
+            .filter(this::isCopyable)
+            .collect(Collectors.toList());
+        fields.forEach(this::setWritable);
         return fields;
     }
 
@@ -249,8 +204,9 @@ public class ReflectionCloner extends AbstractCloner {
         MODIFIERS_FIELD.setAccessible(true);
     }
 
-    protected void setWritable(Field field, int modifiers) {
+    protected void setWritable(Field field) {
         field.setAccessible(true);
+        int modifiers = field.getModifiers();
         if (Modifier.isFinal(modifiers)) {
             try {
                 MODIFIERS_FIELD.set(field, ~Modifier.FINAL & modifiers);
@@ -258,17 +214,6 @@ public class ReflectionCloner extends AbstractCloner {
             catch (IllegalAccessException e) {
                 throw new ClonerException(e);
             }
-        }
-    }
-
-    protected void copyField(Object from, Object into, Field field, Map<Object, Object> cloned) {
-        try {
-            Object value = field.get(from);
-            Object valueClone = isImmutable(field.getType()) ? value : doClone(value, cloned);
-            field.set(into, valueClone);
-        }
-        catch (IllegalAccessException e) {
-            throw new ClonerException(e);
         }
     }
 

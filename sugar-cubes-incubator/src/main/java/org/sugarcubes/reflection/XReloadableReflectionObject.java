@@ -9,6 +9,13 @@ public abstract class XReloadableReflectionObject<T> extends XReflectionObjectIm
 
     private transient T reflectionObject;
 
+    protected XReloadableReflectionObject() {
+    }
+
+    protected XReloadableReflectionObject(T reflectionObject) {
+        this.reflectionObject = reflectionObject;
+    }
+
     @Override
     public T getReflectionObject() {
         if (reflectionObject == null) {

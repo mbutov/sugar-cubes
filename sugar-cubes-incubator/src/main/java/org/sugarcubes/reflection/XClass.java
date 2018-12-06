@@ -12,15 +12,15 @@ import java.util.stream.Stream;
  */
 public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnotated<Class<C>>, XModifiers {
 
-    private final Class<C> _class;
+    private final Class<C> reflectionObject;
 
-    XClass(Class<C> _class) {
-        this._class = _class;
+    XClass(Class<C> reflectionObject) {
+        this.reflectionObject = reflectionObject;
     }
 
     @Override
     public Class<C> getReflectionObject() {
-        return _class;
+        return reflectionObject;
     }
 
     @Override

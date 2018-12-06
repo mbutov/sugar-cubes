@@ -25,11 +25,13 @@ public class XField<F> extends XReloadableReflectionObject<Field>
         this.modifiers = reflectionObject.getModifiers();
     }
 
+    private static final XField<Integer> MODIFIERS = XReflection.of(Field.class).getField("modifiers");
+
     @Override
     protected Field loadReflectionObject() {
         Field field = execute(() -> tryToMakeAccessible(declaringClass.getDeclaredField(name)));
-        if (getModifiers() != modifiers) {
-            setModifiers(modifiers);
+        if (field.getModifiers() != modifiers) {
+            MODIFIERS.set(field, modifiers);
         }
         return field;
     }
@@ -41,8 +43,6 @@ public class XField<F> extends XReloadableReflectionObject<Field>
     public void set(Object obj, F value) {
         execute(() -> getReflectionObject().set(obj, value));
     }
-
-    private static final XField<Integer> MODIFIERS = XReflection.of(Field.class).getField("modifiers");
 
     public void setModifiers(int modifiers) {
         this.modifiers = modifiers;

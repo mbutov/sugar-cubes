@@ -10,25 +10,19 @@ import static org.sugarcubes.reflection.XReflectionUtils.tryToMakeAccessible;
  *
  * @author Maxim Butov
  */
-public class XConstructor<T> extends XReflectionObjectImpl<Constructor<T>>
+public class XConstructor<T> extends XReloadableReflectionObject<Constructor<T>>
     implements XAnnotated<Constructor<T>>, XExecutable<T>, XMember<Constructor<T>>, XModifiers {
 
     private final Class<T> declaringClass;
     private final Class[] parameterTypes;
 
     XConstructor(Constructor<T> reflectionObject) {
-
-        super(reflectionObject);
-
-        tryToMakeAccessible(reflectionObject);
-
         this.declaringClass = reflectionObject.getDeclaringClass();
         this.parameterTypes = reflectionObject.getParameterTypes();
-
     }
 
     @Override
-    protected Constructor<T> reloadReflectionObject() {
+    protected Constructor<T> loadReflectionObject() {
         return tryToMakeAccessible(execute(() -> declaringClass.getDeclaredConstructor(parameterTypes)));
     }
 
