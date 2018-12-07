@@ -167,11 +167,7 @@ public class ReflectionCloner extends AbstractCloner {
     }
 
     protected boolean isCopyable(Field field) {
-        return (field.getModifiers() & excludedModifiers) != 0;
-    }
-
-    protected boolean shouldBeExcluded(int modifiers) {
-        return (excludedModifiers & modifiers) != 0;
+        return (field.getModifiers() & excludedModifiers) == 0;
     }
 
     protected Collection<Field> getCopyableFields(Class clazz) {

@@ -6,6 +6,7 @@ include 'sugar-cubes-builder'
 include 'sugar-cubes-proxy'
 include 'sugar-cubes-valueholder'
 include 'sugar-cubes-tuple'
+include 'sugar-cubes-reflection'
 
 include 'sugar-cubes-library'
 

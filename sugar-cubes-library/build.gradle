@@ -1,5 +1,7 @@
 configureJavaModule(project)
 
+project.version = rootProject.version
+
 /**
  * Modules to include into library.
  */
@@ -11,6 +13,7 @@ def modules = [
     'sugar-cubes-proxy',
     'sugar-cubes-valueholder',
     'sugar-cubes-tuple',
+    'sugar-cubes-reflection',
 
 ]
 

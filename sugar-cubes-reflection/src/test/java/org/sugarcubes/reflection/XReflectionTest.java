@@ -1,0 +1,53 @@
+package org.sugarcubes.reflection;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.junit.Assert;
+import org.junit.Test;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+
+/**
+ * todo: document it and adjust author
+ *
+ * @author Maxim Butov
+ */
+public class XReflectionTest {
+
+    @Test
+    public void testClasses() {
+
+        XClass<Integer> xClass = XReflection.of(Integer.class);
+
+        Assert.assertThat(xClass.getConstructors().count(), greaterThan(0L));
+        Assert.assertThat(xClass.getFields().count(), greaterThan(0L));
+        Assert.assertThat(xClass.getMethods().count(), greaterThan(0L));
+
+    }
+
+    @Test
+    public void testInheritance() {
+
+        List<Class> inheritance =
+            XReflection.of(Integer.class).getInheritance().map(XClass::getReflectionObject).collect(Collectors.toList());
+        Assert.assertThat(inheritance, is(Arrays.asList(Integer.class, Number.class, Object.class)));
+
+    }
+
+    @Test
+    public void testFinal() {
+
+        XField<Integer> xField = XReflection.of(Integer.class).getField("value");
+        xField.clearFinal();
+
+        Integer obj = new Integer(-1);
+        Integer newValue = 1;
+        xField.set(obj, newValue);
+        
+        Assert.assertEquals(newValue, xField.get(obj));
+
+    }
+
+}
