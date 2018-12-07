@@ -58,11 +58,6 @@ public final class XNullClass extends XClass<Object> {
     }
 
     @Override
-    public Stream<XConstructor<Object>> getDeclaredConstructors() {
-        return Stream.empty();
-    }
-
-    @Override
     public Stream<XConstructor<Object>> getConstructors() {
         return Stream.empty();
     }
@@ -95,6 +90,11 @@ public final class XNullClass extends XClass<Object> {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof XNullClass;
+    }
+
+    @Override
+    public String toString() {
+        return "XNullClass";
     }
 
 }

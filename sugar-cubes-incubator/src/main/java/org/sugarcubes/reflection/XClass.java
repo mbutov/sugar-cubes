@@ -1,9 +1,15 @@
 package org.sugarcubes.reflection;
 
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import static java.util.Arrays.stream;
+
+import static org.sugarcubes.reflection.XPredicates.withName;
+import static org.sugarcubes.reflection.XPredicates.withParameterTypes;
+import static org.sugarcubes.reflection.XReflectiveOperationException.withMessage;
 
 /**
  * Wrapper for {@link Class}.
@@ -47,62 +53,82 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public Stream<XClass<?>> getDeclaredInterfaces() {
-        return Arrays.stream(getReflectionObject().getInterfaces()).map(XReflection::of);
+        return stream(getReflectionObject().getInterfaces()).map(XReflection::of);
     }
 
     public Stream<XClass<?>> getInterfaces() {
         return Stream.concat(getDeclaredInterfaces(), getSuperclass().getInterfaces()).distinct();
     }
 
-    public Stream<XConstructor<C>> getDeclaredConstructors() {
-        return Arrays.stream((Constructor<C>[]) getReflectionObject().getDeclaredConstructors())
-            .map(XReflection::of);
+    public Stream<XConstructor<C>> getConstructors() {
+        return stream((Constructor<C>[]) getReflectionObject().getDeclaredConstructors()).map(XReflection::of);
     }
 
-    public Stream<XConstructor<C>> getConstructors() {
-        return getDeclaredConstructors();
+    public Optional<XConstructor<C>> findConstructor(Class... types) {
+        return find(getConstructors(), withParameterTypes(types));
+    }
+
+    public XConstructor<C> getConstructor(Class... types) {
+        return findConstructor(types)
+            .orElseThrow(withMessage(() -> String.format("Constructor %s(%s) not found", getName(), getParameterNames(types))));
     }
 
     public Stream<XField<?>> getDeclaredFields() {
-        return Arrays.stream(getReflectionObject().getDeclaredFields()).map(XReflection::of);
+        return stream(getReflectionObject().getDeclaredFields()).map(XReflection::of);
+    }
+
+    public <X> Optional<XField<X>> findDeclaredField(String name) {
+        return find(getDeclaredFields(), withName(name));
+    }
+
+    public <X> XField<X> getDeclaredField(String name) {
+        return this.<X>findDeclaredField(name).orElseThrow(withMessage("Field %s.%s not found", getName(), name));
     }
 
     public Stream<XField<?>> getFields() {
         return Stream.concat(getDeclaredFields(), getSuperclass().getFields());
     }
 
+    public <X> Optional<XField<X>> findField(String name) {
+        return find(getFields(), withName(name));
+    }
+
+    public <X> XField<X> getField(String name) {
+        return this.<X>findField(name).orElseThrow(withMessage("Field %s.%s not found in class hierarchy", getName(), name));
+    }
+
     public Stream<XMethod<?>> getDeclaredMethods() {
-        return Arrays.stream(getReflectionObject().getDeclaredMethods()).map(XReflection::of);
+        return stream(getReflectionObject().getDeclaredMethods()).map(XReflection::of);
+    }
+
+    public <X> Optional<XMethod<X>> findDeclaredMethod(String name, Class... types) {
+        return find(getDeclaredMethods(), method -> method.hasNameAndParameterTypes(name, types));
+    }
+
+    public <X> XMethod<X> getDeclaredMethod(String name, Class... types) {
+        return this.<X>findDeclaredMethod(name, types)
+            .orElseThrow(withMessage(() -> String.format("Method %s.%s(%s) not found", getName(), name, getParameterNames(types))));
     }
 
     public Stream<XMethod<?>> getMethods() {
         return Stream.concat(getDeclaredMethods(), getSuperclass().getMethods());
     }
 
-    public Optional<XConstructor<C>> findConstructor(Class... types) {
-        return getDeclaredConstructors().filter(XPredicates.withParameterTypes(types)).findAny();
-    }
-
-    public XConstructor<C> getConstructor(Class... types) {
-        return findConstructor(types).orElseThrow(XReflectiveOperationException.withMessage("Constructor not found"));
-    }
-
-    public <X> Optional<XField<X>> findField(String name) {
-        return (Optional) getFields().filter(XPredicates.withName(name)).findFirst();
-    }
-
-    public <X> XField<X> getField(String name) {
-        return this.<X>findField(name).orElseThrow(XReflectiveOperationException.withMessage("Field not found"));
-    }
-
     public <X> Optional<XMethod<X>> findMethod(String name, Class... types) {
-        return (Optional) getMethods()
-            .filter(method -> method.hasNameAndParameterTypes(name, types))
-            .findFirst();
+        return (Optional) getMethods().filter(method -> method.hasNameAndParameterTypes(name, types)).findFirst();
     }
 
     public <X> XMethod<X> getMethod(String name, Class... types) {
-        return this.<X>findMethod(name, types).orElseThrow(XReflectiveOperationException.withMessage("Method not found"));
+        return this.<X>findMethod(name, types)
+            .orElseThrow(withMessage(() -> String.format("Method %s.%s(%s) not found in class hierarchy", getName(), name, getParameterNames(types))));
+    }
+
+    private static <T, V extends T> Optional<V> find(Stream<T> stream, Predicate<? super T> predicate) {
+        return (Optional) stream.filter(predicate).collect(XCollectors.toOptional());
+    }
+
+    private static String getParameterNames(Class[] types) {
+        return stream(types).map(Class::getName).collect(Collectors.joining(","));
     }
 
 }

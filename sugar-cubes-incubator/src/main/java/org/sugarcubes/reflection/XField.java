@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import static org.sugarcubes.reflection.XReflectionUtils.execute;
-import static org.sugarcubes.reflection.XReflectionUtils.tryToMakeAccessible;
 
 /**
  * Wrapper for {@link Field}.
@@ -20,6 +19,7 @@ public class XField<F> extends XReloadableReflectionObject<Field>
     private int modifiers;
 
     XField(Field reflectionObject) {
+        super(reflectionObject);
         this.declaringClass = reflectionObject.getDeclaringClass();
         this.name = reflectionObject.getName();
         this.modifiers = reflectionObject.getModifiers();
@@ -28,13 +28,14 @@ public class XField<F> extends XReloadableReflectionObject<Field>
     private static final XField<Integer> MODIFIERS = XReflection.of(Field.class).getField("modifiers");
 
     @Override
-    protected Field loadReflectionObject() {
-        Field field = execute(() -> tryToMakeAccessible(declaringClass.getDeclaredField(name)));
+    protected Field loadReflectionObject() throws ReflectiveOperationException {
+        Field field = declaringClass.getDeclaredField(name);
         if (field.getModifiers() != modifiers) {
             MODIFIERS.set(field, modifiers);
         }
         return field;
     }
+
 
     public F get(Object obj) {
         return execute(() -> getReflectionObject().get(obj));
@@ -45,8 +46,10 @@ public class XField<F> extends XReloadableReflectionObject<Field>
     }
 
     public void setModifiers(int modifiers) {
-        this.modifiers = modifiers;
-        MODIFIERS.set(getReflectionObject(), modifiers);
+        if (this.modifiers != modifiers) {
+            this.modifiers = modifiers;
+            MODIFIERS.set(getReflectionObject(), modifiers);
+        }
     }
 
     public void setModifier(int modifier, boolean newValue) {

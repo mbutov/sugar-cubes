@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -22,13 +23,13 @@ public class XReflection {
 
     private static <K, V> V getFromCache(K key, Function<K, V> mappingFunction) {
         Map<K, WeakReference<V>> cache = (Map) CACHE;
-        WeakReference<V> reference = cache.get(key);
-        V value = reference != null ? reference.get() : null;
-        if (value == null) {
-            value = mappingFunction.apply(key);
-            cache.put(key, new WeakReference<>(value));
-        }
-        return value;
+        BiFunction<K, WeakReference<V>, WeakReference<V>> remappingFunction = (k, ref) -> {
+            if (ref != null && ref.get() != null) {
+                return ref;
+            }
+            return new WeakReference<>(mappingFunction.apply(k));
+        };
+        return cache.compute(key, remappingFunction).get();
     }
 
     public static <T> XClass<T> of(Class<T> clazz) {

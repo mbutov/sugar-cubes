@@ -10,12 +10,12 @@ import java.util.function.Predicate;
  */
 public class XPredicates {
 
-    public static Predicate<XReflectionObject> withName(String name) {
+    public static <X> Predicate<XReflectionObject<X>> withName(String name) {
         Objects.requireNonNull(name);
         return obj -> obj.hasName(name);
     }
 
-    public static Predicate<XExecutable<?>> withParameterTypes(Class... types) {
+    public static <T> Predicate<XExecutable<T>> withParameterTypes(Class... types) {
         Objects.requireNonNull(types);
         return obj -> obj.hasParameterTypes(types);
     }

@@ -9,7 +9,7 @@ import java.util.Arrays;
  */
 public interface XExecutable<T> {
 
-    Class[] getParameterTypes();
+    Class<?>[] getParameterTypes();
 
     default boolean hasParameterTypes(Class... types) {
         return Arrays.equals(types, getParameterTypes());

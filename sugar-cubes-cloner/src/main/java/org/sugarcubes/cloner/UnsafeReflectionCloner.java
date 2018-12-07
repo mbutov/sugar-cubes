@@ -85,7 +85,7 @@ public class UnsafeReflectionCloner extends ReflectionCloner {
     }
 
     @Override
-    protected void setWritable(Field field, int modifiers) {
+    protected void setWritable(Field field) {
         // Unsafe doesn't need this
     }
 

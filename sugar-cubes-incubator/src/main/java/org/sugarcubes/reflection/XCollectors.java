@@ -19,7 +19,7 @@ public class XCollectors {
 
         void accumulate(X next) {
             if (!values.isEmpty()) {
-                throw new IllegalStateException("Too many elements");
+                throw new IllegalStateException("Stream contains two or more elements");
             }
             values.add(next);
         }

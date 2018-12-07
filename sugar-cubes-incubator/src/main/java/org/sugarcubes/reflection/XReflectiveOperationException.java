@@ -24,8 +24,12 @@ public class XReflectiveOperationException extends RuntimeException {
         super(message, cause);
     }
 
-    public static Supplier<XReflectiveOperationException> withMessage(String message) {
-        return () -> new XReflectiveOperationException(message);
+    public static Supplier<XReflectiveOperationException> withMessage(String message, Object... args) {
+        return withMessage(() -> String.format(message, args));
+    }
+
+    public static Supplier<XReflectiveOperationException> withMessage(Supplier<String> message) {
+        return () -> new XReflectiveOperationException(message.get());
     }
 
 }
