@@ -53,20 +53,12 @@ public class XField<F> extends XReloadableReflectionObject<Field>
     }
 
     public void setModifier(int modifier, boolean newValue) {
-        if (modifier == 0 || (modifier & (modifier - 1)) != 0) {
+        if (!XModifiers.isValidModifier(modifier)) {
             throw new IllegalArgumentException("Invalid modifier 0x" + Integer.toHexString(modifier));
         }
-        int modifiers = MODIFIERS.get(getReflectionObject());
-        boolean oldValue = (modifiers & modifier) != 0;
-        if (oldValue != newValue) {
-            if (newValue) {
-                modifiers += modifier;
-            }
-            else {
-                modifiers -= modifier;
-            }
-            setModifiers(modifiers);
-        }
+        int modifiers = this.modifiers;
+        modifiers = newValue ? modifiers | modifier : modifiers & ~modifier;
+        setModifiers(modifiers);
     }
 
     public void setFinal(boolean isFinal) {

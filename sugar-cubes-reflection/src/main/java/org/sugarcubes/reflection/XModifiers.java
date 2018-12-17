@@ -1,7 +1,7 @@
 package org.sugarcubes.reflection;
 
 import java.lang.reflect.Modifier;
-import java.util.function.Function;
+import java.util.function.IntPredicate;
 
 /**
  * Modifiers-related methods.
@@ -10,10 +10,28 @@ import java.util.function.Function;
  */
 public interface XModifiers {
 
+    /**
+     * Checks that integer has single bit set.
+     *
+     * @param modifier value to check
+     *
+     * @return result
+     */
+    static boolean isValidModifier(int modifier) {
+        return (modifier != 0) && ((modifier & (modifier - 1)) == 0);
+    }
+
+    /**
+     * @return set of modifiers of reflection object
+     */
     int getModifiers();
 
-    default boolean isModifier(Function<Integer, Boolean> method) {
-        return method.apply(getModifiers());
+    default boolean isModifier(int modifier) {
+        return (getModifiers() & modifier) != 0;
+    }
+
+    default boolean isModifier(IntPredicate method) {
+        return method.test(getModifiers());
     }
 
     default boolean isPublic() {
@@ -29,7 +47,7 @@ public interface XModifiers {
     }
 
     default boolean isPackage() {
-        return !(isPublic() | isPrivate() | isProtected());
+        return !isPublic() && !isPrivate() && !isProtected();
     }
 
     default boolean isStatic() {
