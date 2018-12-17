@@ -30,7 +30,7 @@ public class XMethod<R> extends XReloadableReflectionObject<Method>
 
     @Override
     public Class<?>[] getParameterTypes() {
-        return parameterTypes;
+        return parameterTypes.clone();
     }
 
     public boolean hasNameAndParameterTypes(String name, Class... types) {
