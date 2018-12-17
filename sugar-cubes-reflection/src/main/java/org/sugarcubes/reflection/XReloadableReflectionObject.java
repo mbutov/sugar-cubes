@@ -3,7 +3,7 @@ package org.sugarcubes.reflection;
 import java.lang.reflect.AccessibleObject;
 
 /**
- * todo: document it and adjust author
+ * A superclass for reflection wrappers which have transient part and must be reloaded after deserialization.
  *
  * @author Maxim Butov
  */
@@ -13,22 +13,18 @@ public abstract class XReloadableReflectionObject<T extends AccessibleObject> ex
 
     protected XReloadableReflectionObject(T reflectionObject) {
         this.reflectionObject = reflectionObject;
-        prepare(reflectionObject);
+        XReflectionUtils.tryToMakeAccessible(reflectionObject);
     }
 
     @Override
     public T getReflectionObject() {
         if (reflectionObject == null) {
             reflectionObject = XReflectionUtils.execute(this::loadReflectionObject);
-            prepare(reflectionObject);
+            XReflectionUtils.tryToMakeAccessible(reflectionObject);
         }
         return reflectionObject;
     }
 
     protected abstract T loadReflectionObject() throws ReflectiveOperationException;
-
-    protected void prepare(T reflectionObject) {
-        XReflectionUtils.tryToMakeAccessible(reflectionObject);
-    }
 
 }

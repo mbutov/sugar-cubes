@@ -10,6 +10,20 @@ import java.util.function.IntPredicate;
  */
 public interface XModifiers {
 
+    /**
+     * Checks that integer has single bit set.
+     *
+     * @param modifier value to check
+     *
+     * @return result
+     */
+    static boolean isValidModifier(int modifier) {
+        return (modifier != 0) && ((modifier & (modifier - 1)) == 0);
+    }
+
+    /**
+     * @return set of modifiers of reflection object
+     */
     int getModifiers();
 
     default boolean isModifier(int modifier) {
