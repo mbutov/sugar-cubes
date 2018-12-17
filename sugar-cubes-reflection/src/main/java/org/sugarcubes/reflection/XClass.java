@@ -89,12 +89,12 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
         return Stream.concat(getDeclaredFields(), getSuperclass().getFields());
     }
 
-    public <X> Optional<XField<X>> findField(String name) {
-        return find(getFields(), withName(name));
+    public <X> Stream<XField<X>> findFields(String name) {
+        return (Stream) getFields().filter(withName(name));
     }
 
     public <X> XField<X> getField(String name) {
-        return this.<X>findField(name).orElseThrow(withMessage("Field %s.%s not found in class hierarchy", getName(), name));
+        return this.<X>findFields(name).collect(XCollectors.onlyElement());
     }
 
     public Stream<XMethod<?>> getDeclaredMethods() {

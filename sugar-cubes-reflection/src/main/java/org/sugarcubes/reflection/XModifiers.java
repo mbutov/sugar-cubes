@@ -1,7 +1,7 @@
 package org.sugarcubes.reflection;
 
 import java.lang.reflect.Modifier;
-import java.util.function.Function;
+import java.util.function.IntPredicate;
 
 /**
  * Modifiers-related methods.
@@ -12,8 +12,12 @@ public interface XModifiers {
 
     int getModifiers();
 
-    default boolean isModifier(Function<Integer, Boolean> method) {
-        return method.apply(getModifiers());
+    default boolean isModifier(int modifier) {
+        return (getModifiers() & modifier) != 0;
+    }
+
+    default boolean isModifier(IntPredicate method) {
+        return method.test(getModifiers());
     }
 
     default boolean isPublic() {
@@ -29,7 +33,7 @@ public interface XModifiers {
     }
 
     default boolean isPackage() {
-        return !(isPublic() | isPrivate() | isProtected());
+        return !isPublic() && !isPrivate() && !isProtected();
     }
 
     default boolean isStatic() {

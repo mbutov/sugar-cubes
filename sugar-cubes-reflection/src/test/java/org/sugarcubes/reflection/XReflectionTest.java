@@ -50,4 +50,26 @@ public class XReflectionTest {
 
     }
 
+    @Test
+    public void testModifiers() {
+
+        XClass<Integer> xClass = XReflection.of(Integer.class);
+
+        Assert.assertTrue(xClass.isPublic());
+        Assert.assertTrue(xClass.isFinal());
+
+        Assert.assertFalse(xClass.isAbstract());
+        Assert.assertFalse(xClass.isInterface());
+        Assert.assertFalse(xClass.isPackage());
+        Assert.assertFalse(xClass.isPrivate());
+        Assert.assertFalse(xClass.isProtected());
+
+        XField<Object> xField = xClass.getDeclaredField("serialVersionUID");
+
+        Assert.assertTrue(xField.isPrivate());
+        Assert.assertTrue(xField.isStatic());
+        Assert.assertTrue(xField.isFinal());
+
+    }
+
 }
