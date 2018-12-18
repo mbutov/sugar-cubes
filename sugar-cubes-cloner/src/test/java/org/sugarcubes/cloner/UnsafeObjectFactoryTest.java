@@ -12,9 +12,6 @@ public class UnsafeObjectFactoryTest {
         private Xxx(int x) {
         }
 
-        void printParent() {
-            System.out.println(UnsafeObjectFactoryTest.this);
-        }
     }
 
     @Test

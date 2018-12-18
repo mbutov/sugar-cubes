@@ -36,20 +36,11 @@ public class CustomClassLoader extends ClassLoader {
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 
-        for (String prefix : disabledPrefixes) {
-            if (name.startsWith(prefix)) {
-                throw new ClassNotFoundException(name);
-            }
+        if (disabledPrefixes.stream().anyMatch(name::startsWith)) {
+            throw new ClassNotFoundException(name);
         }
 
-        boolean reload = false;
-
-        for (String prefix : reloadedPrefixes) {
-            reload = name.startsWith(prefix);
-            if (reload) {
-                break;
-            }
-        }
+        boolean reload = reloadedPrefixes.stream().anyMatch(name::startsWith);
 
         if (reload) {
             String resourceName = name.replace(".", "/") + ".class";

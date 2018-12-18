@@ -2,12 +2,14 @@ package org.sugarcubes.reflection;
 
 import java.lang.reflect.Constructor;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static java.util.Arrays.stream;
 
+import static org.sugarcubes.reflection.XCollectors.onlyElement;
+import static org.sugarcubes.reflection.XCollectors.toOptional;
 import static org.sugarcubes.reflection.XPredicates.withName;
+import static org.sugarcubes.reflection.XPredicates.withNameAndParameterTypes;
 import static org.sugarcubes.reflection.XPredicates.withParameterTypes;
 import static org.sugarcubes.reflection.XReflectiveOperationException.withMessage;
 
@@ -61,11 +63,12 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public Stream<XConstructor<C>> getConstructors() {
-        return stream((Constructor<C>[]) getReflectionObject().getDeclaredConstructors()).map(XReflection::of);
+        Constructor<C>[] constructors = (Constructor<C>[]) getReflectionObject().getDeclaredConstructors();
+        return stream(constructors).map(XReflection::of);
     }
 
     public Optional<XConstructor<C>> findConstructor(Class... types) {
-        return find(getConstructors(), withParameterTypes(types));
+        return getConstructors().filter(withParameterTypes(types)).collect(toOptional());
     }
 
     public XConstructor<C> getConstructor(Class... types) {
@@ -78,11 +81,13 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public <X> Optional<XField<X>> findDeclaredField(String name) {
-        return find(getDeclaredFields(), withName(name));
+        Stream<XField<X>> fields = (Stream) getDeclaredFields();
+        return fields.filter(withName(name)).collect(toOptional());
     }
 
     public <X> XField<X> getDeclaredField(String name) {
-        return this.<X>findDeclaredField(name).orElseThrow(withMessage("Field %s.%s not found", getName(), name));
+        Optional<XField<X>> field = findDeclaredField(name);
+        return field.orElseThrow(withMessage("Field %s.%s not found", getName(), name));
     }
 
     public Stream<XField<?>> getFields() {
@@ -90,11 +95,15 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public <X> Stream<XField<X>> findFields(String name) {
-        return (Stream) getFields().filter(withName(name));
+        Stream<XField<X>> fields = (Stream) getFields();
+        return fields.filter(withName(name));
     }
 
     public <X> XField<X> getField(String name) {
-        return this.<X>findFields(name).collect(XCollectors.onlyElement());
+        return this.<X>findFields(name).collect(onlyElement(
+            withMessage("Two or more fields with name %s found in %s hierarchy", name, getName()),
+            withMessage("No field %s found in %s hierarchy", name, getName())
+        ));
     }
 
     public Stream<XMethod<?>> getDeclaredMethods() {
@@ -102,12 +111,14 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public <X> Optional<XMethod<X>> findDeclaredMethod(String name, Class... types) {
-        return find(getDeclaredMethods(), method -> method.hasNameAndParameterTypes(name, types));
+        Stream<XMethod<X>> methods = (Stream) getDeclaredMethods();
+        return methods.filter(withNameAndParameterTypes(name, types)).collect(toOptional());
     }
 
     public <X> XMethod<X> getDeclaredMethod(String name, Class... types) {
-        return this.<X>findDeclaredMethod(name, types)
-            .orElseThrow(withMessage(() -> String.format("Method %s.%s(%s) not found", getName(), name, getParameterNames(types))));
+        Optional<XMethod<X>> method = findDeclaredMethod(name, types);
+        return method.orElseThrow(withMessage(() ->
+            String.format("Method %s.%s(%s) not found", getName(), name, getParameterNames(types))));
     }
 
     public Stream<XMethod<?>> getMethods() {
@@ -115,16 +126,13 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public <X> Optional<XMethod<X>> findMethod(String name, Class... types) {
-        return (Optional) getMethods().filter(method -> method.hasNameAndParameterTypes(name, types)).findFirst();
+        Stream<XMethod<X>> methods = (Stream) getMethods();
+        return methods.filter(withNameAndParameterTypes(name, types)).findFirst();
     }
 
     public <X> XMethod<X> getMethod(String name, Class... types) {
         return this.<X>findMethod(name, types)
             .orElseThrow(withMessage(() -> String.format("Method %s.%s(%s) not found in class hierarchy", getName(), name, getParameterNames(types))));
-    }
-
-    private static <T, V extends T> Optional<V> find(Stream<T> stream, Predicate<? super T> predicate) {
-        return (Optional) stream.filter(predicate).collect(XCollectors.toOptional());
     }
 
     private static String getParameterNames(Class[] types) {
