@@ -1,66 +1,23 @@
 configureJavaModule(project)
 
-project.version = rootProject.version
+dependencies {
 
-/**
- * Modules to include into library.
- */
-def modules = [
+    compileOnly project(':sugar-cubes-compile-only')
 
-    'sugar-cubes-cloner',
-    'sugar-cubes-rex',
-    'sugar-cubes-builder',
-    'sugar-cubes-proxy',
-    'sugar-cubes-valueholder',
-    'sugar-cubes-tuple',
-    'sugar-cubes-reflection',
+    compileOnly libs.aopalliance
+    compileOnly libs.objenesis
+    compileOnly libs.asm_all
+    compileOnly libs.cglib
+    compileOnly libs.javassist
+    compileOnly libs.dexmaker
+    compileOnly libs.bytebuddy
 
-]
+    compileOnly libs.objenesis
 
-task copyClassesAndResourcesFromModules(dependsOn: modules.collect { ":${it}:compileJava" }) {
+    compileOnly "javax.servlet:javax.servlet-api:3.1.0"
+    compileOnly libs.spring
 
-    outputs.dir sourceSets.main.output.classesDir
-    outputs.dir sourceSets.main.output.resourcesDir
-
-    def moduleProjects = modules.collect { project(":${it}") }
-
-    rootProject.afterEvaluate {
-
-        moduleProjects.each { moduleProject ->
-
-            dependencies.compileOnly moduleProject
-
-            def sourceDirectories = []
-
-            sourceDirectories += moduleProject.sourceSets.main.java.srcDirs
-            sourceDirectories += moduleProject.sourceSets.main.resources.srcDirs
-
-            sourceDirectories.each { d ->
-                project.tasks.processResources.inputs.dir d
-            }
-
-        }
-
-    }
-
-    doLast {
-
-        moduleProjects.each { moduleProject ->
-
-            copy {
-                from moduleProject.sourceSets.main.output.classesDir
-                into sourceSets.main.output.classesDir
-            }
-
-            copy {
-                from moduleProject.sourceSets.main.output.resourcesDir
-                into sourceSets.main.output.resourcesDir
-            }
-
-        }
-
-    }
+    testCompile libs.guava
+    testCompile libs.commons_lang3
 
 }
-
-tasks.jar.dependsOn(copyClassesAndResourcesFromModules)

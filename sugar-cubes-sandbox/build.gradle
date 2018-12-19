@@ -1,0 +1,10 @@
+configureJavaModule(project)
+
+dependencies {
+
+    compile project(':sugar-cubes-library')
+
+    compileOnly libs.javax_servlet
+    compileOnly libs.spring
+
+}

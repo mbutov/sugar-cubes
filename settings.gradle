@@ -1,15 +1,5 @@
 rootProject.name = 'sugar-cubes'
 
-include 'sugar-cubes-cloner'
-include 'sugar-cubes-rex'
-include 'sugar-cubes-builder'
-include 'sugar-cubes-proxy'
-include 'sugar-cubes-valueholder'
-include 'sugar-cubes-tuple'
-include 'sugar-cubes-reflection'
-
+include 'sugar-cubes-compile-only'
 include 'sugar-cubes-library'
-
-include 'sugar-cubes-incubator'
-
-include 'fernflower'
+include 'sugar-cubes-sandbox'

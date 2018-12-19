@@ -1,8 +1,0 @@
-configureJavaModule(project)
-includeIntoLibrary(project)
-
-dependencies {
-
-    testCompile libs.commons_lang3
-
-}

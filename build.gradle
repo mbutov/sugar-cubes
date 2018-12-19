@@ -16,6 +16,13 @@ allprojects {
     ext.libs = [:]
     ext.versions = [:]
 
+    libs.javax_servlet = "javax.servlet:javax.servlet-api:3.1.0"
+    libs.javax_mail = "javax.mail:mail:1.4.1"
+    libs.javax_validation = "javax.validation:validation-api:2.0.1.Final"
+    libs.javax_annotation = "javax.annotation:javax.annotation-api:1.3.2"
+    libs.javax_jms = "javax.jms:javax.jms-api:2.0.1"
+    libs.javax_inject = "javax.inject:javax.inject:1"
+
     libs.objenesis = "org.objenesis:objenesis:2.5.1"
 
     libs.guava = "com.google.guava:guava:21.0"
@@ -107,10 +114,6 @@ subprojects {
 
 }
 
-def includeIntoLibrary(Project project) {
-    // todo
-}
-
 def configureJavaModule(Project project) {
     configure(project, configureJavaModuleClosure)
 }
@@ -147,7 +150,7 @@ ext.configureJavaModuleClosure = {
             attributes(
                 'Implementation-Title': project.name,
                 'Implementation-Version': project.version,
-                'Implementation-Vendor': 'SweetSoftLab',
+                'Implementation-Vendor': 'Symmetric Systems',
                 'Implementation-Vendor-Id': project.group,
             )
         }
