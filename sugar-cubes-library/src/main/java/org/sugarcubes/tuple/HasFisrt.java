@@ -1,13 +1,11 @@
 package org.sugarcubes.tuple;
 
-import java.util.List;
-
 /**
  * A mix-in for tuples with 1+ elements.
  *
  * @author Maxim Butov
  */
-public interface HasFisrt<A> extends List {
+public interface HasFisrt<A> extends Tuple {
 
     /**
      * @return the 1-st element of tuple

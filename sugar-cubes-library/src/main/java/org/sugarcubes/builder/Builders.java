@@ -7,6 +7,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.sugarcubes.function.ThreeConsumer;
+import org.sugarcubes.function.ThreeFunction;
+
 /**
  * {@link Builder}-related static helpers.
  *

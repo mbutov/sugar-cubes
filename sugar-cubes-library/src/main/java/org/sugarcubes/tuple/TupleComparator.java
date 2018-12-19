@@ -7,11 +7,11 @@ import java.util.Comparator;
  *
  * @author Maxim Butov
  */
-public class TupleCompator<T> implements Comparator<Tuple<T>> {
+public class TupleComparator<T> implements Comparator<Tuple<T>> {
 
-    public static final TupleCompator NATURAL_ORDER = new TupleCompator((Comparator) Comparator.naturalOrder());
+    public static final TupleComparator NATURAL_ORDER = new TupleComparator((Comparator) Comparator.naturalOrder());
 
-    public static <T extends Comparable> TupleCompator<T> naturalOrder() {
+    public static <T extends Comparable> TupleComparator<T> naturalOrder() {
         return NATURAL_ORDER;
     }
 
@@ -22,7 +22,7 @@ public class TupleCompator<T> implements Comparator<Tuple<T>> {
      *
      * @param comparator tuple element comparator
      */
-    public TupleCompator(Comparator<T> comparator) {
+    public TupleComparator(Comparator<T> comparator) {
         this.comparator = comparator;
     }
 

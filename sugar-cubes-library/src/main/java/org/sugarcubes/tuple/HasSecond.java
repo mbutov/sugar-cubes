@@ -1,13 +1,11 @@
 package org.sugarcubes.tuple;
 
-import java.util.List;
-
 /**
  * A mix-in for tuples with 2+ elements.
  *
  * @author Maxim Butov
  */
-public interface HasSecond<B> extends List {
+public interface HasSecond<B> extends Tuple {
 
     /**
      * @return the 2-nd element of tuple

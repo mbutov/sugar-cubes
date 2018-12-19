@@ -10,33 +10,33 @@ public class TupleTest {
 
     @Test
     public void testEquals() throws Exception {
-        Assert.assertEquals(new Tuple<Integer>(1), new Tuple<Object>(1));
-        Assert.assertNotEquals(new Tuple<>(1), new Tuple<>("a"));
+        Assert.assertEquals(new TupleImpl<Integer>(1), new TupleImpl<Object>(1));
+        Assert.assertNotEquals(new TupleImpl<>(1), new TupleImpl<>("a"));
     }
 
     @Test
     public void testCompareTo() throws Exception {
-        Assert.assertTrue(new Tuple<>("a").compareTo(new Tuple<>("a")) == 0);
-        Assert.assertTrue(new Tuple<>("a").compareTo(new Tuple<>("a", "b")) == -1);
-        Assert.assertTrue(new Tuple<>("a", "a").compareTo(new Tuple<>("a", "b")) == -1);
-        Assert.assertTrue(new Tuple<>("a", "b").compareTo(new Tuple<>("a", "a")) == 1);
-        Assert.assertTrue(new Tuple<>("a", "b").compareTo(new Tuple<>("a")) == 1);
+        Assert.assertTrue(new TupleImpl<>("a").compareTo(new TupleImpl<>("a")) == 0);
+        Assert.assertTrue(new TupleImpl<>("a").compareTo(new TupleImpl<>("a", "b")) == -1);
+        Assert.assertTrue(new TupleImpl<>("a", "a").compareTo(new TupleImpl<>("a", "b")) == -1);
+        Assert.assertTrue(new TupleImpl<>("a", "b").compareTo(new TupleImpl<>("a", "a")) == 1);
+        Assert.assertTrue(new TupleImpl<>("a", "b").compareTo(new TupleImpl<>("a")) == 1);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNullElement() throws Exception {
-        new Tuple<>(1, null);
+        new TupleImpl<>(1, null);
     }
 
     @Test(expected = ClassCastException.class)
     public void testNonComparable() throws Exception {
-        new Tuple(1).compareTo(new Tuple("a"));
+        new TupleImpl(1).compareTo(new TupleImpl("a"));
     }
 
     @Test
     public void testToArray() throws Exception {
 
-        Tuple<Object> tuple = new Tuple<>(1, 2, 3);
+        TupleImpl<Object> tuple = new TupleImpl<>(1, 2, 3);
 
         assertArraySameTypeAndEqual(new Object[] {1, 2, 3}, tuple.toArray());
         assertArraySameTypeAndEqual(new Integer[] {1, 2, 3}, tuple.toArray(new Integer[0]));

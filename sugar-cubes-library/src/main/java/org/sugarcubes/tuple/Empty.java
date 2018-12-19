@@ -7,7 +7,7 @@ package org.sugarcubes.tuple;
  *
  * @author Maxim Butov
  */
-public final class Empty<T> extends Tuple<T> {
+public final class Empty<T> extends TupleImpl<T> {
 
     /**
      * An untyped instance of {@link Empty}.

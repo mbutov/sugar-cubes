@@ -3,11 +3,11 @@ package org.sugarcubes.tuple;
 /**
  * Single element tuple.
  *
- * @see Tuple
+ * @see TupleImpl
  *
  * @author Maxim Butov
  */
-public class Single<A> extends Tuple implements HasFisrt<A> {
+public class Single<A> extends TupleImpl implements HasFisrt<A> {
 
     public Single(A a) {
         super(false, new Object[] {a});
