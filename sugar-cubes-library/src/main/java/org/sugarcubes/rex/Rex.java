@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -51,7 +52,7 @@ public class Rex<T extends Throwable> {
      * @return Rex wrapper
      */
     public static <T extends Throwable> Rex<T> of(T throwable) {
-        return new Rex<T>(throwable);
+        return new Rex<>(throwable);
     }
 
     /**
@@ -62,7 +63,7 @@ public class Rex<T extends Throwable> {
      * @return Rex wrapper
      */
     public static <T extends Throwable> Rex<T> of(T throwable, Function<Throwable, RuntimeException> translator) {
-        return new Rex<T>(throwable, translator);
+        return new Rex<>(throwable, translator);
     }
 
     /**
@@ -197,7 +198,7 @@ public class Rex<T extends Throwable> {
      * @param exceptionClass type to check
      * @return true if the original throwable is of this type
      */
-    public boolean is(Class<? extends Throwable> exceptionClass) {
+    public boolean isOf(Class<? extends Throwable> exceptionClass) {
         return exceptionClass.isInstance(throwable);
     }
 
@@ -207,13 +208,8 @@ public class Rex<T extends Throwable> {
      * @param exceptionClasses classes to check
      * @return true if the original throwable is of one of these types
      */
-    public boolean is(Class<? extends Throwable>... exceptionClasses) {
-        for (Class<? extends Throwable> exceptionClass : exceptionClasses) {
-            if (is(exceptionClass)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean isAnyOf(Class<? extends Throwable>... exceptionClasses) {
+        return Arrays.stream(exceptionClasses).anyMatch(this::isOf);
     }
 
     /**
@@ -224,7 +220,7 @@ public class Rex<T extends Throwable> {
      * @throws E original throwable casted to type {@code exceptionClass}
      */
     public <E extends Throwable> Rex<T> throwIf(Class<E> exceptionClass) throws E {
-        if (is(exceptionClass)) {
+        if (isOf(exceptionClass)) {
             throw (E) throwable;
         }
         return this;
@@ -238,7 +234,7 @@ public class Rex<T extends Throwable> {
      * @throws T original throwable
      */
     public Rex<T> throwIf(Class<Throwable>... exceptionClasses) throws T {
-        if (is(exceptionClasses)) {
+        if (isAnyOf(exceptionClasses)) {
             throw rethrow();
         }
         return this;
@@ -294,7 +290,7 @@ public class Rex<T extends Throwable> {
      */
     public Rex<Throwable> cause() {
         Throwable cause = throwable.getCause();
-        return cause != null ? new Rex<Throwable>(cause, translator) : null;
+        return cause != null ? new Rex<>(cause, translator) : null;
     }
 
     /**
@@ -327,7 +323,7 @@ public class Rex<T extends Throwable> {
      * @return Rex-wrapper of cause or the same instance
      */
     public <E extends Throwable> Rex<Throwable> replaceWithCauseIf(Class<E> exceptionClass) {
-        return is(exceptionClass) ? cause() : cast();
+        return isOf(exceptionClass) ? cause() : cast();
     }
 
     /**
@@ -343,10 +339,10 @@ public class Rex<T extends Throwable> {
      *          .submit(e -> logger.error("Unexpected error", e));
      * </pre>
      *
-     * @param supplier the action to perform with the throwable
+     * @param consumer the action to perform with the throwable
      */
-    public Rex<T> submit(Consumer<T> supplier) {
-        supplier.accept(throwable);
+    public Rex<T> submit(Consumer<T> consumer) {
+        consumer.accept(throwable);
         return this;
     }
 

@@ -7,6 +7,12 @@ dependencies {
     compileOnly libs.javax_servlet
     compileOnly libs.spring
 
+    testCompile libs.test
     testCompile project(':sugar-cubes-library').sourceSets.test.output
 
+}
+
+// remove sun.misc.* from output classes directory
+compileJava.doLast {
+    new File(sourceSets.main.java.outputDir, 'sun').deleteDir()
 }

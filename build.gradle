@@ -139,12 +139,6 @@ ext.configureJavaModuleClosure = {
 
     }
 
-    dependencies {
-
-        testCompile libs.test
-
-    }
-
     jar {
         manifest {
             attributes(

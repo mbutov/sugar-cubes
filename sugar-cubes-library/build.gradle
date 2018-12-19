@@ -13,6 +13,7 @@ dependencies {
     compileOnly libs.javax_servlet
     compileOnly libs.spring
 
+    testCompile libs.test
     testCompile libs.guava
     testCompile libs.commons_lang3
 
