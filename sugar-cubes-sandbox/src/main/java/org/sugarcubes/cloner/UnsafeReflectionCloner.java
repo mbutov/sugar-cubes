@@ -1,10 +1,11 @@
 package org.sugarcubes.cloner;
 
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+
+import org.sugarcubes.reflection.XField;
 
 import sun.misc.Unsafe;
 
@@ -85,14 +86,9 @@ public class UnsafeReflectionCloner extends ReflectionCloner {
     }
 
     @Override
-    protected void setWritable(Field field) {
-        // Unsafe doesn't need this
-    }
-
-    @Override
-    protected void copyField(Object from, Object into, Field field, Map<Object, Object> cloned) {
-        long offset = UNSAFE.objectFieldOffset(field);
-        UnsafeCopyOperation operation = OPERATIONS.get(field.getType());
+    protected void copyField(Object from, Object into, XField<Object> field, Map<Object, Object> cloned) {
+        long offset = UNSAFE.objectFieldOffset(field.getReflectionObject());
+        UnsafeCopyOperation operation = OPERATIONS.get(field.getReflectionObject().getType());
         if (operation != null) {
             operation.copy(from, offset, into);
         }

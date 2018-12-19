@@ -22,34 +22,32 @@ import java.util.RandomAccess;
  *
  * Tuples can be used as complex keys in maps, caches, etc.
  *
- * Tuple is not cloneable because it is immutable.
- *
  * @author Maxim Butov
  */
 public class Tuple<T> extends AbstractList<T> implements RandomAccess, Serializable, Comparable<Tuple<T>> {
 
     private static final long serialVersionUID = 1L;
 
-    private final T[] values;
+    private final Object[] values;
 
     public Tuple(T... values) {
-        this(false, values.clone());
+        this(true, values);
     }
 
     public Tuple(Collection<T> values) {
         this(false, values.toArray());
     }
 
-    protected Tuple(boolean unused, Object[] values) {
+    protected Tuple(boolean clone, Object[] values) {
         for (Object value : values) {
             Objects.requireNonNull(value, "Values contains null");
         }
-        this.values = (T[]) values;
+        this.values = clone ? values.clone() : values;
     }
 
     @Override
     public T get(int index) {
-        return values[index];
+        return (T) values[index];
     }
 
     @Override
@@ -59,7 +57,7 @@ public class Tuple<T> extends AbstractList<T> implements RandomAccess, Serializa
 
     @Override
     public Tuple<T> subList(int fromIndex, int toIndex) {
-        return new Tuple<T>(false, Arrays.copyOfRange(values, fromIndex, toIndex));
+        return new Tuple<>(false, Arrays.copyOfRange(values, fromIndex, toIndex));
     }
 
     @Override
@@ -97,21 +95,7 @@ public class Tuple<T> extends AbstractList<T> implements RandomAccess, Serializa
 
     @Override
     public int compareTo(Tuple<T> that) {
-
-        int s1 = size();
-        int s2 = that.size();
-
-        int n = Math.min(s1, s2);
-
-        for (int k = 0; k < n; k++) {
-            int r = ((Comparable) get(k)).compareTo(that.get(k));
-            if (r != 0) {
-                return r;
-            }
-        }
-
-        return Integer.compare(s1, s2);
-
+        return TupleCompator.NATURAL_ORDER.compare(this, that);
     }
 
     @Override

@@ -21,7 +21,7 @@ public class ObjenesisObjectFactory implements ObjectFactory {
     }
 
     @Override
-    public <T> T newInstance(Class<T> clazz) {
+    public <T> T newInstanceUnsafe(Class<T> clazz) throws Throwable {
         return objenesis.newInstance(clazz);
     }
 

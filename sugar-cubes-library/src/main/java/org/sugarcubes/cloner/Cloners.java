@@ -3,8 +3,7 @@ package org.sugarcubes.cloner;
 /**
  * Factory for creating different {@link Cloner}s.
  *
- * {@link ReflectionCloner} and {@link UnsafeReflectionCloner} each are ~100 times faster than
- * {@link SerializableCloner} and can deal with non-serializable objects.
+ * {@link ReflectionCloner} is ~100 times faster than {@link SerializableCloner} and can deal with non-serializable objects.
  *
  * @author Maxim Butov
  */
@@ -41,15 +40,6 @@ public class Cloners {
      */
     public static Cloner serialization() {
         return SerializableCloner.INSTANCE;
-    }
-
-    /**
-     * Returns an instance of {@link UnsafeReflectionCloner}.
-     *
-     * @return {@link UnsafeReflectionCloner} instance
-     */
-    public static Cloner unsafe() {
-        return UnsafeReflectionCloner.INSTANCE;
     }
 
 }

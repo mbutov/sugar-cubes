@@ -1,5 +1,4 @@
 rootProject.name = 'sugar-cubes'
 
-include 'sugar-cubes-compile-only'
 include 'sugar-cubes-library'
 include 'sugar-cubes-sandbox'

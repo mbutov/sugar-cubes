@@ -1,7 +1,6 @@
 package org.sugarcubes.cloner;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -33,15 +32,10 @@ public class SerializableCloner extends AbstractCloner {
     }
 
     @Override
-    protected Object doClone(Object object) {
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            new ObjectOutputStream(out).writeObject(object);
-            return new ObjectInputStream(new ByteArrayInputStream(out.buf(), 0, out.size())).readObject();
-        }
-        catch (IOException | ClassNotFoundException e) {
-            throw new ClonerException(e);
-        }
+    protected Object doClone(Object object) throws Throwable {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ObjectOutputStream(out).writeObject(object);
+        return new ObjectInputStream(new ByteArrayInputStream(out.buf(), 0, out.size())).readObject();
     }
 
 }

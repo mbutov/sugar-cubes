@@ -43,6 +43,7 @@ public abstract class AbstractClonerTests {
         Assert.assertEquals(b1.x, b2.x);
         Assert.assertSame(b1.y, b2.y);
         Assert.assertNull(b2.z);
+        Assert.assertSame(b2.a, b2);
 
         Assert.assertArrayEquals(b1.xxx, b2.xxx);
         Assert.assertArrayEquals(b1.yyy, b2.yyy);

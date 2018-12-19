@@ -7,4 +7,6 @@ dependencies {
     compileOnly libs.javax_servlet
     compileOnly libs.spring
 
+    testCompile project(':sugar-cubes-library').sourceSets.test.output
+
 }

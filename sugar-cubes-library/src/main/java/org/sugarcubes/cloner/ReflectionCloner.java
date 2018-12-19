@@ -1,10 +1,7 @@
 package org.sugarcubes.cloner;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -12,6 +9,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
+
+import org.sugarcubes.reflection.XField;
+import org.sugarcubes.reflection.XModifiers;
+import org.sugarcubes.reflection.XReflection;
 
 /**
  * Implementation of {@link Cloner} which copies objects fields using Reflection API.
@@ -26,14 +27,14 @@ public class ReflectionCloner extends AbstractCloner {
     private final ObjectFactory objectFactory;
 
     /**
-     * Set of modifiers which are excluded when copying.
+     * Set of fields modifiers which are excluded when copying.
      */
     private int excludedModifiers = Modifier.STATIC;
 
     /**
      * Cache with (class, fields to copy) entries.
      */
-    private final Map<Class, Collection<Field>> fieldCache = new WeakHashMap<>();
+    private final Map<Class, Collection<XField<?>>> fieldCache = new WeakHashMap<>();
 
     /**
      * Default constructor. Uses {@link ObjenesisObjectFactory} if Objenesis library is present, or
@@ -150,67 +151,27 @@ public class ReflectionCloner extends AbstractCloner {
     }
 
     protected void copyFields(Object from, Object into, Map<Object, Object> cloned) {
-        for (Field field : getCopyableFields(from.getClass())) {
+        for (XField field : getCopyableFields(from.getClass())) {
             copyField(from, into, field, cloned);
         }
     }
 
-    protected void copyField(Object from, Object into, Field field, Map<Object, Object> cloned) {
-        try {
-            Object value = field.get(from);
-            Object valueClone = isImmutable(field.getType()) ? value : doClone(value, cloned);
-            field.set(into, valueClone);
-        }
-        catch (IllegalAccessException e) {
-            throw new ClonerException(e);
-        }
+    protected void copyField(Object from, Object into, XField<Object> field, Map<Object, Object> cloned) {
+        Object value = field.get(from);
+        Object valueClone = isImmutable(field.getReflectionObject().getType()) ? value : doClone(value, cloned);
+        field.set(into, valueClone);
     }
 
-    protected boolean isCopyable(Field field) {
-        return (field.getModifiers() & excludedModifiers) == 0;
-    }
-
-    protected Collection<Field> getCopyableFields(Class clazz) {
+    protected Collection<XField<?>> getCopyableFields(Class<?> clazz) {
         return fieldCache.computeIfAbsent(clazz, this::findCopyableFields);
     }
 
-    protected List<Field> findCopyableFields(Class clazz) {
-        List<Class> inheritance = new ArrayList<>();
-        for (Class c = clazz; c != null; c = c.getSuperclass()) {
-            inheritance.add(c);
-        }
-        List<Field> fields = inheritance.stream()
-            .map(Class::getDeclaredFields)
-            .flatMap(Arrays::stream)
-            .filter(this::isCopyable)
+    protected List<XField<?>> findCopyableFields(Class<?> clazz) {
+        List<XField<?>> fields = XReflection.of(clazz).getFields()
+            .filter(field -> !field.isModifier(excludedModifiers))
             .collect(Collectors.toList());
-        fields.forEach(this::setWritable);
+        fields.stream().filter(XModifiers::isFinal).forEach(XField::clearFinal);
         return fields;
-    }
-
-    private static final Field MODIFIERS_FIELD;
-
-    static {
-        try {
-            MODIFIERS_FIELD = Field.class.getDeclaredField("modifiers");
-        }
-        catch (NoSuchFieldException e) {
-            throw new ClonerException("java.lang.reflect.Field.modifiers not found", e);
-        }
-        MODIFIERS_FIELD.setAccessible(true);
-    }
-
-    protected void setWritable(Field field) {
-        field.setAccessible(true);
-        int modifiers = field.getModifiers();
-        if (Modifier.isFinal(modifiers)) {
-            try {
-                MODIFIERS_FIELD.set(field, ~Modifier.FINAL & modifiers);
-            }
-            catch (IllegalAccessException e) {
-                throw new ClonerException(e);
-            }
-        }
     }
 
 }

@@ -7,7 +7,7 @@ public class UnsafeReflectionClonerTest extends AbstractClonerTests {
 
     @Override
     protected Cloner getCloner() {
-        return Cloners.unsafe();
+        return new UnsafeReflectionCloner();
     }
 
 }

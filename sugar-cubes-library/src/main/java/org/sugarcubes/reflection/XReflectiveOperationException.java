@@ -8,6 +8,8 @@ import java.util.function.Supplier;
  *
  * Can be also created without causing exception indicating that XReflection API is not used properly.
  *
+ * @see XInvocationException
+ *
  * @author Maxim Butov
  */
 public class XReflectiveOperationException extends RuntimeException {

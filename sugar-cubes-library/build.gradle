@@ -2,8 +2,6 @@ configureJavaModule(project)
 
 dependencies {
 
-    compileOnly project(':sugar-cubes-compile-only')
-
     compileOnly libs.aopalliance
     compileOnly libs.objenesis
     compileOnly libs.asm_all
@@ -12,9 +10,7 @@ dependencies {
     compileOnly libs.dexmaker
     compileOnly libs.bytebuddy
 
-    compileOnly libs.objenesis
-
-    compileOnly "javax.servlet:javax.servlet-api:3.1.0"
+    compileOnly libs.javax_servlet
     compileOnly libs.spring
 
     testCompile libs.guava

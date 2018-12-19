@@ -2,6 +2,7 @@ package org.sugarcubes.reflection;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
@@ -25,6 +26,8 @@ public class XReflectionTest {
         Assert.assertThat(xClass.getFields().count(), greaterThan(0L));
         Assert.assertThat(xClass.getMethods().count(), greaterThan(0L));
 
+
+        Set<XField<?>> collect = xClass.getFields().filter(xField -> !xField.isPublic()).collect(Collectors.toSet());
     }
 
     @Test

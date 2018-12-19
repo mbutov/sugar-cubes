@@ -31,6 +31,10 @@ Tools for faster deep cloning of different kind of objects.
 
 Generic API for proxy creation via various providers.
     
+### org.sugarcubes.reflection          
+
+Set of wrappers for Java Reflection classes. Simplifies working with Reflection API.
+    
 ### org.sugarcubes.rex          
     
 REx means "runtime exceptions". This module helps to handle checked exceptions
@@ -40,7 +44,7 @@ and translate them into unchecked.
     
 Simple (but enough for most cases) java tuple implementation.
     
-### sugar-cubes-sandbox
+## Sandbox
 
-Sandbox for sweet candydates. 
-
+Sandbox is a place for sweet candydates.
+The code is not fully complete here, it is mostly experimental. 

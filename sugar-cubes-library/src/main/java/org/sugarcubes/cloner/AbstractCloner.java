@@ -23,6 +23,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.sugarcubes.rex.Rex;
+
 /**
  * Base abstract class for cloners.
  *
@@ -35,8 +37,12 @@ public abstract class AbstractCloner implements Cloner {
         if (object == null || isImmutable(object.getClass())) {
             return object;
         }
-        else {
+
+        try {
             return (T) doClone(object);
+        }
+        catch (Throwable e) {
+            throw Rex.of(e).throwIf(ClonerException.class).throwOther(ClonerException::new);
         }
     }
 
@@ -97,6 +103,6 @@ public abstract class AbstractCloner implements Cloner {
      * @param object object to clone, not null
      * @return clone of the object
      */
-    protected abstract Object doClone(Object object);
+    protected abstract Object doClone(Object object) throws Throwable;
 
 }
