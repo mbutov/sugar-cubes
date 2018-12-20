@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Rex means "runtime exceptions".
@@ -357,4 +358,14 @@ public class Rex<T extends Throwable> {
         return buffer.toString();
     }
 
+    public <E extends Throwable> Rex<T> ifThenThrow(Predicate<Throwable> predicate, Function<Throwable, E> function) throws E {
+        if (predicate.test(throwable)) {
+            throw function.apply(throwable);
+        }
+        return this;
+    }
+
+    public <X extends Throwable, Y extends Throwable> Rex<T> ifThenThrow(Class<X> type, Function<X, Y> function) throws Y {
+        return ifThenThrow(type::isInstance, e -> function.apply((X) e));
+    }
 }
