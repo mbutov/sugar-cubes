@@ -1,5 +1,8 @@
 package org.sugarcubes.proxy;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 /**
  * @author Maxim Butov
  */
@@ -18,22 +21,16 @@ public class ClassLoaders {
     }
 
     public static ClassLoader getClassLoader(ClassLoader classLoader, Class clazz) {
-        ClassLoader cl = classLoader;
-        if (cl == null) {
-            cl = getContextClassLoader();
-            if (cl == null) {
-                if (clazz != null) {
-                    cl = clazz.getClassLoader();
-                }
-                if (cl == null) {
-                    cl = ClassLoaders.class.getClassLoader();
-                    if (cl == null) {
-                        cl = ClassLoader.getSystemClassLoader();
-                    }
-                }
-            }
-        }
-        return cl;
+        return Stream.of(
+            classLoader,
+            getContextClassLoader(),
+            clazz != null ? clazz.getClassLoader() : null,
+            ClassLoaders.class.getClassLoader(),
+            ClassLoader.getSystemClassLoader()
+        )
+            .filter(Objects::nonNull)
+            .findFirst()
+            .get();
     }
 
     public static ClassLoader getContextClassLoader() {

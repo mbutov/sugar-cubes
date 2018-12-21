@@ -15,7 +15,7 @@ public class BytebuddyProxyProvider extends InstantiatorProxyProvider {
 
     @Override
     protected <T> ProxyFactory<T> newCustomProxyFactory(ClassLoader classLoader, GenericType type) {
-        return new CglibProxyFactory<T>(classLoader, type, getInstantiatorStrategy());
+        return new BytebuddyProxyFactory<T>(classLoader, type, getInstantiatorStrategy());
     }
 
 }
