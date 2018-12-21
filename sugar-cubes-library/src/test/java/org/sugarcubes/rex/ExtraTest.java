@@ -12,21 +12,21 @@ public class ExtraTest {
 
     @Test
     public void testLegalArgument() throws Exception {
-        new Extra()
-            .map(IOException.class, RuntimeException.class)
+        Extra<Throwable, RuntimeException> map = new Extra<Throwable, RuntimeException>()
+            .map(IOException.class, RuntimeException::new)
             .map(Throwable.class, RuntimeException::new);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalArgument() throws Exception {
-        new Extra()
-            .map(Throwable.class, RuntimeException.class)
+        Extra<Throwable, RuntimeException> map = new Extra<Throwable, RuntimeException>()
+            .map(Throwable.class, RuntimeException::new)
             .map(IOException.class, RuntimeException::new);
     }
 
     @Test(expected = UncheckedIOException.class)
     public void testTranslator() throws Exception {
-        throw new Extra()
+        throw new Extra<Throwable, RuntimeException>()
             .map(IOException.class, UncheckedIOException::new)
             .apply(new IOException());
     }

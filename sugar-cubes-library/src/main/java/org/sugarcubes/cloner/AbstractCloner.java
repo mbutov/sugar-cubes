@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.sugarcubes.rex.Rex;
+import static org.sugarcubes.rex.Rex.withMessage;
 
 /**
  * Base abstract class for cloners.
@@ -42,7 +43,10 @@ public abstract class AbstractCloner implements Cloner {
             return (T) doClone(object);
         }
         catch (Throwable e) {
-            throw Rex.of(e).throwIf(ClonerException.class).throwOther(ClonerException::new);
+            throw Rex.of(e)
+                .rethrowIfError()
+                .rethrowIf(ClonerException.class)
+                .rethrow(withMessage("Unexpected error", ClonerException::new));
         }
     }
 

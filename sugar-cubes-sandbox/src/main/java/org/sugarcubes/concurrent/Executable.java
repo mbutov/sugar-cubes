@@ -4,7 +4,7 @@ import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.sugarcubes.rex.Rex;
+import org.sugarcubes.rex.Rex0;
 
 /**
  * Extension of {@link Callable}, which has a safe version of {@link #call()} - {@link #execute()},
@@ -35,7 +35,7 @@ public interface Executable<T, E extends Exception> extends Callable<T>, XCallab
             return call();
         }
         catch (Exception e) {
-            throw Rex.throwUnchecked(e);
+            throw Rex0.throwUnchecked(e);
         }
     }
 

@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 
 import org.sugarcubes.rex.Rex;
 
-
 /**
  * @author Maxim Butov
  */
@@ -35,10 +34,10 @@ public class ProxyInvocationHandler extends SmartInvocationHandler implements Se
         }
         catch (Throwable throwable) {
             throw Rex.of(throwable)
-                .replaceWithCauseIf(InvocationTargetException.class)
-                .throwIfUnchecked()
-                .throwIf(method)
-                .throwUnchecked();
+                .replaceIf(InvocationTargetException.class, Rex::cause)
+                .rethrowIfUnchecked()
+                .rethrowIfDeclared(method)
+                .rethrowAsRuntime();
         }
     }
 

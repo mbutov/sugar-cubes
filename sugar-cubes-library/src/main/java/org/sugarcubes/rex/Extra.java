@@ -1,8 +1,8 @@
 package org.sugarcubes.rex;
 
-import java.lang.reflect.Constructor;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -15,7 +15,7 @@ import java.util.function.Function;
  * <pre>
  *      Function<Throwable, RuntimeException> translator =
  *          new Extra()
- *              .map(SQLException.class, DataAccessException.class)
+ *              .map(SQLException.class, DataAccessException::new)
  *              .map(Throwable.class, DefaultRuntimeException::new);
  *
  *      try {
@@ -27,94 +27,41 @@ import java.util.function.Function;
  *
  * @author Maxim Butov
  */
-public class Extra implements Function<Throwable, RuntimeException> {
+public class Extra<K extends Throwable, V extends Throwable> implements Function<K, V> {
 
-    /**
-     * Default translator of checked exceptions into unchecked.
-     */
-    public static final Function<Throwable, RuntimeException> DEFAULT = RuntimeException::new;
-
-    /**
-     * Does not translate, throws an exception.
-     */
-    public static final Function<Throwable, RuntimeException> ERROR = ex -> {
-        throw new IllegalStateException("Cannot translate an exception", ex);
+    public static final Function<Throwable, Throwable> NOT_SUPPORTED = ex -> {
+        throw new IllegalArgumentException("Cannot translate " + ex);
     };
 
-    /**
-     * Returns a function which creates new instance of {@code translated} class using constructor
-     * with Throwable parameter.
-     *
-     * @param translated class of runtime exception
-     * @return translator function
-     */
-    public static Function<Throwable, RuntimeException> newInstance(Class<? extends RuntimeException> translated) {
-        Constructor<? extends RuntimeException> constructor = Rex.call(() -> translated.getConstructor(Throwable.class));
-        return ex -> Rex.call(() -> constructor.newInstance(ex));
+    private final Map<Class<K>, Function<K, V>> translators = new LinkedHashMap<>();
+    private final Function<K, V> defaultTranslator;
+
+    public Extra(Function<K, V> defaultTranslator) {
+        this.defaultTranslator = defaultTranslator;
     }
 
-    /**
-     * Default translation scenario.
-     */
-    private final Function<Throwable, RuntimeException> defaultScenario;
-
-    /**
-     * Ordered pairs of (exception class, translation scenario).
-     */
-    private final Map<Class<? extends Throwable>, Function<Throwable, RuntimeException>> translators =
-        new LinkedHashMap<>();
-
-    /**
-     * Creates translator with default scenario.
-     */
     public Extra() {
-        this(true);
+        this((Function) NOT_SUPPORTED);
     }
 
-    /**
-     * Creates translator.
-     * @param useDefault if true, then use default scenario, if false, then throw an exception when scenario not found
-     */
-    public Extra(boolean useDefault) {
-        this(useDefault ? DEFAULT : null);
-    }
-
-    /**
-     * Creates translator with default scenario.
-     *
-     * @param defaultScenario default scenario to apply to exception
-     */
-    public Extra(Function<Throwable, RuntimeException> defaultScenario) {
-        this.defaultScenario = defaultScenario;
-    }
-
-    public <E extends Throwable> Extra map(Class<E> original, Function<E, RuntimeException> translator) {
-        for (Map.Entry<Class<? extends Throwable>, Function<Throwable, RuntimeException>> entry : translators.entrySet()) {
-            if (entry.getKey().isAssignableFrom(original)) {
-                throw new IllegalArgumentException("There is already mapping for " + entry.getKey());
-            }
+    public <T extends K> Extra<K, V> map(Class<T> type, Function<T, V> function) {
+        Optional<Class<K>> existing = translators.keySet().stream().filter(t -> t.isAssignableFrom(type)).findAny();
+        if (existing.isPresent()) {
+            throw new IllegalArgumentException(String.format("Translator already contains %s, cannot add %s", existing.get(), type));
         }
-        translators.put(original, (Function) translator);
+        translators.put((Class) type, (Function) function);
         return this;
     }
 
-    public Extra map(Class<? extends Throwable> original, Class<? extends RuntimeException> translated) {
-        return map(original, (Function) newInstance(translated));
-    }
-
     @Override
-    public RuntimeException apply(Throwable throwable) {
-        for (Map.Entry<Class<? extends Throwable>, Function<Throwable, RuntimeException>> entry : translators.entrySet()) {
-            if (entry.getKey().isInstance(throwable)) {
-                return entry.getValue().apply(throwable);
-            }
-        }
-        if (defaultScenario == null) {
-            throw new IllegalStateException("Cannot translate " + throwable);
-        }
-        else {
-            return defaultScenario.apply(throwable);
-        }
+    public V apply(K k) {
+        Function<K, V> translator =
+            translators.entrySet().stream()
+                .filter(e -> e.getKey().isInstance(k))
+                .findAny()
+                .map(Map.Entry::getValue)
+                .orElse(defaultTranslator);
+        return translator.apply(k);
     }
 
 }

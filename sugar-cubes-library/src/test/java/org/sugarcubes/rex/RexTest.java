@@ -15,7 +15,7 @@ public class RexTest {
             throw new IOException();
         }
         catch (Throwable e) {
-            throw Rex.of(e).throwUnchecked();
+            throw Rex.of(e).rethrowIfUnchecked().rethrowAsRuntime();
         }
     }
 
@@ -25,7 +25,7 @@ public class RexTest {
             throw new NullPointerException();
         }
         catch (Throwable e) {
-            throw Rex.throwUnchecked(e);
+            throw Rex.of(e).rethrowIfUnchecked().rethrowAsRuntime();
         }
     }
 
@@ -35,7 +35,7 @@ public class RexTest {
             throw new NoClassDefFoundError();
         }
         catch (Throwable e) {
-            throw Rex.throwUnchecked(e);
+            throw Rex.of(e).rethrowIfUnchecked().rethrowAsRuntime();
         }
     }
 
@@ -55,7 +55,7 @@ public class RexTest {
             throw new IOException();
         }
         catch (Throwable e) {
-            throw Rex.of(e).throwUndeclared();
+            throw Rex.of(e).rethrowUndeclared();
         }
     }
 

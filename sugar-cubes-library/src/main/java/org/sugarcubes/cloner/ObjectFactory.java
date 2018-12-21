@@ -1,6 +1,7 @@
 package org.sugarcubes.cloner;
 
 import org.sugarcubes.rex.Rex;
+import static org.sugarcubes.rex.Rex.withMessage;
 
 /**
  * Object factory interface.
@@ -23,14 +24,14 @@ public interface ObjectFactory {
         }
         catch (Throwable e) {
             throw Rex.of(e)
-                .throwIfError()
-                .throwIf(ClonerException.class)
-                .throwOther(ClonerException::new);
+                .rethrowIfError()
+                .rethrowIf(ClonerException.class)
+                .rethrow(withMessage("Unexpected error", ClonerException::new));
         }
     }
 
     default <T> T newInstanceUnsafe(Class<T> clazz) throws Throwable {
-        throw new Error("Must never happen");
+        throw new Error("Not implemented");
     }
 
 }
