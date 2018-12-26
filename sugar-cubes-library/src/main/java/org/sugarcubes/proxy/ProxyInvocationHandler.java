@@ -35,7 +35,6 @@ public class ProxyInvocationHandler extends SmartInvocationHandler implements Se
         catch (Throwable throwable) {
             throw Rex.of(throwable)
                 .replaceIf(InvocationTargetException.class, Rex::cause)
-                .rethrowIfUnchecked()
                 .rethrowIfDeclared(method)
                 .rethrowAsRuntime();
         }

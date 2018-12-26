@@ -173,12 +173,23 @@ public class Rex<T extends Throwable> implements Serializable {
     }
 
     public Error rethrowAsRuntime() {
-        return replace(RuntimeException::new).rethrow();
+        return rethrowIfUnchecked().replace(RuntimeException::new).rethrow();
+    }
+
+    public static Error rethrowAsRuntime(Throwable error) {
+        return of(error).rethrowAsRuntime();
     }
 
     public <E extends Throwable> Rex<T> rethrowIf(Class<E> errorType) throws E {
         if (is(errorType)) {
             throw this.<E>cast().rethrow();
+        }
+        return this;
+    }
+
+    public <E extends Throwable, X extends Throwable> Rex<T> rethrowIf(Class<E> errorType, Function<E, X> function) throws X {
+        if (is(errorType)) {
+            throw this.<E>cast().replace(function).rethrow();
         }
         return this;
     }

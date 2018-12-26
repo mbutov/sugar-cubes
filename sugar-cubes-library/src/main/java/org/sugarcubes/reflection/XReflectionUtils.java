@@ -3,7 +3,7 @@ package org.sugarcubes.reflection;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 
-import org.sugarcubes.rex.Rex0;
+import org.sugarcubes.rex.Rex;
 
 /**
  * Internal utilities.
@@ -40,11 +40,10 @@ class XReflectionUtils {
             return (Y) callable.call();
         }
         catch (Throwable e) {
-            throw Rex0.of(e)
-                .throwIfUnchecked()
-                .ifThenThrow(InvocationTargetException.class, x -> new XInvocationException(x.getCause()))
-                .ifThenThrow(ReflectiveOperationException.class, XReflectiveOperationException::new)
-                .throwUnchecked();
+            throw Rex.of(e)
+                .rethrowIf(InvocationTargetException.class, x -> new XInvocationException(x.getCause()))
+                .rethrowIf(ReflectiveOperationException.class, XReflectiveOperationException::new)
+                .rethrowAsRuntime();
         }
     }
 

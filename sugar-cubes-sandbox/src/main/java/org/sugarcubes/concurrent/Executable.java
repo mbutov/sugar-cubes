@@ -4,7 +4,7 @@ import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.sugarcubes.rex.Rex0;
+import org.sugarcubes.rex.Rex;
 
 /**
  * Extension of {@link Callable}, which has a safe version of {@link #call()} - {@link #execute()},
@@ -35,7 +35,7 @@ public interface Executable<T, E extends Exception> extends Callable<T>, XCallab
             return call();
         }
         catch (Exception e) {
-            throw Rex0.throwUnchecked(e);
+            throw Rex.of(e).rethrowAsRuntime();
         }
     }
 
@@ -104,12 +104,7 @@ public interface Executable<T, E extends Exception> extends Callable<T>, XCallab
      * {@link Supplier} -> {@link Executable}
      */
     static <T> Executable<T, RuntimeException> of(Supplier<T> supplier) {
-        return new Executable<T, RuntimeException>() {
-            @Override
-            public T call() {
-                return supplier.get();
-            }
-        };
+        return supplier::get;
     }
 
     /**
