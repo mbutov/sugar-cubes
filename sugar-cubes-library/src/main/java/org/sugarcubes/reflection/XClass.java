@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static java.util.Arrays.stream;
 
-import static org.sugarcubes.reflection.XCollectors.onlyElement;
-import static org.sugarcubes.reflection.XCollectors.toOptional;
+import static org.sugarcubes.stream.XCollectors.onlyElement;
+import static org.sugarcubes.stream.XCollectors.toOptional;
 import static org.sugarcubes.reflection.XPredicates.withName;
 import static org.sugarcubes.reflection.XPredicates.withNameAndParameterTypes;
 import static org.sugarcubes.reflection.XPredicates.withParameterTypes;

@@ -1,12 +1,12 @@
-package org.sugarcubes.reflection;
+package org.sugarcubes.stream;
 
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
-import static org.sugarcubes.reflection.XCollectors.onlyElement;
-import static org.sugarcubes.reflection.XCollectors.toOptional;
+import static org.sugarcubes.stream.XCollectors.onlyElement;
+import static org.sugarcubes.stream.XCollectors.toOptional;
 
 /**
  * @author Maxim Butov

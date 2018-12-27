@@ -1,4 +1,4 @@
-package org.sugarcubes.reflection;
+package org.sugarcubes.cache;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -10,13 +10,13 @@ import java.util.WeakHashMap;
 /**
  * Cache implementation with weak keys and soft values.
  *
- * @author Q-MBU
+ * @author Maxim Butov
  */
-public class XReflectionObjectCache<K, V> extends AbstractMap<K, V> {
+public class WeakKeysSoftValuesCache<K, V> extends AbstractMap<K, V> {
 
     private final Map<K, Reference<V>> cache = new WeakHashMap<>();
 
-    private V value(Reference<V> ref) {
+    private V valueOf(Reference<V> ref) {
         return ref != null ? ref.get() : null;
     }
 
@@ -27,17 +27,17 @@ public class XReflectionObjectCache<K, V> extends AbstractMap<K, V> {
 
     @Override
     public V get(Object key) {
-        return value(cache.get(key));
+        return valueOf(cache.get(key));
     }
 
     @Override
     public V put(K key, V value) {
-        return value(cache.put(key, new SoftReference<>(value)));
+        return valueOf(cache.put(key, new SoftReference<>(value)));
     }
 
     @Override
     public V remove(Object key) {
-        return value(cache.remove(key));
+        return valueOf(cache.remove(key));
     }
 
     @Override

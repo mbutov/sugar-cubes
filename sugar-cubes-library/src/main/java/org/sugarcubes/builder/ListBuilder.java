@@ -19,7 +19,7 @@ public class ListBuilder<X, L extends List<X>> extends CollectionBuilder<X, L> {
     }
 
     public static <X, L extends List<X>> ListBuilder<X, L> list(Supplier<L> supplier) {
-        return new ListBuilder<X, L>(supplier);
+        return new ListBuilder<>(supplier);
     }
 
     public static <X> ListBuilder<X, List<X>> arrayList() {

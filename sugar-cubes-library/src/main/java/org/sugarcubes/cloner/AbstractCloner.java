@@ -20,9 +20,8 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import org.sugarcubes.builder.SetBuilder;
 import org.sugarcubes.rex.Rex;
 import static org.sugarcubes.rex.Rex.withMessage;
 
@@ -53,9 +52,8 @@ public abstract class AbstractCloner implements Cloner {
     /**
      * Some immutable classes.
      */
-    private static final Set<Class> IMMUTABLE_CLASSES = Collections.unmodifiableSet(
-        Stream.of(
-
+    private static final Set<Class> IMMUTABLE_CLASSES = SetBuilder.<Class>hashSet()
+        .addAll(
             String.class,
 
             Boolean.class,
@@ -87,9 +85,8 @@ public abstract class AbstractCloner implements Cloner {
             URI.class,
             URL.class,
 
-            Pattern.class
-
-        ).collect(Collectors.toSet()));
+            Pattern.class)
+        .get(Collections::unmodifiableSet);
 
     /**
      * Checks whether the object of class is immutable (i.e. may be cloned by reference).

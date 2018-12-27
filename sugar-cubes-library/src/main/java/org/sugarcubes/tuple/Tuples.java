@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 /**
- * Factory for {@link TupleImpl}s and some utility methods.
+ * Factory for {@link Tuple}s and some utility methods.
  *
  * @author Maxim Butov
  */
@@ -37,10 +38,7 @@ public class Tuples {
     }
 
     public static <T> Tuple<T> union(Tuple<T> left, Tuple<T> right) {
-        List<T> list = new ArrayList<>(left.size() + right.size());
-        list.addAll(left);
-        list.addAll(right);
-        return new TupleImpl<>(list);
+        return new TupleImpl<>(false, Stream.of(left, right).flatMap(Collection::stream).toArray());
     }
 
     public static <T> Tuple<T> append(Tuple<T> tuple, T... values) {

@@ -1,4 +1,4 @@
-package org.sugarcubes.reflection;
+package org.sugarcubes.stream;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -12,7 +12,7 @@ import java.util.stream.Collector;
  *
  * @author Maxim Butov
  */
-class XCollectors {
+public class XCollectors {
 
     private static final Supplier<RuntimeException> ILLEGAL_COLLECTOR_STATE =
         () -> new IllegalStateException("Illegal collector state.");

@@ -39,7 +39,7 @@ public interface Builder<T> extends Supplier<T> {
      * @return new builder instance, for the same instance use {@link MutableBuilder}
      */
     default Builder<T> apply(Consumer<T> consumer) {
-        return transform(Builders.consumerToFunction(consumer));
+        return transform(Builders.toIdentity(consumer));
     }
 
     /**

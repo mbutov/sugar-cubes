@@ -6,9 +6,10 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
-import org.sugarcubes.function.ThreeConsumer;
-import org.sugarcubes.function.ThreeFunction;
+import org.sugarcubes.function.TernaryConsumer;
+import org.sugarcubes.function.TernaryFunction;
 
 /**
  * {@link Builder}-related static helpers.
@@ -52,7 +53,7 @@ public class Builders {
      * @param consumer consumer
      * @return function
      */
-    public static <T> Function<T, T> consumerToFunction(Consumer<T> consumer) {
+    public static <T> UnaryOperator<T> toIdentity(Consumer<T> consumer) {
         return t -> {
             consumer.accept(t);
             return t;
@@ -96,7 +97,7 @@ public class Builders {
      * @param arg2 supplier for argument 2
      * @return consumer
      */
-    public static <T, X, Y> Consumer<T> call(ThreeConsumer<T, X, Y> method, Supplier<X> arg1, Supplier<Y> arg2) {
+    public static <T, X, Y> Consumer<T> call(TernaryConsumer<T, X, Y> method, Supplier<X> arg1, Supplier<Y> arg2) {
         return t -> method.accept(t, arg1.get(), arg2.get());
     }
 
@@ -111,7 +112,7 @@ public class Builders {
      * @param arg2 argument 2
      * @return consumer
      */
-    public static <T, X, Y> Consumer<T> call(ThreeConsumer<T, X, Y> method, X arg1, Y arg2) {
+    public static <T, X, Y> Consumer<T> call(TernaryConsumer<T, X, Y> method, X arg1, Y arg2) {
         return call(method, of(arg1), of(arg2));
     }
 
@@ -154,7 +155,7 @@ public class Builders {
      * @param arg2 supplier for argument 2
      * @return function
      */
-    public static <T, X, Y, R> Function<T, R> invoke(ThreeFunction<T, X, Y, R> method, Supplier<X> arg1, Supplier<Y> arg2) {
+    public static <T, X, Y, R> Function<T, R> invoke(TernaryFunction<T, X, Y, R> method, Supplier<X> arg1, Supplier<Y> arg2) {
         return t -> method.apply(t, arg1.get(), arg2.get());
     }
 
@@ -169,7 +170,7 @@ public class Builders {
      * @param arg2 argument 2
      * @return function
      */
-    public static <T, X, Y, R> Function<T, R> invoke(ThreeFunction<T, X, Y, R> method, X arg1, Y arg2) {
+    public static <T, X, Y, R> Function<T, R> invoke(TernaryFunction<T, X, Y, R> method, X arg1, Y arg2) {
         return invoke(method, of(arg1), of(arg2));
     }
 

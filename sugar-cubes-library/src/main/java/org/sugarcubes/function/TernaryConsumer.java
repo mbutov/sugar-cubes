@@ -11,11 +11,11 @@ import java.util.Objects;
  * @author Maxim Butov
  */
 @FunctionalInterface
-public interface ThreeConsumer<T, U, V> {
+public interface TernaryConsumer<T, U, V> {
 
     void accept(T t, U u, V v);
 
-    default ThreeConsumer<T, U, V> andThen(ThreeConsumer<? super T, ? super U, ? super V> after) {
+    default TernaryConsumer<T, U, V> andThen(TernaryConsumer<? super T, ? super U, ? super V> after) {
         Objects.requireNonNull(after);
         return (T t, U u, V v) -> {
             accept(t, u, v);
