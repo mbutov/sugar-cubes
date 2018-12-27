@@ -3,6 +3,7 @@ package org.sugarcubes.reflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import org.sugarcubes.validation.Arg;
 import static org.sugarcubes.reflection.XReflectionUtils.execute;
 
 /**
@@ -54,9 +55,7 @@ public class XField<F> extends XReloadableReflectionObject<Field>
     }
 
     public void setModifier(int modifier, boolean newValue) {
-        if (!XModifiers.isValidModifier(modifier)) {
-            throw new IllegalArgumentException("Invalid modifier 0x" + Integer.toHexString(modifier));
-        }
+        Arg.check(modifier, XModifiers::isValidModifier, () -> "Invalid modifier 0x" + Integer.toHexString(modifier));
         int newModifiers = newValue ? modifiers | modifier : modifiers & ~modifier;
         setModifiers(newModifiers);
     }

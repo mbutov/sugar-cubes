@@ -1,6 +1,6 @@
 package org.sugarcubes.builder;
 
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -33,7 +33,7 @@ public class Builders {
      * @return builder
      */
     public static <T> Builder<T> of(Supplier<T> supplier) {
-        return supplier instanceof Builder ? (Builder<T>) supplier : supplier::get;
+        return supplier::get;
     }
 
     /**
@@ -43,7 +43,8 @@ public class Builders {
      * @return builder
      */
     public static <T> Builder<T> of(T value) {
-        return Optional.of(value)::get; // check not null
+        Objects.requireNonNull(value, "value must not be null");
+        return () -> value;
     }
 
     /**

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static java.util.Arrays.stream;
 
+import org.sugarcubes.validation.Arg;
 import static org.sugarcubes.stream.XCollectors.onlyElement;
 import static org.sugarcubes.stream.XCollectors.toOptional;
 import static org.sugarcubes.reflection.XPredicates.withName;
@@ -23,7 +24,7 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     private final Class<C> reflectionObject;
 
     XClass(Class<C> reflectionObject) {
-        this.reflectionObject = reflectionObject;
+        this.reflectionObject = Arg.notNull(reflectionObject, "Class must not be null");
     }
 
     @Override
