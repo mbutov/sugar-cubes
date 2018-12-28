@@ -4,6 +4,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.sugarcubes.function.Invocations;
+
 /**
  * Generic builder for any objects. Almost same as {@link Supplier}, just have methods
  * {@link #transform(Function)} and {@link #apply(Consumer)}.
@@ -39,7 +41,7 @@ public interface Builder<T> extends Supplier<T> {
      * @return new builder instance, for the same instance use {@link MutableBuilder}
      */
     default Builder<T> apply(Consumer<T> consumer) {
-        return transform(Builders.toIdentity(consumer));
+        return transform(Invocations.toIdentity(consumer));
     }
 
     /**

@@ -104,7 +104,12 @@ public interface Executable<T, E extends Exception> extends Callable<T>, XCallab
      * {@link Supplier} -> {@link Executable}
      */
     static <T> Executable<T, RuntimeException> of(Supplier<T> supplier) {
-        return supplier::get;
+        return new Executable<T, RuntimeException>() {
+            @Override
+            public T call() throws RuntimeException {
+                return supplier.get();
+            }
+        };
     }
 
     /**
