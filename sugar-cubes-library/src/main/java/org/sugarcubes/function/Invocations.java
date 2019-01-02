@@ -112,7 +112,7 @@ public class Invocations {
      * Creates {@link Function} which takes an object, then calls its method with the {@code arg} as an argument and
      * returns the result of this call.
      *
-     * Usage: {@code invoke(String::indexOf, person::getName)}
+     * Usage: {@code invoke(String::indexOf, "substring")}
      *
      * @param method one-arg method reference
      * @param arg supplier for argument
