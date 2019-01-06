@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 public class Tuples {
 
     public static <T> Empty<T> of() {
-        return Empty.INSTANCE;
+        return Empty.instance();
     }
 
     public static <A> Single<A> of(A a) {

@@ -1,5 +1,6 @@
 package org.sugarcubes.tuple;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -50,6 +51,15 @@ public class TupleTest {
     public static void assertArraySameTypeAndEqual(Object[] expected, Object[] actual) {
         Assert.assertEquals(expected.getClass(), actual.getClass());
         Assert.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testEmpty() {
+        Empty<String> stringEmpty = Empty.instance();
+        Empty<Integer> integerEmpty = Empty.instance();
+        Assert.assertSame(stringEmpty, integerEmpty);
+        Empty<String> stringEmpty2 = SerializationUtils.clone(stringEmpty);
+        Assert.assertSame(stringEmpty, stringEmpty2);
     }
 
 }
