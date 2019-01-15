@@ -13,10 +13,6 @@ import java.util.function.Supplier;
  */
 public class CollectionBuilder<X, C extends Collection<X>> extends MutableBuilder<C, CollectionBuilder<X, C>> {
 
-    public CollectionBuilder(C value) {
-        super(value);
-    }
-
     public CollectionBuilder(Supplier<C> supplier) {
         super(supplier);
     }
@@ -50,7 +46,7 @@ public class CollectionBuilder<X, C extends Collection<X>> extends MutableBuilde
     }
 
     public X[] toArray(IntFunction<X[]> generator) {
-        return get().stream().toArray(generator);
+        return build().stream().toArray(generator);
     }
 
 }

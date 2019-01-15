@@ -10,10 +10,6 @@ import java.util.function.Supplier;
  */
 public class ListBuilder<X, L extends List<X>> extends CollectionBuilder<X, L> {
 
-    public ListBuilder(L value) {
-        super(value);
-    }
-
     public ListBuilder(Supplier<L> supplier) {
         super(supplier);
     }

@@ -19,7 +19,7 @@ public class CollectionBuilderTest {
         Collection<Integer> collection = CollectionBuilder.<Integer, Collection<Integer>>collection(ArrayList::new)
             .add(1).add(2).addAll(3, 4, 5)
             .replace(Collections::unmodifiableCollection)
-            .get();
+            .build();
 
         Assert.assertArrayEquals(new Object[] {1, 2, 3, 4, 5,}, collection.toArray());
 
@@ -28,11 +28,11 @@ public class CollectionBuilderTest {
     @Test(expected = UnsupportedOperationException.class)
     public void testUnmodifiableCollection() throws Exception {
 
-        new CollectionBuilder<>(new HashSet<Integer>())
-            .<Collection<Integer>>cast()
+        new CollectionBuilder<>(HashSet::new)
+            .cast()
             .replace(Collections::unmodifiableCollection)
             .add(1)
-            .get();
+            .build();
 
     }
 

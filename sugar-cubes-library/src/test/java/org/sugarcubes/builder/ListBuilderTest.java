@@ -19,7 +19,7 @@ public class ListBuilderTest {
         List<String> list = ListBuilder.<String>arrayList()
             .add("x")
             .add("y", "z")
-            .get();
+            .build();
 
         Assert.assertTrue(list instanceof ArrayList);
         Assert.assertEquals(Arrays.asList("x", "y", "z"), list);
@@ -33,7 +33,7 @@ public class ListBuilderTest {
             .add("x")
             .add("y", "z")
             .replace(Collections::unmodifiableList)
-            .get();
+            .build();
 
         Assert.assertEquals(Arrays.asList("x", "y", "z"), list);
 

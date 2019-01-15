@@ -20,16 +20,7 @@ public class MutableBuilder<T, B extends MutableBuilder<T, B>> implements Builde
     private Builder<T> delegate;
 
     /**
-     * Constructor with constant value.
-     *
-     * @param value initial value
-     */
-    protected MutableBuilder(T value) {
-        this.delegate = Builders.of(value);
-    }
-
-    /**
-     * Constructor with constant value.
+     * Constructor with supplier.
      *
      * @param supplier supplier of initial value
      */
@@ -38,8 +29,8 @@ public class MutableBuilder<T, B extends MutableBuilder<T, B>> implements Builde
     }
 
     @Override
-    public T get() {
-        return delegate.get();
+    public T build() {
+        return delegate.build();
     }
 
     @Override

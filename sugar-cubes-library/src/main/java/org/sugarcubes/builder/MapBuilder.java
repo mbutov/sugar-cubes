@@ -16,10 +16,6 @@ import java.util.function.Supplier;
  */
 public class MapBuilder<K, V, M extends Map<K, V>> extends MutableBuilder<M, MapBuilder<K, V, M>> {
 
-    public MapBuilder(M value) {
-        super(value);
-    }
-
     public MapBuilder(Supplier<M> supplier) {
         super(supplier);
     }

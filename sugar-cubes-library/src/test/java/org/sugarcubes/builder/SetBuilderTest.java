@@ -14,7 +14,8 @@ public class SetBuilderTest {
         SetBuilder.<Integer>hashSet()
             .add(1).add(2)
             .cast()
-            .replace(Collections::unmodifiableCollection).get();
+            .replace(Collections::unmodifiableCollection)
+            .build();
 
     }
 

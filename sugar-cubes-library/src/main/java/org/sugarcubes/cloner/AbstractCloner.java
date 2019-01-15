@@ -53,40 +53,23 @@ public abstract class AbstractCloner implements Cloner {
      * Some immutable classes.
      */
     private static final Set<Class> IMMUTABLE_CLASSES = SetBuilder.<Class>hashSet()
-        .addAll(
+        .addAll(new Class[] {
             String.class,
 
-            Boolean.class,
-            Byte.class,
-            Short.class,
-            Character.class,
-            Integer.class,
-            Long.class,
-            Float.class,
-            Double.class,
+            Boolean.class, Byte.class, Short.class, Character.class, Integer.class, Long.class, Float.class, Double.class,
 
-            BigInteger.class,
-            BigDecimal.class,
+            BigInteger.class, BigDecimal.class,
 
-            Duration.class,
-            Instant.class,
-            LocalDate.class,
-            LocalDateTime.class,
-            LocalTime.class,
-            MonthDay.class,
-            OffsetDateTime.class,
-            OffsetTime.class,
-            Period.class,
-            Year.class,
-            YearMonth.class,
-            ZonedDateTime.class,
-            ZoneOffset.class,
+            Duration.class, Instant.class, LocalDate.class, LocalDateTime.class, LocalTime.class, MonthDay.class,
+            OffsetDateTime.class, OffsetTime.class, Period.class, Year.class, YearMonth.class,
+            ZonedDateTime.class, ZoneOffset.class,
 
-            URI.class,
-            URL.class,
+            URI.class, URL.class,
 
-            Pattern.class)
-        .get(Collections::unmodifiableSet);
+            Pattern.class,
+        })
+        .transform(Collections::unmodifiableSet)
+        .build();
 
     /**
      * Checks whether the object of class is immutable (i.e. may be cloned by reference).

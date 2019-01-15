@@ -17,10 +17,6 @@ import java.util.function.Supplier;
  */
 public class SetBuilder<X, S extends Set<X>> extends CollectionBuilder<X, S> {
 
-    public SetBuilder(S value) {
-        super(value);
-    }
-
     public SetBuilder(Supplier<S> supplier) {
         super(supplier);
     }

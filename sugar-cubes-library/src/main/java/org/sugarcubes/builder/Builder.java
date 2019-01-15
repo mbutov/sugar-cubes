@@ -12,7 +12,24 @@ import org.sugarcubes.function.Invocations;
  *
  * @author Maxim Butov
  */
+@FunctionalInterface
 public interface Builder<T> extends Supplier<T> {
+
+    /**
+     * Creates an object from seed, applies all modifications and returns the final object
+     *
+     * @return built object
+     */
+    T build();
+
+    /**
+     * This method should not be used in explicit manner. Use {@link #build()} instead.
+     */
+    @Deprecated
+    @Override
+    default T get() {
+        return build();
+    }
 
     /**
      * Returns new builder, which applies function to the result of this builder.
@@ -21,21 +38,11 @@ public interface Builder<T> extends Supplier<T> {
      * @return new builder
      */
     default <V> Builder<V> transform(Function<T, V> function) {
-        return () -> function.apply(get());
+        return () -> function.apply(build());
     }
 
     /**
-     * Shortcut {@code for transform(function).get()}.
-     *
-     * @param function function to apply
-     * @return the final value
-     */
-    default <V> V get(Function<T, V> function) {
-        return transform(function).get();
-    }
-
-    /**
-     * Calls {@link Consumer#accept(Object)} to the object before returning it from {@link #get()}.
+     * Calls {@link Consumer#accept(Object)} to the object before returning it from {@link #build()}.
      *
      * @param consumer consumer
      * @return new builder instance, for the same instance use {@link MutableBuilder}
@@ -50,7 +57,7 @@ public interface Builder<T> extends Supplier<T> {
      * @return supplier
      */
     default Supplier<T> complete() {
-        return this::get;
+        return this::build;
     }
 
     /**
