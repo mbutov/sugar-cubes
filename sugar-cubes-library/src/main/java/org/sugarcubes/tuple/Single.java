@@ -9,6 +9,8 @@ package org.sugarcubes.tuple;
  */
 public class Single<A> extends TupleImpl implements HasFisrt<A> {
 
+    private static final long serialVersionUID = 1L;
+
     public Single(A a) {
         super(false, new Object[] {a});
     }

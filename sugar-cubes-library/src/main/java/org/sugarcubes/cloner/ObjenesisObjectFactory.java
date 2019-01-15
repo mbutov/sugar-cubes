@@ -10,7 +10,7 @@ import org.objenesis.ObjenesisStd;
  */
 public class ObjenesisObjectFactory implements ObjectFactory {
 
-    private Objenesis objenesis;
+    private final Objenesis objenesis;
 
     public ObjenesisObjectFactory() {
         this(new ObjenesisStd());

@@ -5,8 +5,8 @@ import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
-import static org.sugarcubes.stream.XCollectors.onlyElement;
-import static org.sugarcubes.stream.XCollectors.toOptional;
+import static org.sugarcubes.stream.ZeroOneCollectors.onlyElement;
+import static org.sugarcubes.stream.ZeroOneCollectors.toOptional;
 
 /**
  * @author Maxim Butov

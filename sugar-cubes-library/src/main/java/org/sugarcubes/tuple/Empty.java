@@ -9,6 +9,8 @@ package org.sugarcubes.tuple;
  */
 public final class Empty<T> extends TupleImpl<T> {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * An untyped instance of {@link Empty}.
      */
@@ -27,8 +29,6 @@ public final class Empty<T> extends TupleImpl<T> {
     private Empty() {
         super(false, new Object[0]);
     }
-
-    private static final long serialVersionUID = 1L;
 
     private Object readResolve() {
         return INSTANCE;

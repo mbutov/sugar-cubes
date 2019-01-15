@@ -8,11 +8,11 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 /**
- * Useful collectors.
+ * Collectors for streams with zero or one elements.
  *
  * @author Maxim Butov
  */
-public class XCollectors {
+public class ZeroOneCollectors {
 
     private static final Supplier<RuntimeException> ILLEGAL_COLLECTOR_STATE =
         () -> new IllegalStateException("Illegal collector state.");

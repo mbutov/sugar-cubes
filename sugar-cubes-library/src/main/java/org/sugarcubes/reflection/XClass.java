@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 import static java.util.Arrays.stream;
 
 import org.sugarcubes.validation.Arg;
-import static org.sugarcubes.stream.XCollectors.onlyElement;
-import static org.sugarcubes.stream.XCollectors.toOptional;
+import static org.sugarcubes.stream.ZeroOneCollectors.onlyElement;
+import static org.sugarcubes.stream.ZeroOneCollectors.toOptional;
 import static org.sugarcubes.reflection.XPredicates.withName;
 import static org.sugarcubes.reflection.XPredicates.withNameAndParameterTypes;
 import static org.sugarcubes.reflection.XPredicates.withParameterTypes;
