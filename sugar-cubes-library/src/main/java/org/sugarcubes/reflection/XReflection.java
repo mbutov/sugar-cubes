@@ -28,8 +28,7 @@ public class XReflection {
     }
 
     public static <X> XField<X> of(Field field) {
-        // XField can modify state of field, so don't cache them
-        return new XField<>(field);
+        return computeIfAbsent(field, XField::new);
     }
 
     /**

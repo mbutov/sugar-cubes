@@ -42,8 +42,7 @@ public class XReflectionTest {
     @Test
     public void testFinal() {
 
-        XField<Integer> xField = XReflection.of(Integer.class).getField("value");
-        xField.clearFinal();
+        XField<Integer> xField = XReflection.of(Integer.class).<Integer>getField("value").withNoFinal();
 
         Integer obj = new Integer(-1);
         Integer newValue = 1;

@@ -11,13 +11,12 @@ import static org.sugarcubes.reflection.XReflectionUtils.execute;
  *
  * @author Maxim Butov
  */
-public class XField<F> extends XReloadableReflectionObject<Field>
-    implements XAnnotated<Field>, XMember<Field>, XModifiers {
+public class XField<T> extends XReloadableReflectionObject<Field>
+    implements XAnnotated<Field>, XMember<Field>, XModifiers, XTyped<T> {
 
     private final Class declaringClass;
     private final String name;
-
-    private int modifiers;
+    private final int modifiers;
 
     XField(Field reflectionObject) {
         super(reflectionObject);
@@ -26,46 +25,51 @@ public class XField<F> extends XReloadableReflectionObject<Field>
         this.modifiers = reflectionObject.getModifiers();
     }
 
-    private static final XField<Integer> MODIFIERS = XReflection.of(Field.class).getDeclaredField("modifiers");
-
-    private static void setModifiers(Field field, int modifiers) {
-        if (field.getModifiers() != modifiers) {
-            MODIFIERS.set(field, modifiers);
-        }
+    @Override
+    protected Field loadReflectionObject() throws ReflectiveOperationException {
+        return fieldWithModifiers(declaringClass.getDeclaredField(name), modifiers);
     }
 
     @Override
-    protected Field loadReflectionObject() throws ReflectiveOperationException {
-        Field field = declaringClass.getDeclaredField(name);
-        setModifiers(field, modifiers);
-        return field;
+    public Class<T> getType() {
+        return (Class) getReflectionObject().getType();
     }
 
-    public F get(Object obj) {
+    public T get(Object obj) {
         return execute(() -> getReflectionObject().get(obj));
     }
 
-    public void set(Object obj, F value) {
+    public void set(Object obj, T value) {
         execute(() -> getReflectionObject().set(obj, value));
     }
 
-    public void setModifiers(int modifiers) {
-        this.modifiers = modifiers;
-        setModifiers(getReflectionObject(), modifiers);
+    public XField<T> withModifiers(int modifiers) {
+        return this.modifiers != modifiers ? new XField<T>(fieldWithModifiers(getReflectionObject(), modifiers)) : this;
     }
 
-    public void setModifier(int modifier, boolean newValue) {
+    public XField<T> withModifier(int modifier, boolean newValue) {
         Arg.check(modifier, XModifiers::isValidModifier, () -> "Invalid modifier 0x" + Integer.toHexString(modifier));
         int newModifiers = newValue ? modifiers | modifier : modifiers & ~modifier;
-        setModifiers(newModifiers);
+        return withModifiers(newModifiers);
     }
 
-    public void setFinal(boolean isFinal) {
-        setModifier(Modifier.FINAL, isFinal);
+    public XField<T> withFinal(boolean isFinal) {
+        return withModifier(Modifier.FINAL, isFinal);
     }
 
-    public void clearFinal() {
-        setFinal(false);
+    public XField<T> withNoFinal() {
+        return withFinal(false);
+    }
+
+    // private stuff
+
+    private static final XField<Integer> MODIFIERS = XReflection.of(Field.class).getDeclaredField("modifiers");
+
+    private static Field fieldWithModifiers(Field field, int modifiers) {
+        if (field.getModifiers() != modifiers) {
+            MODIFIERS.set(field, modifiers);
+        }
+        return field;
     }
 
 }

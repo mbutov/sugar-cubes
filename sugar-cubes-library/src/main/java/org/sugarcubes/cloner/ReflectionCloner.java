@@ -11,7 +11,6 @@ import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
 import org.sugarcubes.reflection.XField;
-import org.sugarcubes.reflection.XModifiers;
 import org.sugarcubes.reflection.XReflection;
 
 /**
@@ -169,8 +168,8 @@ public class ReflectionCloner extends AbstractCloner {
     protected List<XField<?>> findCopyableFields(Class<?> clazz) {
         List<XField<?>> fields = XReflection.of(clazz).getFields()
             .filter(field -> !field.isModifier(excludedModifiers))
+            .map(XField::withNoFinal)
             .collect(Collectors.toList());
-        fields.stream().filter(XModifiers::isFinal).forEach(XField::clearFinal);
         return fields;
     }
 

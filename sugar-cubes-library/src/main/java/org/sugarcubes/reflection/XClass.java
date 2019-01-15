@@ -19,7 +19,7 @@ import static org.sugarcubes.reflection.XReflectiveOperationException.withMessag
  *
  * @author Maxim Butov
  */
-public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnotated<Class<C>>, XModifiers {
+public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnotated<Class<C>>, XModifiers, XTyped<C> {
 
     private final Class<C> reflectionObject;
 
@@ -29,6 +29,11 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
 
     @Override
     public Class<C> getReflectionObject() {
+        return reflectionObject;
+    }
+
+    @Override
+    public Class<C> getType() {
         return reflectionObject;
     }
 
