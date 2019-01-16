@@ -1,4 +1,4 @@
-package org.sugarcubes.builder;
+package org.sugarcubes.builder.collection;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import org.sugarcubes.builder.MutableBuilder;
 
 /**
  * Base class for List and Set builders.
@@ -20,7 +22,7 @@ public class CollectionBuilder<X, C extends Collection<X>> extends MutableBuilde
     }
 
     public static <X, C extends Collection<X>> CollectionBuilder<X, C> collection(Supplier<C> supplier) {
-        return new CollectionBuilder<X, C>(supplier);
+        return new CollectionBuilder<>(supplier);
     }
 
     public <D extends Collection<X>> CollectionBuilder<X, D> cast() {

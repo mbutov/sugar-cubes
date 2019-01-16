@@ -1,7 +1,8 @@
 package org.sugarcubes.builder;
 
-import java.util.Objects;
 import java.util.function.Supplier;
+
+import org.sugarcubes.arg.Arg;
 
 /**
  * {@link Builder}-related static helpers.
@@ -17,7 +18,7 @@ public class Builders {
      * @return builder
      */
     public static <T> Builder<T> of(T value) {
-        Objects.requireNonNull(value, "value must not be null");
+        Arg.notNull(value, "value must not be null");
         return () -> value;
     }
 

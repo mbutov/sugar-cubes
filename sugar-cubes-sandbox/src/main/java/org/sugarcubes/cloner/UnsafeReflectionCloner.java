@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import org.sugarcubes.builder.MapBuilder;
+import org.sugarcubes.builder.collection.MapBuilder;
 import org.sugarcubes.function.TernaryConsumer;
 import org.sugarcubes.reflection.XField;
 

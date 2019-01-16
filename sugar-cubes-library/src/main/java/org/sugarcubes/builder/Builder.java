@@ -60,11 +60,4 @@ public interface Builder<T> extends Supplier<T> {
         return this::build;
     }
 
-    /**
-     * Returns itself.
-     */
-    default Builder<T> self() {
-        return this;
-    }
-
 }

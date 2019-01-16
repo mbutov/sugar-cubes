@@ -1,4 +1,4 @@
-package org.sugarcubes.builder;
+package org.sugarcubes.builder.collection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,6 +7,7 @@ import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.sugarcubes.builder.collection.MapBuilder;
 
 /**
  * @author Maxim Butov

@@ -6,10 +6,10 @@ import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
+import org.sugarcubes.arg.Arg;
 import org.sugarcubes.reflection.XField;
 import org.sugarcubes.reflection.XReflection;
 
@@ -49,7 +49,7 @@ public class ReflectionCloner extends AbstractCloner {
      * @param objectFactory object factory to use
      */
     public ReflectionCloner(ObjectFactory objectFactory) {
-        Objects.requireNonNull(objectFactory, "objectFactory is null");
+        Arg.notNull(objectFactory, "objectFactory is null");
         this.objectFactory = objectFactory;
     }
 

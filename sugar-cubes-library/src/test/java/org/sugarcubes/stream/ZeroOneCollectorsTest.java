@@ -11,7 +11,7 @@ import static org.sugarcubes.stream.ZeroOneCollectors.toOptional;
 /**
  * @author Maxim Butov
  */
-public class XCollectorsTest {
+public class ZeroOneCollectorsTest {
 
     @Test
     public void testToOptional() {

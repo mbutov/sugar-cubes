@@ -27,7 +27,7 @@ public class TupleTest {
         Assert.assertThat(Tuples.of("a", "b"), greaterThan(Tuples.of("a")));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testNullElement() {
         Tuples.of(1, null);
     }

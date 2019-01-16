@@ -1,4 +1,4 @@
-package org.sugarcubes.validation;
+package org.sugarcubes.arg;
 
 import java.util.Objects;
 import java.util.function.Predicate;

@@ -30,7 +30,7 @@ public class SingletonHolder<T> implements Supplier<T> {
                 value = loader.call();
             }
             catch (Exception e) {
-                throw Rex.of(e).rethrowAsRuntime();
+                throw Rex.rethrowAsRuntime(e);
             }
         }
         return value;

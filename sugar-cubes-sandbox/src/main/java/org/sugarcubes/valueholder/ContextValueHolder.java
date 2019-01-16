@@ -6,9 +6,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.function.Supplier;
+
+import org.sugarcubes.arg.Arg;
 
 /**
  * {@link ValueHolder}, ассоциированный с данным контекстом. Можно использовать, например, для значений в контексте
@@ -42,7 +43,7 @@ public class ContextValueHolder<T> extends AbstractValueHolder<T> {
      * @param key композитный ключ
      */
     public ContextValueHolder(Supplier context, Object... key) {
-        Objects.requireNonNull(context, "context must not be null");
+        Arg.notNull(context, "context must not be null");
 
         this.context = context;
 
@@ -68,12 +69,12 @@ public class ContextValueHolder<T> extends AbstractValueHolder<T> {
      */
     public ContextValueHolder(Object context, Object... key) {
         this(new ReferenceSupplier(new WeakReference(context)), key);
-        Objects.requireNonNull(context, "context must not be null");
+        Arg.notNull(context, "context must not be null");
     }
 
     private Object getContext() {
         Object context = this.context.get();
-        Objects.requireNonNull(context, "context must not be null");
+        Arg.notNull(context, "context must not be null");
         return context;
     }
 

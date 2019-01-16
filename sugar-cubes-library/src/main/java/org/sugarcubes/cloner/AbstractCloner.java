@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.sugarcubes.builder.SetBuilder;
+import org.sugarcubes.builder.collection.SetBuilder;
 import org.sugarcubes.rex.Rex;
 import static org.sugarcubes.rex.Rex.withMessage;
 

@@ -1,4 +1,4 @@
-package org.sugarcubes.builder;
+package org.sugarcubes.builder.collection;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -8,6 +8,8 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.function.Supplier;
+
+import org.sugarcubes.builder.MutableBuilder;
 
 /**
  * Map builders.
@@ -21,7 +23,7 @@ public class MapBuilder<K, V, M extends Map<K, V>> extends MutableBuilder<M, Map
     }
 
     public <D extends Map<K, V>> MapBuilder<K, V, D> cast() {
-        return (MapBuilder<K, V, D>) this;
+        return (MapBuilder) this;
     }
 
     public MapBuilder<K, V, M> put(K key, V value) {
@@ -35,7 +37,7 @@ public class MapBuilder<K, V, M extends Map<K, V>> extends MutableBuilder<M, Map
     /// STATIC STUFF
 
     public static <K, V, M extends Map<K, V>> MapBuilder<K, V, M> map(Supplier<M> supplier) {
-        return new MapBuilder<K, V, M>(supplier);
+        return new MapBuilder<>(supplier);
     }
 
     public static <K, V> MapBuilder<K, V, Map<K, V>> hashMap() {

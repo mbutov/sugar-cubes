@@ -3,7 +3,7 @@ package org.sugarcubes.reflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import org.sugarcubes.validation.Arg;
+import org.sugarcubes.arg.Arg;
 import static org.sugarcubes.reflection.XReflectionUtils.execute;
 
 /**
@@ -61,7 +61,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
         return withFinal(false);
     }
 
-    // private stuff
+    /// private stuff
 
     private static final XField<Integer> MODIFIERS = XReflection.of(Field.class).getDeclaredField("modifiers");
 

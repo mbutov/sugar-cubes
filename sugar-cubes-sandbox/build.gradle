@@ -4,6 +4,14 @@ dependencies {
 
     compile project(':sugar-cubes-library')
 
+    compileOnly libs.aopalliance
+    compileOnly libs.objenesis
+    compileOnly libs.asm_all
+    compileOnly libs.cglib
+    compileOnly libs.javassist
+    compileOnly libs.dexmaker
+    compileOnly libs.bytebuddy
+
     compileOnly libs.javax_servlet
     compileOnly libs.spring
 

@@ -1,4 +1,4 @@
-package org.sugarcubes.builder;
+package org.sugarcubes.builder.collection;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
