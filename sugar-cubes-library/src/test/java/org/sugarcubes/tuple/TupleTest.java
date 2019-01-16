@@ -3,6 +3,9 @@ package org.sugarcubes.tuple;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sugarcubes.cloner.Cloners;
+import static org.hamcrest.Matchers.comparesEqualTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 
 /**
  * @author Maxim Butov
@@ -10,34 +13,34 @@ import org.sugarcubes.cloner.Cloners;
 public class TupleTest {
 
     @Test
-    public void testEquals() throws Exception {
-        Assert.assertEquals(new TupleImpl<Integer>(1), new TupleImpl<Object>(1));
-        Assert.assertNotEquals(new TupleImpl<>(1), new TupleImpl<>("a"));
+    public void testEquals() {
+        Assert.assertEquals(Tuples.of(1), Tuples.of(1));
+        Assert.assertNotEquals(Tuples.of(1), Tuples.of("a"));
     }
 
     @Test
-    public void testCompareTo() throws Exception {
-        Assert.assertTrue(new TupleImpl<>("a").compareTo(new TupleImpl<>("a")) == 0);
-        Assert.assertTrue(new TupleImpl<>("a").compareTo(new TupleImpl<>("a", "b")) == -1);
-        Assert.assertTrue(new TupleImpl<>("a", "a").compareTo(new TupleImpl<>("a", "b")) == -1);
-        Assert.assertTrue(new TupleImpl<>("a", "b").compareTo(new TupleImpl<>("a", "a")) == 1);
-        Assert.assertTrue(new TupleImpl<>("a", "b").compareTo(new TupleImpl<>("a")) == 1);
+    public void testCompareTo() {
+        Assert.assertThat(Tuples.of("a"), comparesEqualTo(Tuples.of("a")));
+        Assert.assertThat(Tuples.of("a"), lessThan(Tuples.of("a", "b")));
+        Assert.assertThat(Tuples.of("a", "a"), lessThan(Tuples.of("a", "b")));
+        Assert.assertThat(Tuples.of("a", "b"), greaterThan(Tuples.of("a", "a")));
+        Assert.assertThat(Tuples.of("a", "b"), greaterThan(Tuples.of("a")));
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNullElement() throws Exception {
-        new TupleImpl<>(1, null);
+    public void testNullElement() {
+        Tuples.of(1, null);
     }
 
     @Test(expected = ClassCastException.class)
-    public void testNonComparable() throws Exception {
-        new TupleImpl(1).compareTo(new TupleImpl("a"));
+    public void testNonComparable() {
+        Tuples.of(1).compareTo(Tuples.of("a"));
     }
 
     @Test
     public void testToArray() throws Exception {
 
-        TupleImpl<Object> tuple = new TupleImpl<>(1, 2, 3);
+        Tuple<Object> tuple = Tuples.of(1, 2, 3);
 
         assertArraySameTypeAndEqual(new Object[] {1, 2, 3}, tuple.toArray());
         assertArraySameTypeAndEqual(new Integer[] {1, 2, 3}, tuple.toArray(new Integer[0]));
@@ -58,7 +61,7 @@ public class TupleTest {
         Empty<String> stringEmpty = Empty.instance();
         Empty<Integer> integerEmpty = Empty.instance();
         Assert.assertSame(stringEmpty, integerEmpty);
-        Empty<String> stringEmpty2 = Cloners.serialization().clone(stringEmpty);
+        Empty<String> stringEmpty2 = Cloners.serializationClone(stringEmpty);
         Assert.assertSame(stringEmpty, stringEmpty2);
     }
 

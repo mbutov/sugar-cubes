@@ -3,8 +3,10 @@ package org.sugarcubes.builder;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Base class for List and Set builders.
@@ -29,6 +31,10 @@ public class CollectionBuilder<X, C extends Collection<X>> extends MutableBuilde
         return apply(collection -> collection.add(element));
     }
 
+    public CollectionBuilder<X, C> add(Optional<X> element) {
+        return apply(list -> element.ifPresent(list::add));
+    }
+
     public CollectionBuilder<X, C> add(X... elements) {
         return addAll(elements);
     }
@@ -39,6 +45,10 @@ public class CollectionBuilder<X, C extends Collection<X>> extends MutableBuilde
 
     public CollectionBuilder<X, C> addAll(X... elements) {
         return apply(collection -> collection.addAll(Arrays.asList(elements)));
+    }
+
+    public CollectionBuilder<X, C> addAll(Stream<X> elements) {
+        return apply(list -> elements.forEach(list::add));
     }
 
     public X[] toArray(Class<? super X> componentType) {

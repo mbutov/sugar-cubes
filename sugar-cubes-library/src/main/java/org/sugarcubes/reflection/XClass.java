@@ -1,18 +1,23 @@
 package org.sugarcubes.reflection;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static java.util.Arrays.stream;
 
+import org.sugarcubes.builder.ListBuilder;
+import org.sugarcubes.builder.SetBuilder;
 import org.sugarcubes.validation.Arg;
-import static org.sugarcubes.stream.ZeroOneCollectors.onlyElement;
-import static org.sugarcubes.stream.ZeroOneCollectors.toOptional;
 import static org.sugarcubes.reflection.XPredicates.withName;
 import static org.sugarcubes.reflection.XPredicates.withNameAndParameterTypes;
 import static org.sugarcubes.reflection.XPredicates.withParameterTypes;
 import static org.sugarcubes.reflection.XReflectiveOperationException.withMessage;
+import static org.sugarcubes.stream.ZeroOneCollectors.onlyElement;
+import static org.sugarcubes.stream.ZeroOneCollectors.toOptional;
 
 /**
  * Wrapper for {@link Class}.
@@ -47,9 +52,19 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
         return getReflectionObject().getName();
     }
 
+    private transient XClass<?> xSuper;
+    private transient List<XClass<?>> inheritance;
+    private transient List<XClass<?>> xDeclaredInterfaces;
+    private transient List<XClass<?>> xInterfaces;
+    private transient List<XConstructor<C>> xConstructors;
+    private transient List<XField<?>> xDeclaredFields;
+
     public XClass<?> getSuperclass() {
-        Class<?> superclass = getReflectionObject().getSuperclass();
-        return superclass != null ? XReflection.of(superclass) : XNullClass.INSTANCE;
+        if (xSuper == null) {
+            Class<?> superclass = getReflectionObject().getSuperclass();
+            xSuper = superclass != null ? XReflection.of(superclass) : XNullClass.INSTANCE;
+        }
+        return xSuper;
     }
 
     public boolean isNull() {
@@ -57,20 +72,48 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public Stream<XClass<?>> getInheritance() {
-        return Stream.concat(Stream.of(this), getSuperclass().getInheritance());
+        if (inheritance == null) {
+            inheritance = ListBuilder.<XClass<?>>arrayList()
+                .add(this)
+                .addAll(getSuperclass().getInheritance())
+                .transform(Collections::unmodifiableList)
+                .build();
+        }
+        return inheritance.stream();
     }
 
     public Stream<XClass<?>> getDeclaredInterfaces() {
-        return stream(getReflectionObject().getInterfaces()).map(XReflection::of);
+        if (xDeclaredInterfaces == null) {
+            xDeclaredInterfaces = SetBuilder.<XClass<?>>linkedHashSet()
+                .addAll(stream(getReflectionObject().getInterfaces()).map(XReflection::of))
+                .transform(ArrayList::new)
+                .transform(Collections::unmodifiableList)
+                .build();
+        }
+        return xDeclaredInterfaces.stream();
     }
 
     public Stream<XClass<?>> getInterfaces() {
-        return Stream.concat(getDeclaredInterfaces(), getSuperclass().getInterfaces()).distinct();
+        if (xInterfaces == null) {
+            Stream<XClass<?>> stream = Stream.concat(getDeclaredInterfaces(), getSuperclass().getInterfaces()).distinct();
+            xInterfaces = SetBuilder.<XClass<?>>linkedHashSet()
+                .addAll(getDeclaredInterfaces())
+                .addAll(getSuperclass().getInterfaces())
+                .transform(ArrayList::new)
+                .transform(Collections::unmodifiableList)
+                .build();
+        }
+        return xInterfaces.stream();
     }
 
     public Stream<XConstructor<C>> getConstructors() {
-        Constructor<C>[] constructors = (Constructor<C>[]) getReflectionObject().getDeclaredConstructors();
-        return stream(constructors).map(XReflection::of);
+        if (xConstructors == null) {
+            xConstructors = ListBuilder.<XConstructor<C>>arrayList()
+                .addAll(stream((Constructor<C>[]) getReflectionObject().getDeclaredConstructors()).map(XReflection::of))
+                .transform(Collections::unmodifiableList)
+                .build();
+        }
+        return xConstructors.stream();
     }
 
     public Optional<XConstructor<C>> findConstructor(Class... types) {
@@ -83,7 +126,13 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public Stream<XField<?>> getDeclaredFields() {
-        return stream(getReflectionObject().getDeclaredFields()).map(XReflection::of);
+        if (xDeclaredFields == null) {
+            xDeclaredFields = ListBuilder.<XField<?>>arrayList()
+                .addAll(stream(getReflectionObject().getDeclaredFields()).map(XReflection::of))
+                .transform(Collections::unmodifiableList)
+                .build();
+        }
+        return xDeclaredFields.stream();
     }
 
     public <X> Optional<XField<X>> findDeclaredField(String name) {

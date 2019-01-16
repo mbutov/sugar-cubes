@@ -44,7 +44,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
     }
 
     public XField<T> withModifiers(int modifiers) {
-        return this.modifiers != modifiers ? new XField<T>(fieldWithModifiers(getReflectionObject(), modifiers)) : this;
+        return this.modifiers != modifiers ? new XField<>(fieldWithModifiers(getReflectionObject(), modifiers)) : this;
     }
 
     public XField<T> withModifier(int modifier, boolean newValue) {

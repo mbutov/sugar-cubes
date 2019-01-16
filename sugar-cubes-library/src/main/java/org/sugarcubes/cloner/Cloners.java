@@ -42,4 +42,26 @@ public class Cloners {
         return SerializableCloner.INSTANCE;
     }
 
+    /**
+     * Clones object using {@link #reflection()} cloner.
+     *
+     * @param object original object
+     *
+     * @return clone
+     */
+    public static <T> T reflectionClone(T object) {
+        return reflection().clone(object);
+    }
+
+    /**
+     * Clones object using {@link #serialization()} cloner.
+     *
+     * @param object original object
+     *
+     * @return clone
+     */
+    public static <T> T serializationClone(T object) {
+        return serialization().clone(object);
+    }
+
 }
