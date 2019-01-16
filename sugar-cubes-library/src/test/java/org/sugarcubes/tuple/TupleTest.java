@@ -1,8 +1,8 @@
 package org.sugarcubes.tuple;
 
-import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.sugarcubes.cloner.Cloners;
 
 /**
  * @author Maxim Butov
@@ -58,7 +58,7 @@ public class TupleTest {
         Empty<String> stringEmpty = Empty.instance();
         Empty<Integer> integerEmpty = Empty.instance();
         Assert.assertSame(stringEmpty, integerEmpty);
-        Empty<String> stringEmpty2 = SerializationUtils.clone(stringEmpty);
+        Empty<String> stringEmpty2 = Cloners.serialization().clone(stringEmpty);
         Assert.assertSame(stringEmpty, stringEmpty2);
     }
 

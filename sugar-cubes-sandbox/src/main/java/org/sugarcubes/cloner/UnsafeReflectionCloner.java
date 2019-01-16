@@ -1,10 +1,11 @@
 package org.sugarcubes.cloner;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import org.sugarcubes.builder.MapBuilder;
+import org.sugarcubes.function.TernaryConsumer;
 import org.sugarcubes.reflection.XField;
 
 import sun.misc.Unsafe;
@@ -46,44 +47,24 @@ public class UnsafeReflectionCloner extends ReflectionCloner {
 
     }
 
-    /**
-     * 3-arguments consumer.
-     */
-    @FunctionalInterface
-    private interface ThreeConsumer<T, U, V> {
-
-        /**
-         * Performs this operation on the given arguments.
-         *
-         * @param t the first input argument
-         * @param u the second input argument
-         * @param v the third input argument
-         */
-        void accept(T t, U u, V v);
-
-    }
-
-    private static <X> UnsafeCopyOperation getCopyOperation(ThreeConsumer<Object, Long, X> put, BiFunction<Object, Long, X> get) {
+    private static <X> UnsafeCopyOperation getCopyOperation(TernaryConsumer<Object, Long, X> put, BiFunction<Object, Long, X> get) {
         return (from, offset, into) -> put.accept(into, offset, get.apply(from, offset));
     }
 
     /**
      * Mapping of primitive types to copy operations.
      */
-    private static final Map<Class, UnsafeCopyOperation> OPERATIONS;
-
-    static {
-        Map<Class, UnsafeCopyOperation> operations = new HashMap<>();
-        operations.put(boolean.class, getCopyOperation(UNSAFE::putBoolean, UNSAFE::getBoolean));
-        operations.put(byte.class, getCopyOperation(UNSAFE::putByte, UNSAFE::getByte));
-        operations.put(char.class, getCopyOperation(UNSAFE::putChar, UNSAFE::getChar));
-        operations.put(short.class, getCopyOperation(UNSAFE::putShort, UNSAFE::getShort));
-        operations.put(int.class, getCopyOperation(UNSAFE::putInt, UNSAFE::getInt));
-        operations.put(long.class, getCopyOperation(UNSAFE::putLong, UNSAFE::getLong));
-        operations.put(float.class, getCopyOperation(UNSAFE::putFloat, UNSAFE::getFloat));
-        operations.put(double.class, getCopyOperation(UNSAFE::putDouble, UNSAFE::getDouble));
-        OPERATIONS = Collections.unmodifiableMap(operations);
-    }
+    private static final Map<Class, UnsafeCopyOperation> OPERATIONS = MapBuilder.<Class, UnsafeCopyOperation>hashMap()
+        .put(boolean.class, getCopyOperation(UNSAFE::putBoolean, UNSAFE::getBoolean))
+        .put(byte.class, getCopyOperation(UNSAFE::putByte, UNSAFE::getByte))
+        .put(char.class, getCopyOperation(UNSAFE::putChar, UNSAFE::getChar))
+        .put(short.class, getCopyOperation(UNSAFE::putShort, UNSAFE::getShort))
+        .put(int.class, getCopyOperation(UNSAFE::putInt, UNSAFE::getInt))
+        .put(long.class, getCopyOperation(UNSAFE::putLong, UNSAFE::getLong))
+        .put(float.class, getCopyOperation(UNSAFE::putFloat, UNSAFE::getFloat))
+        .put(double.class, getCopyOperation(UNSAFE::putDouble, UNSAFE::getDouble))
+        .transform(Collections::unmodifiableMap)
+        .build();
 
     @Override
     protected void copyField(Object from, Object into, XField<Object> field, Map<Object, Object> cloned) {
