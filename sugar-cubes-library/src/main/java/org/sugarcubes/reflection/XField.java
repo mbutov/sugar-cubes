@@ -43,6 +43,10 @@ public class XField<T> extends XReloadableReflectionObject<Field>
         execute(() -> getReflectionObject().set(obj, value));
     }
 
+    public <X> XField<X> cast() {
+        return (XField) this;
+    }
+
     public XField<T> withModifiers(int modifiers) {
         return this.modifiers != modifiers ? new XField<>(fieldWithModifiers(getReflectionObject(), modifiers)) : this;
     }

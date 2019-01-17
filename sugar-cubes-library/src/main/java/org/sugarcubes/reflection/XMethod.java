@@ -46,4 +46,8 @@ public class XMethod<R> extends XReloadableReflectionObject<Method>
         return execute(() -> getReflectionObject().invoke(obj, args));
     }
 
+    public <X> XMethod<X> cast() {
+        return (XMethod) this;
+    }
+
 }

@@ -24,10 +24,12 @@ public class XReflectionTest {
 
         Assert.assertThat(xClass.getConstructors().count(), greaterThan(0L));
         Assert.assertThat(xClass.getFields().count(), greaterThan(0L));
+        Assert.assertThat(xClass.getFields().count(), greaterThan(xClass.getDeclaredFields().count()));
         Assert.assertThat(xClass.getMethods().count(), greaterThan(0L));
-
+        Assert.assertThat(xClass.getMethods().count(), greaterThan(xClass.getDeclaredMethods().count()));
 
         Set<XField<?>> collect = xClass.getFields().filter(xField -> !xField.isPublic()).collect(Collectors.toSet());
+
     }
 
     @Test

@@ -25,7 +25,7 @@ public class Invocations {
     }
 
     /**
-     * Creates {@link Function} which takes an object, then calls {@link Consumer#accept(Object)} and then returns
+     * Creates {@link UnaryOperator} which takes an object, then calls {@link Consumer#accept(Object)} and then returns
      * the same object.
      *
      * @param consumer consumer

@@ -11,8 +11,12 @@ public interface XTyped<T> {
 
     Class<T> getType();
 
-    default boolean isType(Class<?> type) {
+    default boolean typeIs(Class<?> type) {
         return type.isAssignableFrom(getType());
+    }
+
+    default boolean typeIsAssignableFrom(Class<?> type) {
+        return getType().isAssignableFrom(type);
     }
 
 }

@@ -1,6 +1,6 @@
 package org.sugarcubes.reflection;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -52,44 +52,42 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
         return false;
     }
 
-    private transient XClass xSuper;
-    private transient List<XClass<?>> inheritance;
-    private transient List<XClass<?>> xDeclaredInterfaces;
-    private transient List<XClass<?>> xInterfaces;
-    private transient List<XConstructor<C>> xConstructors;
-    private transient List<XField<?>> xDeclaredFields;
-    private transient List<XField<?>> xFields;
+    private enum CacheKey {
+        SUPER, INHERITANCE, DECLARED_INTERFACES, INTERFACES, CONSTRUCTORS, DECLARED_FIELDS, FIELDS,
+    }
 
-    private <X> X compute(X value, Function<XClass<C>, X> function) {
-        return Optional.ofNullable(value).orElseGet(() -> function.apply(this));
+    private final Map<CacheKey, Object> cache = new XClassCache<>();
+
+    private <X> X computeIfAbsent(CacheKey key, Function<XClass<C>, X> function) {
+        return (X) cache.computeIfAbsent(key, k -> function.apply(this));
     }
 
     public XClass<?> getSuperclass() {
-        return xSuper = compute(xSuper, XClassUtils::getSuperclass);
+        return computeIfAbsent(CacheKey.SUPER, XClassUtils::getSuperclass);
     }
 
     public Stream<XClass<?>> getInheritance() {
-        return (inheritance = compute(inheritance, XClassUtils::getInheritance)).stream();
+        return computeIfAbsent(CacheKey.INHERITANCE, XClassUtils::getInheritance).stream();
     }
 
     public Stream<XClass<?>> getDeclaredInterfaces() {
-        return (xDeclaredInterfaces = compute(xDeclaredInterfaces, XClassUtils::getDeclaredInterfaces)).stream();
+        return computeIfAbsent(CacheKey.DECLARED_INTERFACES, XClassUtils::getDeclaredInterfaces).stream();
     }
 
     public Stream<XClass<?>> getInterfaces() {
-        return (xInterfaces = compute(xInterfaces, XClassUtils::getInterfaces)).stream();
+        return computeIfAbsent(CacheKey.INTERFACES, XClassUtils::getInterfaces).stream();
     }
 
     public Stream<XConstructor<C>> getConstructors() {
-        return (xConstructors = compute(xConstructors, XClassUtils::getConstructors)).stream();
+        return computeIfAbsent(CacheKey.CONSTRUCTORS, XClassUtils::getConstructors).stream();
     }
 
     public Stream<XField<?>> getDeclaredFields() {
-        return (xDeclaredFields = compute(xDeclaredFields, XClassUtils::getDeclaredFields)).stream();
+        return computeIfAbsent(CacheKey.DECLARED_FIELDS, XClassUtils::getDeclaredFields).stream();
     }
 
     public Stream<XField<?>> getFields() {
-        return (xFields = compute(xFields, XClassUtils::getFields)).stream();
+        return computeIfAbsent(CacheKey.FIELDS, XClassUtils::getFields).stream();
     }
 
     public Optional<XConstructor<C>> findConstructor(Class... types) {
@@ -102,25 +100,24 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public <X> Optional<XField<X>> findDeclaredField(String name) {
-        Stream<XField<X>> fields = (Stream) getDeclaredFields();
-        return fields.filter(withName(name)).collect(toOptional());
+        return getDeclaredFields().filter(withName(name)).map(XField::<X>cast).collect(toOptional());
     }
 
     public <X> XField<X> getDeclaredField(String name) {
-        Optional<XField<X>> field = findDeclaredField(name);
-        return field.orElseThrow(withMessage("Field %s.%s not found", getName(), name));
+        return this.<X>findDeclaredField(name)
+            .orElseThrow(withMessage("Field %s.%s not found", getName(), name));
     }
 
     public <X> Stream<XField<X>> findFields(String name) {
-        Stream<XField<X>> fields = (Stream) getFields();
-        return fields.filter(withName(name));
+        return getFields().filter(withName(name)).map(XField::<X>cast);
     }
 
     public <X> XField<X> getField(String name) {
-        return this.<X>findFields(name).collect(onlyElement(
-            withMessage("Two or more fields with name %s found in %s hierarchy", name, getName()),
-            withMessage("No field %s found in %s hierarchy", name, getName())
-        ));
+        return this.<X>findFields(name)
+            .collect(onlyElement(
+                withMessage("Two or more fields with name %s found in %s hierarchy", name, getName()),
+                withMessage("No field %s found in %s hierarchy", name, getName())
+            ));
     }
 
     public Stream<XMethod<?>> getDeclaredMethods() {
@@ -128,14 +125,16 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public <X> Optional<XMethod<X>> findDeclaredMethod(String name, Class... types) {
-        Stream<XMethod<X>> methods = (Stream) getDeclaredMethods();
-        return methods.filter(withNameAndParameterTypes(name, types)).collect(toOptional());
+        return getDeclaredMethods()
+            .map(XMethod::<X>cast)
+            .filter(withNameAndParameterTypes(name, types))
+            .collect(toOptional());
     }
 
     public <X> XMethod<X> getDeclaredMethod(String name, Class... types) {
-        Optional<XMethod<X>> method = findDeclaredMethod(name, types);
-        return method.orElseThrow(withMessage(() ->
-            String.format("Method %s.%s(%s) not found", getName(), name, getParameterNames(types))));
+        return this.<X>findDeclaredMethod(name, types)
+            .orElseThrow(withMessage(() ->
+                String.format("Method %s.%s(%s) not found", getName(), name, getParameterNames(types))));
     }
 
     public Stream<XMethod<?>> getMethods() {
@@ -143,8 +142,10 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public <X> Optional<XMethod<X>> findMethod(String name, Class... types) {
-        Stream<XMethod<X>> methods = (Stream) getMethods();
-        return methods.filter(withNameAndParameterTypes(name, types)).findFirst();
+        return getMethods()
+            .map(XMethod::<X>cast)
+            .filter(withNameAndParameterTypes(name, types))
+            .findFirst();
     }
 
     public <X> XMethod<X> getMethod(String name, Class... types) {
