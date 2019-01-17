@@ -27,10 +27,6 @@ Provides generic builder pattern as well as some builders for collections.
     
 Tools for faster deep cloning of different kind of objects.
 
-### org.sugarcubes.proxy
-
-Generic API for proxy creation via various providers.
-    
 ### org.sugarcubes.reflection          
 
 Set of wrappers for Java Reflection classes. Simplifies working with Reflection API.
@@ -47,4 +43,9 @@ Simple (but enough for most cases) java tuple implementation.
 ## Sandbox
 
 Sandbox is a place for sweet candydates.
-The code is not fully complete here, it is mostly experimental. 
+The code here is mostly experimental. 
+
+### org.sugarcubes.proxy
+
+Generic API for proxy creation via various providers.
+    
