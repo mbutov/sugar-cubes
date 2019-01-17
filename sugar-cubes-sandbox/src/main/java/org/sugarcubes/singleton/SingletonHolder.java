@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import org.sugarcubes.rex.Rex;
 
 /**
- * todo: document it and adjust author
+ * todo: document it
  *
  * @author Maxim Butov
  */

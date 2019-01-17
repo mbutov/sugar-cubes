@@ -3,7 +3,7 @@ package org.sugarcubes.function;
 import java.util.function.Predicate;
 
 /**
- * todo: document it and adjust author
+ * todo: document it
  *
  * @author Maxim Butov
  */

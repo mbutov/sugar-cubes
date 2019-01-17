@@ -3,7 +3,7 @@ package org.sugarcubes.mixin;
 import java.util.Map;
 
 /**
- * todo: document it and adjust author
+ * todo: document it
  *
  * @author Maxim Butov
  */

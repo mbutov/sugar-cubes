@@ -8,7 +8,7 @@ import org.objenesis.ObjenesisStd;
  *
  * @author Maxim Butov
  */
-public class ObjenesisObjectFactory implements ObjectFactory {
+public class ObjenesisObjectFactory implements ClonerObjectFactory {
 
     private final Objenesis objenesis;
 

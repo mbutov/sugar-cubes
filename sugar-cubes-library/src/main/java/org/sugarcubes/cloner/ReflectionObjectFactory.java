@@ -7,7 +7,7 @@ import org.sugarcubes.reflection.XReflection;
  *
  * @author Maxim Butov
  */
-public class ReflectionObjectFactory implements ObjectFactory {
+public class ReflectionObjectFactory implements ClonerObjectFactory {
 
     @Override
     public <T> T newInstanceUnsafe(Class<T> clazz) throws Throwable {

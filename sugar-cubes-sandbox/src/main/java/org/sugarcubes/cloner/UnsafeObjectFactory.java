@@ -7,7 +7,7 @@ import sun.misc.Unsafe;
  *
  * @author Maxim Butov
  */
-public class UnsafeObjectFactory implements ObjectFactory {
+public class UnsafeObjectFactory implements ClonerObjectFactory {
 
     @Override
     public <T> T newInstanceUnsafe(Class<T> clazz) throws Throwable {

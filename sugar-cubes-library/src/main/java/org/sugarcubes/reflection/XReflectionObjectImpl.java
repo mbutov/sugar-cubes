@@ -3,7 +3,7 @@ package org.sugarcubes.reflection;
 import java.io.Serializable;
 
 /**
- * todo: document it and adjust author
+ * Abstract reflection wrapper.
  *
  * @author Maxim Butov
  */

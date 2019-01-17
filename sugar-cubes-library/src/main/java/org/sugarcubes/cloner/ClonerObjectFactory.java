@@ -8,7 +8,7 @@ import static org.sugarcubes.rex.Rex.withMessage;
  *
  * @author Maxim Butov
  */
-public interface ObjectFactory {
+public interface ClonerObjectFactory {
 
     /**
      * Creates an instance of the specified class. Instance may be not initialized.

@@ -16,9 +16,9 @@ public class Cloners {
      *
      * @return {@link ReflectionCloner} instance
      *
-     * @see ReflectionCloner#ReflectionCloner(ObjectFactory)
+     * @see ReflectionCloner#ReflectionCloner(ClonerObjectFactory)
      */
-    public static Cloner reflection(ObjectFactory objectFactory) {
+    public static Cloner reflection(ClonerObjectFactory objectFactory) {
         return new ReflectionCloner(objectFactory);
     }
 

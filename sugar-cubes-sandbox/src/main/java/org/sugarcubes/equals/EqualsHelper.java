@@ -5,9 +5,9 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 /**
- * todo: document it and adjust author
+ * todo: document it
  *
- * @author Q-MBU
+ * @author Maxim Butov
  */
 public class EqualsHelper {
 

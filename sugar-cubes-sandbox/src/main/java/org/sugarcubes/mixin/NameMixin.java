@@ -1,7 +1,7 @@
 package org.sugarcubes.mixin;
 
 /**
- * todo: document it and adjust author
+ * todo: document it
  *
  * @author Maxim Butov
  */

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The {@link Map} implementation which does not serialize its content.
+ * The {@link Map} implementation which does not serialize its state.
  *
  * @author Maxim Butov
  */

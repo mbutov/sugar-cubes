@@ -66,4 +66,19 @@ class XClassUtils {
             .build();
     }
 
+    static List<XMethod<?>> getDeclaredMethods(XClass<?> xClass) {
+        return ListBuilder.<XMethod<?>>arrayList()
+            .addAll(stream(xClass.getReflectionObject().getDeclaredMethods()).map(XReflection::of))
+            .transform(Collections::unmodifiableList)
+            .build();
+    }
+
+    static List<XMethod<?>> getMethods(XClass<?> xClass) {
+        return ListBuilder.<XMethod<?>>arrayList()
+            .addAll(xClass.getDeclaredMethods())
+            .addAll(xClass.getSuperclass().getMethods())
+            .transform(Collections::unmodifiableList)
+            .build();
+    }
+
 }

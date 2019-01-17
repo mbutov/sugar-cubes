@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * todo: document it and adjust author
+ * todo: document it
  *
  * @author Maxim Butov
  */

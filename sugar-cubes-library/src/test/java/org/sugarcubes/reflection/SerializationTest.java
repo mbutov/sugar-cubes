@@ -5,9 +5,9 @@ import org.junit.Test;
 import org.springframework.util.SerializationUtils;
 
 /**
- * todo: document it and adjust author
+ * todo: document it
  *
- * @author Q-MBU
+ * @author Maxim Butov
  */
 public class SerializationTest {
 

@@ -23,7 +23,7 @@ public class ReflectionCloner extends AbstractCloner {
     /**
      * Object factory.
      */
-    private final ObjectFactory objectFactory;
+    private final ClonerObjectFactory objectFactory;
 
     /**
      * Set of fields modifiers which are excluded when copying.
@@ -48,7 +48,7 @@ public class ReflectionCloner extends AbstractCloner {
      *
      * @param objectFactory object factory to use
      */
-    public ReflectionCloner(ObjectFactory objectFactory) {
+    public ReflectionCloner(ClonerObjectFactory objectFactory) {
         Arg.notNull(objectFactory, "objectFactory is null");
         this.objectFactory = objectFactory;
     }
@@ -56,7 +56,7 @@ public class ReflectionCloner extends AbstractCloner {
     /**
      * @return the object factory
      */
-    public ObjectFactory getObjectFactory() {
+    public ClonerObjectFactory getObjectFactory() {
         return objectFactory;
     }
 

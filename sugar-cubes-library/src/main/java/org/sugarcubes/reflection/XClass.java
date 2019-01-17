@@ -53,7 +53,7 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     private enum CacheKey {
-        SUPER, INHERITANCE, DECLARED_INTERFACES, INTERFACES, CONSTRUCTORS, DECLARED_FIELDS, FIELDS,
+        SUPER, INHERITANCE, DECLARED_INTERFACES, INTERFACES, CONSTRUCTORS, DECLARED_METHODS, METHODS, DECLARED_FIELDS, FIELDS,
     }
 
     private final Map<CacheKey, Object> cache = new XClassCache<>();
@@ -90,6 +90,14 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
         return computeIfAbsent(CacheKey.FIELDS, XClassUtils::getFields).stream();
     }
 
+    public Stream<XMethod<?>> getDeclaredMethods() {
+        return computeIfAbsent(CacheKey.DECLARED_METHODS, XClassUtils::getDeclaredMethods).stream();
+    }
+
+    public Stream<XMethod<?>> getMethods() {
+        return computeIfAbsent(CacheKey.METHODS, XClassUtils::getMethods).stream();
+    }
+
     public Optional<XConstructor<C>> findConstructor(Class... types) {
         return getConstructors().filter(withParameterTypes(types)).collect(toOptional());
     }
@@ -120,10 +128,6 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
             ));
     }
 
-    public Stream<XMethod<?>> getDeclaredMethods() {
-        return stream(getReflectionObject().getDeclaredMethods()).map(XReflection::of);
-    }
-
     public <X> Optional<XMethod<X>> findDeclaredMethod(String name, Class... types) {
         return getDeclaredMethods()
             .map(XMethod::<X>cast)
@@ -135,10 +139,6 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
         return this.<X>findDeclaredMethod(name, types)
             .orElseThrow(withMessage(() ->
                 String.format("Method %s.%s(%s) not found", getName(), name, getParameterNames(types))));
-    }
-
-    public Stream<XMethod<?>> getMethods() {
-        return Stream.concat(getDeclaredMethods(), getSuperclass().getMethods());
     }
 
     public <X> Optional<XMethod<X>> findMethod(String name, Class... types) {
