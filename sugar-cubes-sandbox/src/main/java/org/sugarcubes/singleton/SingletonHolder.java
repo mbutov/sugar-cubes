@@ -1,9 +1,9 @@
 package org.sugarcubes.singleton;
 
-import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 import org.sugarcubes.rex.Rex;
+import org.sugarcubes.unsafe.UnsafeCallable;
 
 /**
  * todo: document it
@@ -12,25 +12,33 @@ import org.sugarcubes.rex.Rex;
  */
 public class SingletonHolder<T> implements Supplier<T> {
 
-    private final Callable<T> loader;
+    private final UnsafeCallable<T> loader;
+    private final boolean safe;
 
-    public SingletonHolder(Callable<T> loader) {
+    public SingletonHolder(UnsafeCallable<T> loader, boolean safe) {
         this.loader = loader;
+        this.safe = safe;
     }
 
-    public SingletonHolder(Supplier<T> loader) {
-        this((Callable<T>) loader::get);
+    public SingletonHolder(UnsafeCallable<T> loader) {
+        this(loader, false);
     }
 
+    private volatile boolean loaded;
     private T value;
 
     private synchronized T loadValue() {
-        if (value == null) {
+        if (!loaded) {
             try {
                 value = loader.call();
             }
-            catch (Exception e) {
-                throw Rex.rethrowAsRuntime(e);
+            catch (Throwable e) {
+                if (!safe) {
+                    throw Rex.rethrowAsRuntime(e);
+                }
+            }
+            finally {
+                loaded = true;
             }
         }
         return value;
@@ -38,7 +46,7 @@ public class SingletonHolder<T> implements Supplier<T> {
 
     @Override
     public T get() {
-        return value != null ? value : loadValue();
+        return loaded ? value : loadValue();
     }
 
 }
