@@ -2,6 +2,7 @@ package org.sugarcubes.builder;
 
 import org.junit.Assert;
 import org.junit.Test;
+import static org.hamcrest.Matchers.is;
 
 /**
  * @author Maxim Butov
@@ -15,7 +16,7 @@ public class BuildersTest {
             .transform(x -> x + 1)
             .build();
 
-        Assert.assertEquals(2, y);
+        Assert.assertThat(y, is(2));
 
     }
     

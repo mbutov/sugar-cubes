@@ -58,7 +58,7 @@ public class MutableBuilder<T, B extends MutableBuilder<T, B>> implements Builde
     /**
      * Returns itself.
      */
-    public B self() {
+    protected B self() {
         return (B) this;
     }
 
