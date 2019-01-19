@@ -19,6 +19,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.sugarcubes.builder.collection.SetBuilder;
@@ -65,6 +66,8 @@ public abstract class AbstractCloner implements Cloner {
             ZonedDateTime.class, ZoneOffset.class,
 
             URI.class, URL.class,
+
+            UUID.class,
 
             Pattern.class,
         })
