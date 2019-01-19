@@ -4,6 +4,9 @@ dependencies {
 
     compileOnly libs.objenesis
 
+    compileOnly libs.kryo
+    compileOnly libs.fst
+
     testCompile libs.test
     testCompile libs.guava
     testCompile libs.commons_lang3
