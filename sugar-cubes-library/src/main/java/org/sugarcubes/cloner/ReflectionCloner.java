@@ -2,14 +2,36 @@ package org.sugarcubes.cloner;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Period;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.sugarcubes.arg.Arg;
+import org.sugarcubes.builder.collection.SetBuilder;
 import org.sugarcubes.reflection.XField;
 import org.sugarcubes.reflection.XReflection;
 
@@ -29,6 +51,31 @@ public class ReflectionCloner extends AbstractCloner {
      * Set of fields modifiers which are excluded when copying.
      */
     private int excludedModifiers = Modifier.STATIC;
+
+    /**
+     * Some immutable classes.
+     */
+    private final Set<Class> immutableClasses = SetBuilder.<Class>hashSet()
+        .addAll(new Class[] {
+            Class.class,
+
+            String.class,
+
+            Boolean.class, Byte.class, Short.class, Character.class, Integer.class, Long.class, Float.class, Double.class,
+
+            BigInteger.class, BigDecimal.class,
+
+            Duration.class, Instant.class, LocalDate.class, LocalDateTime.class, LocalTime.class, MonthDay.class,
+            OffsetDateTime.class, OffsetTime.class, Period.class, Year.class, YearMonth.class,
+            ZonedDateTime.class, ZoneOffset.class,
+
+            URI.class, URL.class,
+
+            UUID.class,
+
+            Pattern.class,
+        })
+        .build();
 
     /**
      * Cache with (class, fields to copy) entries.
@@ -66,6 +113,8 @@ public class ReflectionCloner extends AbstractCloner {
      * Example: {@code Cloner cloner = new ReflectionCloner().excludeOnly(Modifier.STATIC | Modifier.TRANSIENT); }
      *
      * @param modifiers modifier, combination of {@link Modifier} constants
+     *
+     * @return same cloner
      */
     public ReflectionCloner excludeOnly(int modifiers) {
         excludedModifiers = modifiers;
@@ -78,13 +127,42 @@ public class ReflectionCloner extends AbstractCloner {
      * Example: {@code Cloner cloner = new ReflectionCloner().exclude(Modifier.STATIC).exclude(Modifier.TRANSIENT); }
      *
      * @param modifier modifier, one of {@link Modifier} constant
+     *
+     * @return same cloner
      */
     public ReflectionCloner exclude(int modifier) {
         return excludeOnly(excludedModifiers | modifier);
     }
 
+    /**
+     * Register immutable types which will not be cloned and just copied via reference.
+     *
+     * @param type immutable type
+     * @param others immutable types
+     *
+     * @return same cloner
+     */
+    public ReflectionCloner withImmutable(Class<?> type, Class<?>... others) {
+        immutableClasses.add(type);
+        immutableClasses.addAll(Arrays.asList(others));
+        return this;
+    }
+
+    /**
+     * Checks whether the object of class is immutable (i.e. may be cloned by reference).
+     *
+     * @param clazz class to check
+     * @return true if the object of the class is immutable
+     */
+    protected boolean isImmutable(Class clazz) {
+        return clazz.isPrimitive() || clazz.isEnum() || immutableClasses.contains(clazz);
+    }
+
     @Override
     protected Object doClone(Object object) {
+        if (object == null || isImmutable(object.getClass())) {
+            return object;
+        }
         return doClone(object, new IdentityHashMap<>());
     }
 

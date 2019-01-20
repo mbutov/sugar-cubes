@@ -1,6 +1,7 @@
 package org.sugarcubes.cloner;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Assert;
@@ -37,16 +38,20 @@ public abstract class AbstractClonerTests {
     @Test
     public void testCloner() {
 
+        Cloner cloner = getCloner();
+
+        Assert.assertNull(cloner.clone(null));
+
         B b1 = new B(1);
-        B b2 = getCloner().clone(b1);
+        B b2 = cloner.clone(b1);
 
         Assert.assertEquals(b1.x, b2.x);
         Assert.assertSame(b1.y, b2.y);
         Assert.assertNull(b2.z);
         Assert.assertSame(b2.a, b2);
 
-        Assert.assertArrayEquals(b1.xxx, b2.xxx);
-        Assert.assertArrayEquals(b1.yyy, b2.yyy);
+        Assert.assertTrue(Arrays.equals(b1.xxx, b2.xxx));
+        Assert.assertTrue(Arrays.deepEquals(b1.yyy, b2.yyy));
 
         Assert.assertSame(b2, b2.a);
         Assert.assertEquals(b1.n, b2.n);

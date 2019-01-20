@@ -4,8 +4,12 @@ dependencies {
 
     compile project(':sugar-cubes-library')
 
-    compileOnly libs.aopalliance
     compileOnly libs.objenesis
+
+    compileOnly libs.kryo
+    compileOnly libs.fst
+
+    compileOnly libs.aopalliance
     compileOnly libs.asm_all
     compileOnly libs.cglib
     compileOnly libs.javassist

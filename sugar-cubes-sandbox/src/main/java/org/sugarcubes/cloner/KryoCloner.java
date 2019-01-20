@@ -1,5 +1,8 @@
 package org.sugarcubes.cloner;
 
+import org.objenesis.strategy.StdInstantiatorStrategy;
+import org.sugarcubes.builder.Builders;
+
 import com.esotericsoftware.kryo.Kryo;
 
 /**
@@ -12,7 +15,9 @@ public class KryoCloner extends AbstractCloner {
     private final Kryo kryo;
 
     public KryoCloner() {
-        this(new Kryo());
+        this(Builders.of(Kryo::new)
+            .apply(kryo -> kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy())))
+            .build());
     }
 
     public KryoCloner(Kryo kryo) {

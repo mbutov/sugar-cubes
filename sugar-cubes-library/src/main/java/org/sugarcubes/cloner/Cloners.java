@@ -18,7 +18,7 @@ public class Cloners {
      *
      * @see ReflectionCloner#ReflectionCloner(ClonerObjectFactory)
      */
-    public static Cloner reflection(ClonerObjectFactory objectFactory) {
+    public static ReflectionCloner reflection(ClonerObjectFactory objectFactory) {
         return new ReflectionCloner(objectFactory);
     }
 
@@ -29,7 +29,7 @@ public class Cloners {
      *
      * @see ReflectionCloner#ReflectionCloner()
      */
-    public static Cloner reflection() {
+    public static ReflectionCloner reflection() {
         return new ReflectionCloner();
     }
 
