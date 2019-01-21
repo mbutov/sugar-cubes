@@ -14,8 +14,19 @@ import static org.sugarcubes.reflection.XReflectionUtils.execute;
 public class XField<T> extends XReloadableReflectionObject<Field>
     implements XAnnotated<Field>, XMember<Field>, XModifiers, XTyped<T> {
 
+    /**
+     * {@link Field#getDeclaringClass()}
+     */
     private final Class declaringClass;
+
+    /**
+     * {@link Field#getName()}
+     */
     private final String name;
+
+    /**
+     * {@link Field#getModifiers()}
+     */
     private final int modifiers;
 
     XField(Field reflectionObject) {
@@ -41,6 +52,12 @@ public class XField<T> extends XReloadableReflectionObject<Field>
 
     public void set(Object obj, T value) {
         execute(() -> getReflectionObject().set(obj, value));
+    }
+
+    public T getAndSet(Object obj, T value) {
+        T oldValue = get(obj);
+        set(obj, value);
+        return oldValue;
     }
 
     public <X> XField<X> cast() {

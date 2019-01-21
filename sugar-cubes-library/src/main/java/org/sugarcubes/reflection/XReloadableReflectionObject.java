@@ -9,6 +9,9 @@ import java.lang.reflect.AccessibleObject;
  */
 public abstract class XReloadableReflectionObject<T extends AccessibleObject> extends XReflectionObjectImpl<T> {
 
+    /**
+     * Constructor or field or method.
+     */
     private transient T reflectionObject;
 
     protected XReloadableReflectionObject(T reflectionObject) {
@@ -25,6 +28,11 @@ public abstract class XReloadableReflectionObject<T extends AccessibleObject> ex
         return reflectionObject;
     }
 
+    /**
+     * Loads reflection object by its properties after deserialization.
+     *
+     * @return initial reflection object
+     */
     protected abstract T loadReflectionObject() throws ReflectiveOperationException;
 
 }
