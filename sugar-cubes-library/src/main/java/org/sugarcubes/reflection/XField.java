@@ -36,9 +36,13 @@ public class XField<T> extends XReloadableReflectionObject<Field>
         this.modifiers = reflectionObject.getModifiers();
     }
 
+    private Field loadField() throws ReflectiveOperationException {
+        return declaringClass.getDeclaredField(name);
+    }
+
     @Override
     protected Field loadReflectionObject() throws ReflectiveOperationException {
-        return fieldWithModifiers(declaringClass.getDeclaredField(name), modifiers);
+        return fieldWithModifiers(loadField(), modifiers);
     }
 
     @Override
@@ -65,7 +69,8 @@ public class XField<T> extends XReloadableReflectionObject<Field>
     }
 
     public XField<T> withModifiers(int modifiers) {
-        return this.modifiers != modifiers ? new XField<>(fieldWithModifiers(getReflectionObject(), modifiers)) : this;
+        return this.modifiers != modifiers ?
+            new XField<>(fieldWithModifiers(execute(this::loadField), modifiers)) : this;
     }
 
     public XField<T> withModifier(int modifier, boolean newValue) {
