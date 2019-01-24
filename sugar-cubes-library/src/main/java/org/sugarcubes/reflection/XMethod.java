@@ -50,4 +50,13 @@ public class XMethod<R> extends XReloadableReflectionObject<Method>
         return (XMethod) this;
     }
 
+    public XMethod<R> getSuper() {
+        return getDeclaringClass().getSuperclass().<R>findMethod(name, parameterTypes).orElse(this);
+    }
+
+    public XMethod<R> getRoot() {
+        XMethod<R> baseMethod = getSuper();
+        return this == baseMethod ? this : baseMethod.getRoot();
+    }
+
 }
