@@ -1,7 +1,11 @@
 package org.sugarcubes.reflection;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
+import org.sugarcubes.stream.ZeroOneCollectors;
+import static org.sugarcubes.reflection.XPredicates.withName;
+import static org.sugarcubes.reflection.XPredicates.withReflectionObject;
 import static org.sugarcubes.reflection.XReflectionUtils.execute;
 
 /**
@@ -50,13 +54,25 @@ public class XMethod<R> extends XReloadableReflectionObject<Method>
         return (XMethod) this;
     }
 
-    public XMethod<R> getSuper() {
-        return getDeclaringClass().getSuperclass().<R>findMethod(name, parameterTypes).orElse(this);
+    public <X> XMethod<X> getSuper() {
+        Method method = getReflectionObject();
+        if (method.isBridge()) {
+            // todo: this is not working
+            return getDeclaringClass().getSuperclass().getMethods()
+                .filter(withName(name))
+                .filter(withReflectionObject(candidate -> candidate.getReturnType().isAssignableFrom(method.getReturnType()) &&
+                    Arrays.equals(method.getGenericParameterTypes(), candidate.getGenericParameterTypes())))
+                .collect(ZeroOneCollectors.onlyElement())
+                .cast();
+        }
+        else {
+            return getDeclaringClass().getSuperclass().<R>findMethod(name, parameterTypes).orElse(this).cast();
+        }
     }
 
-    public XMethod<R> getRoot() {
-        XMethod<R> baseMethod = getSuper();
-        return this == baseMethod ? this : baseMethod.getRoot();
+    public <X> XMethod<X> getRoot() {
+        XMethod<X> baseMethod = getSuper();
+        return this == baseMethod ? cast() : baseMethod.getRoot();
     }
 
 }
