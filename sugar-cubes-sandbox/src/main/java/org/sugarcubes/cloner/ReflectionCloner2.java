@@ -1,6 +1,7 @@
 package org.sugarcubes.cloner;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -19,7 +20,6 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -27,10 +27,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.sugarcubes.arg.Arg;
+import org.sugarcubes.builder.collection.ListBuilder;
 import org.sugarcubes.builder.collection.SetBuilder;
 import org.sugarcubes.reflection.XField;
 import org.sugarcubes.reflection.XReflection;
@@ -40,7 +43,7 @@ import org.sugarcubes.reflection.XReflection;
  *
  * @author Maxim Butov
  */
-public class ReflectionClonerClassic extends AbstractCloner {
+public class ReflectionCloner2 extends AbstractCloner {
 
     /**
      * Object factory.
@@ -48,14 +51,34 @@ public class ReflectionClonerClassic extends AbstractCloner {
     private final ClonerObjectFactory objectFactory;
 
     /**
-     * Set of fields modifiers which are excluded when copying.
+     * Default constructor. Uses {@link ObjenesisObjectFactory} if Objenesis library is present, or
+     * {@link ReflectionObjectFactory} otherwise.
      */
-    private int excludedModifiers = Modifier.STATIC;
+    public ReflectionCloner2() {
+        this(ObjenesisUtils.isObjenesisAvailable() ? new ObjenesisObjectFactory() : new ReflectionObjectFactory());
+    }
+
+    /**
+     * Creates an instance with the specified object factory.
+     *
+     * @param objectFactory object factory to use
+     */
+    public ReflectionCloner2(ClonerObjectFactory objectFactory) {
+        Arg.notNull(objectFactory, "objectFactory is null");
+        this.objectFactory = objectFactory;
+    }
+
+    /**
+     * @return the object factory
+     */
+    public ClonerObjectFactory getObjectFactory() {
+        return objectFactory;
+    }
 
     /**
      * Some immutable classes.
      */
-    private final Set<Class> immutableClasses = SetBuilder.<Class>hashSet()
+    private static final Set<Class<?>> DEFAULT_IMMUTABLE_CLASSES = SetBuilder.<Class<?>>hashSet()
         .addAll(new Class[] {
             Class.class,
 
@@ -78,60 +101,62 @@ public class ReflectionClonerClassic extends AbstractCloner {
         .build();
 
     /**
-     * Cache with (class, fields to copy) entries.
+     * Classes to skip when cloning.
      */
-    private final Map<Class, Collection<XField<?>>> fieldCache = new WeakHashMap<>();
+    private List<Predicate<Class<?>>> skipClasses = ListBuilder.<Predicate<Class<?>>>arrayList()
+        .build();
 
     /**
-     * Default constructor. Uses {@link ObjenesisObjectFactory} if Objenesis library is present, or
-     * {@link ReflectionObjectFactory} otherwise.
+     * Fields to skip when cloning.
      */
-    public ReflectionClonerClassic() {
-        this(ObjenesisUtils.isObjenesisAvailable() ? new ObjenesisObjectFactory() : new ReflectionObjectFactory());
+    private List<Predicate<Field>> skipFields = ListBuilder.<Predicate<Field>>arrayList()
+        .add(field -> Modifier.isStatic(field.getModifiers()))
+        .build();
+
+    /**
+     * Classes which objects are copied without cloning.
+     */
+    private List<Predicate<Class<?>>> immutableClasses = ListBuilder.<Predicate<Class<?>>>arrayList()
+        .add(ReflectionClonerPredicates.isAnyOf(DEFAULT_IMMUTABLE_CLASSES))
+        .build();
+
+    /**
+     * Fields which are copied without cloning.
+     */
+    private List<Predicate<Field>> immutableFields = ListBuilder.<Predicate<Field>>arrayList()
+        .add(field -> field.getType().isPrimitive())
+        .build();
+
+    public ReflectionCloner2 skipClasses(Predicate<Class<?>> classFilter) {
+        this.skipClasses.add(classFilter);
+        return this;
     }
 
-    /**
-     * Creates an instance with the specified object factory.
-     *
-     * @param objectFactory object factory to use
-     */
-    public ReflectionClonerClassic(ClonerObjectFactory objectFactory) {
-        Arg.notNull(objectFactory, "objectFactory is null");
-        this.objectFactory = objectFactory;
+    public ReflectionCloner2 skipClasses(Class<?>... classes) {
+        this.skipClasses.add(ReflectionClonerPredicates.isAnyOf(classes));
+        return this;
     }
 
-    /**
-     * @return the object factory
-     */
-    public ClonerObjectFactory getObjectFactory() {
-        return objectFactory;
-    }
-
-    /**
-     * Sets the modifiers excluded (so the fields with this modifiers will not be copied).
-     * This method clears previously set modifiers.
-     * Example: {@code Cloner cloner = new ReflectionClonerClassic().excludeOnly(Modifier.STATIC | Modifier.TRANSIENT); }
-     *
-     * @param modifiers modifier, combination of {@link Modifier} constants
-     *
-     * @return same cloner
-     */
-    public ReflectionClonerClassic excludeOnly(int modifiers) {
-        excludedModifiers = modifiers;
+    public ReflectionCloner2 skipFields(Predicate<Field> fieldFilter) {
+        this.skipFields.add(fieldFilter);
         return this;
     }
 
     /**
      * Sets the modifier excluded (so the fields with this modifier will not be copied).
-     * This method does not clear previously set modifiers.
-     * Example: {@code Cloner cloner = new ReflectionClonerClassic().exclude(Modifier.STATIC).exclude(Modifier.TRANSIENT); }
+     * This method clears previously set modifiers.
+     * Example: {@code Cloner cloner = new ReflectionCloner().skipModifiers(Modifier.TRANSIENT); }
      *
      * @param modifier modifier, one of {@link Modifier} constant
+     * @param modifiers modifiers, array of {@link Modifier} constants
      *
      * @return same cloner
+     *
+     * @see Modifier
      */
-    public ReflectionClonerClassic exclude(int modifier) {
-        return excludeOnly(excludedModifiers | modifier);
+    public ReflectionCloner2 skipModifiers(int modifier, int modifiers) {
+        int excludedModifiers = IntStream.of(modifiers).reduce(modifier, (x, y) -> x | y);
+        return skipFields(field -> (field.getModifiers() & excludedModifiers) != 0);
     }
 
     /**
@@ -142,9 +167,18 @@ public class ReflectionClonerClassic extends AbstractCloner {
      *
      * @return same cloner
      */
-    public ReflectionClonerClassic withImmutable(Class<?> type, Class<?>... others) {
-        immutableClasses.add(type);
-        immutableClasses.addAll(Arrays.asList(others));
+    public ReflectionCloner2 immutableClasses(Class<?> type, Class<?>... others) {
+        Set<Class<?>> classes = SetBuilder.<Class<?>>hashSet().add(type).addAll(others).build();
+        return immutableClasses(ReflectionClonerPredicates.isAnyOf(classes));
+    }
+
+    public ReflectionCloner2 immutableClasses(Predicate<Class<?>> predicate) {
+        immutableClasses.add(predicate);
+        return this;
+    }
+
+    public ReflectionCloner2 immutableFields(Predicate<Field> predicate) {
+        immutableFields.add(predicate);
         return this;
     }
 
@@ -155,7 +189,7 @@ public class ReflectionClonerClassic extends AbstractCloner {
      * @return true if the object of the class is immutable
      */
     protected boolean isImmutable(Class clazz) {
-        return clazz.isPrimitive() || clazz.isEnum() || immutableClasses.contains(clazz);
+        return clazz.isPrimitive() || clazz.isEnum();// || immutableClasses.contains(clazz);
     }
 
     @Override
@@ -178,6 +212,9 @@ public class ReflectionClonerClassic extends AbstractCloner {
     protected Object doClone(Object object, Map<Object, Object> cloned) {
         if (object == null || isImmutable(object.getClass())) {
             return object;
+        }
+        if (!skipClasses.stream().allMatch(cf -> cf.test(object.getClass()))) {
+            return null;
         }
         else {
             return cloned.computeIfAbsent(object, obj -> doCloneObjectOrArray(obj, cloned));
@@ -235,9 +272,18 @@ public class ReflectionClonerClassic extends AbstractCloner {
 
     protected void copyField(Object from, Object into, XField<Object> field, Map<Object, Object> cloned) {
         Object value = field.get(from);
-        Object valueClone = isImmutable(field.getReflectionObject().getType()) ? value : doClone(value, cloned);
+        Object valueClone;
+        if (value != null) {
+            valueClone = isImmutable(field.getReflectionObject().getType()) ? value : doClone(value, cloned);
+        }
+        else valueClone = null;
         field.set(into, valueClone);
     }
+
+    /**
+     * Cache with (class, fields to copy) entries.
+     */
+    private final Map<Class, Collection<XField<?>>> fieldCache = new WeakHashMap<>();
 
     protected Collection<XField<?>> getCopyableFields(Class<?> clazz) {
         return fieldCache.computeIfAbsent(clazz, this::findCopyableFields);
@@ -245,7 +291,7 @@ public class ReflectionClonerClassic extends AbstractCloner {
 
     protected List<XField<?>> findCopyableFields(Class<?> clazz) {
         List<XField<?>> fields = XReflection.of(clazz).getFields()
-            .filter(field -> !field.isModifier(excludedModifiers))
+            .filter(field -> !ReflectionClonerPredicates.anyMatch(skipFields, field.getReflectionObject()))
             .map(XField::withNoFinal)
             .collect(Collectors.toList());
         return fields;

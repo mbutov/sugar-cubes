@@ -33,11 +33,6 @@ public class MutableBuilder<T, B extends MutableBuilder<T, B>> implements Builde
         return delegate.build();
     }
 
-    @Override
-    public <V> Builder<V> transform(Function<T, V> function) {
-        return delegate.transform(function);
-    }
-
     /**
      * Replaces the builder result using this function.
      *
