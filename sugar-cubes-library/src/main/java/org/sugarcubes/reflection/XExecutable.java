@@ -21,13 +21,15 @@ public interface XExecutable<T> {
             return false;
         }
         for (int k = 0; k < args.length; k++) {
-            if (args == null) {
-                if (!parameterTypes[k].isPrimitive()) {
+            Object arg = args[k];
+            Class parameterType = parameterTypes[k];
+            if (arg == null) {
+                if (parameterType.isPrimitive()) {
                     return false;
                 }
             }
             else {
-                if (!parameterTypes[k].isInstance(args[k])) {
+                if (!parameterType.isInstance(arg)) {
                     return false;
                 }
             }

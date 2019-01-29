@@ -41,7 +41,7 @@ public class UnsafeReflectionCloner extends ReflectionCloner {
     /**
      * Mapping of primitive types to copy operations.
      */
-    private static final Map<Class, TernaryConsumer<Object, Long, Object>> OPERATIONS =
+    private static final Map<Class, TernaryConsumer<Object, Long, Object>> OPERATIONS_WITH_PRIMITIVES =
         MapBuilder.<Class, TernaryConsumer<Object, Long, Object>>hashMap()
             .put(boolean.class, getCopyOperation(UNSAFE::putBoolean, UNSAFE::getBoolean))
             .put(byte.class, getCopyOperation(UNSAFE::putByte, UNSAFE::getByte))
@@ -57,9 +57,10 @@ public class UnsafeReflectionCloner extends ReflectionCloner {
     @Override
     protected void copyField(Object from, Object into, XField<Object> field, Map<Object, Object> cloned) {
         long offset = UNSAFE.objectFieldOffset(field.getReflectionObject());
-        TernaryConsumer<Object, Long, Object> copy = OPERATIONS.get(field.getReflectionObject().getType());
-        if (copy != null) {
-            copy.accept(from, offset, into);
+        TernaryConsumer<Object, Long, Object> primitiveCopy =
+            OPERATIONS_WITH_PRIMITIVES.get(field.getReflectionObject().getType());
+        if (primitiveCopy != null) {
+            primitiveCopy.accept(from, offset, into);
         }
         else {
             UNSAFE.putObject(into, offset, doClone(UNSAFE.getObject(from, offset), cloned));

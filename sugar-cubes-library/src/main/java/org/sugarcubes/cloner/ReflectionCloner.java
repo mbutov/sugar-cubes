@@ -1,6 +1,7 @@
 package org.sugarcubes.cloner;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -19,21 +20,28 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.sugarcubes.arg.Arg;
+import org.sugarcubes.builder.collection.ListBuilder;
 import org.sugarcubes.builder.collection.SetBuilder;
 import org.sugarcubes.reflection.XField;
+import org.sugarcubes.reflection.XMethod;
 import org.sugarcubes.reflection.XReflection;
+import static org.sugarcubes.cloner.ReflectionClonerPredicates.asSet;
+import static org.sugarcubes.cloner.ReflectionClonerPredicates.isAnyOf;
+import static org.sugarcubes.cloner.ReflectionClonerPredicates.isSubclassOf;
 
 /**
  * Implementation of {@link Cloner} which copies objects fields using Reflection API.
@@ -46,41 +54,6 @@ public class ReflectionCloner extends AbstractCloner {
      * Object factory.
      */
     private final ClonerObjectFactory objectFactory;
-
-    /**
-     * Set of fields modifiers which are excluded when copying.
-     */
-    private int excludedModifiers = Modifier.STATIC;
-
-    /**
-     * Some immutable classes.
-     */
-    private final Set<Class> immutableClasses = SetBuilder.<Class>hashSet()
-        .addAll(new Class[] {
-            Class.class,
-
-            String.class,
-
-            Boolean.class, Byte.class, Short.class, Character.class, Integer.class, Long.class, Float.class, Double.class,
-
-            BigInteger.class, BigDecimal.class,
-
-            Duration.class, Instant.class, LocalDate.class, LocalDateTime.class, LocalTime.class, MonthDay.class,
-            OffsetDateTime.class, OffsetTime.class, Period.class, Year.class, YearMonth.class,
-            ZonedDateTime.class, ZoneOffset.class,
-
-            URI.class, URL.class,
-
-            UUID.class,
-
-            Pattern.class,
-        })
-        .build();
-
-    /**
-     * Cache with (class, fields to copy) entries.
-     */
-    private final Map<Class, Collection<XField<?>>> fieldCache = new WeakHashMap<>();
 
     /**
      * Default constructor. Uses {@link ObjenesisObjectFactory} if Objenesis library is present, or
@@ -108,61 +81,125 @@ public class ReflectionCloner extends AbstractCloner {
     }
 
     /**
-     * Sets the modifiers excluded (so the fields with this modifiers will not be copied).
-     * This method clears previously set modifiers.
-     * Example: {@code Cloner cloner = new ReflectionClonerClassic().excludeOnly(Modifier.STATIC | Modifier.TRANSIENT); }
-     *
-     * @param modifiers modifier, combination of {@link Modifier} constants
-     *
-     * @return same cloner
+     * Some immutable classes.
      */
-    public ReflectionCloner excludeOnly(int modifiers) {
-        excludedModifiers = modifiers;
+    private static final Set<Class<?>> DEFAULT_IMMUTABLE_CLASSES = SetBuilder.<Class<?>>hashSet()
+        .addAll(new Class[] {
+            Class.class,
+
+            Boolean.class, Byte.class, Short.class, Character.class, Integer.class, Long.class, Float.class, Double.class,
+
+            String.class,
+
+            BigInteger.class, BigDecimal.class,
+
+            Duration.class, Instant.class, LocalDate.class, LocalDateTime.class, LocalTime.class, MonthDay.class,
+            OffsetDateTime.class, OffsetTime.class, Period.class, Year.class, YearMonth.class,
+            ZonedDateTime.class, ZoneOffset.class,
+
+            URI.class, URL.class,
+
+            UUID.class,
+
+            Pattern.class,
+        })
+        .transform(Collections::unmodifiableSet)
+        .build();
+
+    /**
+     * Fields to skip when cloning.
+     */
+    private List<Predicate<Field>> skipFields = ListBuilder.<Predicate<Field>>arrayList()
+        .add(field -> Modifier.isStatic(field.getModifiers()))
+        .build();
+
+    /**
+     * Returns true if the field should be skipped when cloning.
+     */
+    private boolean isFieldSkipped(Field field) {
+        return ReflectionClonerPredicates.anyMatch(skipFields, field);
+    }
+
+    /**
+     * Classes which instances are cleared (set to null) when cloning.
+     */
+    private List<Predicate<Class<?>>> clearClasses = ListBuilder.<Predicate<Class<?>>>arrayList()
+        .build();
+
+    /**
+     * Returns true if the class should be skipped when cloning.
+     */
+    private boolean isClassCleared(Class<?> clazz) {
+        return ReflectionClonerPredicates.anyMatch(clearClasses, clazz);
+    }
+
+    /**
+     * Classes which objects are copied without cloning.
+     */
+    private List<Predicate<Class<?>>> immutableClasses = ListBuilder.<Predicate<Class<?>>>arrayList()
+        .add(isAnyOf(DEFAULT_IMMUTABLE_CLASSES))
+        .build();
+
+    /**
+     * Returns true if the class is immutable and object should not be cloned.
+     */
+    private boolean isClassImmutable(Class<?> clazz) {
+        return ReflectionClonerPredicates.anyMatch(immutableClasses, clazz);
+    }
+
+    public ReflectionCloner clearIfClassMatches(Predicate<Class<?>> classFilter) {
+        this.clearClasses.add(classFilter);
+        return this;
+    }
+
+    public ReflectionCloner clearExactInstanceOf(Class<?> clazz, Class<?>... classes) {
+        return clearIfClassMatches(isAnyOf(asSet(clazz, classes)));
+    }
+
+    public ReflectionCloner clearInstanceOf(Class<?> clazz, Class<?>... classes) {
+        return clearIfClassMatches(isSubclassOf(asSet(clazz, classes)));
+    }
+
+    public ReflectionCloner skipFields(Predicate<Field> fieldFilter) {
+        this.skipFields.add(fieldFilter);
         return this;
     }
 
     /**
      * Sets the modifier excluded (so the fields with this modifier will not be copied).
-     * This method does not clear previously set modifiers.
-     * Example: {@code Cloner cloner = new ReflectionClonerClassic().exclude(Modifier.STATIC).exclude(Modifier.TRANSIENT); }
+     * This method clears previously set modifiers.
+     * Example: {@code Cloner cloner = new ReflectionCloner().skipModifiers(Modifier.TRANSIENT); }
      *
      * @param modifier modifier, one of {@link Modifier} constant
+     * @param modifiers modifiers, array of {@link Modifier} constants
      *
      * @return same cloner
+     *
+     * @see Modifier
      */
-    public ReflectionCloner exclude(int modifier) {
-        return excludeOnly(excludedModifiers | modifier);
+    public ReflectionCloner skipModifier(int modifier, int modifiers) {
+        int modifiersToExclude = IntStream.of(modifiers).reduce(modifier, (x, y) -> x | y);
+        return skipFields(field -> XReflection.of(field).isModifier(modifiersToExclude));
+    }
+
+    public ReflectionCloner immutableClasses(Predicate<Class<?>> predicate) {
+        immutableClasses.add(predicate);
+        return this;
     }
 
     /**
      * Register immutable types which will not be cloned and just copied via reference.
      *
-     * @param type immutable type
-     * @param others immutable types
+     * @param classes immutable types
      *
      * @return same cloner
      */
-    public ReflectionCloner withImmutable(Class<?> type, Class<?>... others) {
-        immutableClasses.add(type);
-        immutableClasses.addAll(Arrays.asList(others));
-        return this;
-    }
-
-    /**
-     * Checks whether the object of class is immutable (i.e. may be cloned by reference).
-     *
-     * @param clazz class to check
-     * @return true if the object of the class is immutable
-     */
-    protected boolean isImmutable(Class clazz) {
-        return clazz.isPrimitive() || clazz.isEnum() || immutableClasses.contains(clazz);
+    public ReflectionCloner immutableClasses(Class<?> clazz, Class<?>... classes) {
+        return immutableClasses(isAnyOf(asSet(clazz, classes)));
     }
 
     @Override
     protected Object doClone(Object object) {
-        if (object == null || isImmutable(object.getClass())) {
-            return object;
-        }
         return doClone(object, new IdentityHashMap<>());
     }
 
@@ -176,17 +213,24 @@ public class ReflectionCloner extends AbstractCloner {
      * @return clone
      */
     protected Object doClone(Object object, Map<Object, Object> cloned) {
-        if (object == null || isImmutable(object.getClass())) {
+        if (object == null) {
+            return null;
+        }
+        Class<?> type = object.getClass();
+        if (isClassCleared(type)) {
+            return null;
+        }
+        if (isClassImmutable(type)) {
             return object;
         }
-        else {
-            return cloned.computeIfAbsent(object, obj -> doCloneObjectOrArray(obj, cloned));
-        }
+        return cloned.computeIfAbsent(object, obj -> doCloneObjectOrArray(obj, cloned));
     }
 
     protected Object doCloneObjectOrArray(Object object, Map<Object, Object> cloned) {
         return object.getClass().isArray() ? doCloneArray(object, cloned) : doCloneObject(object, cloned);
     }
+
+    private static final XMethod<Object> CLONE_METHOD = XReflection.of(Object.class).getMethod("clone");
 
     /**
      * Clones the array.
@@ -198,18 +242,21 @@ public class ReflectionCloner extends AbstractCloner {
      */
     protected Object doCloneArray(Object object, Map<Object, Object> cloned) {
         Class componentType = object.getClass().getComponentType();
-        int length = Array.getLength(object);
-        Object clone = Array.newInstance(componentType, length);
-        cloned.put(object, clone);
-        if (isImmutable(componentType)) {
-            System.arraycopy(object, 0, clone, 0, length);
+        if (componentType.isPrimitive()) {
+            Object clone = CLONE_METHOD.invoke(object);
+            cloned.put(object, clone);
+            return clone;
         }
         else {
+            Object[] sourceArray = (Object[]) object;
+            int length = sourceArray.length;
+            Object[] targetArray = (Object[]) Array.newInstance(componentType, length);
+            cloned.put(sourceArray, targetArray);
             for (int k = 0; k < length; k++) {
-                Array.set(clone, k, doClone(Array.get(object, k), cloned));
+                targetArray[k] = doClone(sourceArray[k], cloned);
             }
+            return targetArray;
         }
-        return clone;
     }
 
     /**
@@ -234,10 +281,13 @@ public class ReflectionCloner extends AbstractCloner {
     }
 
     protected void copyField(Object from, Object into, XField<Object> field, Map<Object, Object> cloned) {
-        Object value = field.get(from);
-        Object valueClone = isImmutable(field.getReflectionObject().getType()) ? value : doClone(value, cloned);
-        field.set(into, valueClone);
+        field.set(into, doClone(field.get(from), cloned));
     }
+
+    /**
+     * Cache with (class, fields to copy) entries.
+     */
+    private final Map<Class, Collection<XField<?>>> fieldCache = new WeakHashMap<>();
 
     protected Collection<XField<?>> getCopyableFields(Class<?> clazz) {
         return fieldCache.computeIfAbsent(clazz, this::findCopyableFields);
@@ -245,7 +295,7 @@ public class ReflectionCloner extends AbstractCloner {
 
     protected List<XField<?>> findCopyableFields(Class<?> clazz) {
         List<XField<?>> fields = XReflection.of(clazz).getFields()
-            .filter(field -> !field.isModifier(excludedModifiers))
+            .filter(field -> !isFieldSkipped(field.getReflectionObject()))
             .map(XField::withNoFinal)
             .collect(Collectors.toList());
         return fields;
