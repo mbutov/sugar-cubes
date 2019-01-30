@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sugarcubes.builder.collection.ListBuilder;
 
 /**
  * @author Maxim Butov
@@ -19,7 +18,7 @@ public class ListBuilderTest {
 
         List<String> list = ListBuilder.<String>arrayList()
             .add("x")
-            .add("y", "z")
+            .addAll("y", "z")
             .build();
 
         Assert.assertTrue(list instanceof ArrayList);
@@ -32,7 +31,7 @@ public class ListBuilderTest {
 
         List<String> list = ListBuilder.<String>linkedList()
             .add("x")
-            .add("y", "z")
+            .addAll("y", "z")
             .replace(Collections::unmodifiableList)
             .build();
 
@@ -44,7 +43,7 @@ public class ListBuilderTest {
 
     @Test
     public void testArray() throws Exception {
-        Integer[] array = ListBuilder.<Integer>arrayList().add(1, 2, 3, 4, 5).toArray(n -> new Integer[n]);
+        Integer[] array = ListBuilder.<Integer>arrayList().addAll(1, 2, 3, 4, 5).toArray(Integer[]::new);
         Assert.assertArrayEquals(new Integer[] {1, 2, 3, 4, 5,}, array);
     }
 

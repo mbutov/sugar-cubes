@@ -37,10 +37,6 @@ public class CollectionBuilder<X, C extends Collection<X>> extends MutableBuilde
         return apply(list -> element.ifPresent(list::add));
     }
 
-    public CollectionBuilder<X, C> add(X... elements) {
-        return addAll(elements);
-    }
-
     public CollectionBuilder<X, C> addAll(Collection<X> elements) {
         return apply(collection -> collection.addAll(elements));
     }

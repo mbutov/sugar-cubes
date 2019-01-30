@@ -22,6 +22,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.sugarcubes.arg.Arg;
 import org.sugarcubes.builder.collection.ListBuilder;
@@ -39,10 +41,6 @@ import org.sugarcubes.builder.collection.SetBuilder;
 import org.sugarcubes.reflection.XField;
 import org.sugarcubes.reflection.XMethod;
 import org.sugarcubes.reflection.XReflection;
-import static org.sugarcubes.cloner.ReflectionClonerPredicates.anyMatch;
-import static org.sugarcubes.cloner.ReflectionClonerPredicates.asSet;
-import static org.sugarcubes.cloner.ReflectionClonerPredicates.isAnyOf;
-import static org.sugarcubes.cloner.ReflectionClonerPredicates.isSubclassOf;
 
 /**
  * Implementation of {@link Cloner} which copies objects fields using Reflection API.
@@ -168,7 +166,6 @@ public class ReflectionCloner extends AbstractCloner {
 
     /**
      * Sets the modifier excluded (so the fields with this modifier will not be copied).
-     * This method clears previously set modifiers.
      * Example: {@code Cloner cloner = new ReflectionCloner().skipModifiers(Modifier.TRANSIENT); }
      *
      * @param modifier modifier, one of {@link Modifier} constant
@@ -178,11 +175,18 @@ public class ReflectionCloner extends AbstractCloner {
      *
      * @see Modifier
      */
-    public ReflectionCloner skipModifier(int modifier, int modifiers) {
+    public ReflectionCloner skipModifiers(int modifier, int modifiers) {
         int modifiersToExclude = IntStream.of(modifiers).reduce(modifier, (x, y) -> x | y);
         return skipFields(field -> XReflection.of(field).isModifier(modifiersToExclude));
     }
 
+    /**
+     * Adds predicate for immutable classes.
+     *
+     * @param predicate predicate for immutable classes
+     *
+     * @return same cloner
+     */
     public ReflectionCloner immutableClasses(Predicate<Class<?>> predicate) {
         immutableClasses.add(predicate);
         return this;
@@ -204,6 +208,9 @@ public class ReflectionCloner extends AbstractCloner {
         return doClone(object, new IdentityHashMap<>());
     }
 
+    private final Map<Class<?>, Boolean> clearedClassesCache = new HashMap<>();
+    private final Map<Class<?>, Boolean> immutableClassesCache = new HashMap<>();
+
     /**
      * Deep-clones the object.
      *
@@ -218,10 +225,10 @@ public class ReflectionCloner extends AbstractCloner {
             return null;
         }
         Class<?> type = object.getClass();
-        if (isClassCleared(type)) {
+        if (clearedClassesCache.computeIfAbsent(type, this::isClassCleared)) {
             return null;
         }
-        if (isClassImmutable(type)) {
+        if (immutableClassesCache.computeIfAbsent(type, this::isClassImmutable)) {
             return object;
         }
         Object clone = cloned.get(object);
@@ -289,10 +296,10 @@ public class ReflectionCloner extends AbstractCloner {
     /**
      * Cache with (class, fields to copy) entries.
      */
-    private final Map<Class, Collection<XField<?>>> fieldCache = new WeakHashMap<>();
+    private final Map<Class, Collection<XField<?>>> copyableFieldsCache = new WeakHashMap<>();
 
     protected Collection<XField<?>> getCopyableFields(Class<?> clazz) {
-        return fieldCache.computeIfAbsent(clazz, this::findCopyableFields);
+        return copyableFieldsCache.computeIfAbsent(clazz, this::findCopyableFields);
     }
 
     protected List<XField<?>> findCopyableFields(Class<?> clazz) {
@@ -301,6 +308,27 @@ public class ReflectionCloner extends AbstractCloner {
             .map(XField::withNoFinal)
             .collect(Collectors.toList());
         return fields;
+    }
+
+    private static <X> boolean anyMatch(Collection<Predicate<X>> predicates, X x) {
+        return anyMatch(predicates.stream(), x);
+    }
+
+    private static <X> boolean anyMatch(Stream<Predicate<X>> predicates, X x) {
+        return predicates.anyMatch(p -> p.test(x));
+    }
+
+    private static <X> Set<X> asSet(X first, X... others) {
+        Arg.notNull(first, "first argument must be not null");
+        return SetBuilder.<X>hashSet().add(first).addAll(others).build();
+    }
+
+    private static Predicate<Class<?>> isAnyOf(Collection<Class<?>> classes) {
+        return classes::contains;
+    }
+
+    private static Predicate<Class<?>> isSubclassOf(Collection<Class<?>> classes) {
+        return clazz -> anyMatch(classes.stream().map(cl -> (Predicate<Class<?>>) cl::isAssignableFrom), clazz);
     }
 
 }
