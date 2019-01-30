@@ -39,6 +39,7 @@ import org.sugarcubes.builder.collection.SetBuilder;
 import org.sugarcubes.reflection.XField;
 import org.sugarcubes.reflection.XMethod;
 import org.sugarcubes.reflection.XReflection;
+import static org.sugarcubes.cloner.ReflectionClonerPredicates.anyMatch;
 import static org.sugarcubes.cloner.ReflectionClonerPredicates.asSet;
 import static org.sugarcubes.cloner.ReflectionClonerPredicates.isAnyOf;
 import static org.sugarcubes.cloner.ReflectionClonerPredicates.isSubclassOf;
@@ -117,7 +118,7 @@ public class ReflectionCloner extends AbstractCloner {
      * Returns true if the field should be skipped when cloning.
      */
     private boolean isFieldSkipped(Field field) {
-        return ReflectionClonerPredicates.anyMatch(skipFields, field);
+        return anyMatch(skipFields, field);
     }
 
     /**
@@ -130,7 +131,7 @@ public class ReflectionCloner extends AbstractCloner {
      * Returns true if the class should be skipped when cloning.
      */
     private boolean isClassCleared(Class<?> clazz) {
-        return ReflectionClonerPredicates.anyMatch(clearClasses, clazz);
+        return anyMatch(clearClasses, clazz);
     }
 
     /**
@@ -144,7 +145,7 @@ public class ReflectionCloner extends AbstractCloner {
      * Returns true if the class is immutable and object should not be cloned.
      */
     private boolean isClassImmutable(Class<?> clazz) {
-        return ReflectionClonerPredicates.anyMatch(immutableClasses, clazz);
+        return anyMatch(immutableClasses, clazz);
     }
 
     public ReflectionCloner clearIfClassMatches(Predicate<Class<?>> classFilter) {
@@ -223,7 +224,8 @@ public class ReflectionCloner extends AbstractCloner {
         if (isClassImmutable(type)) {
             return object;
         }
-        return cloned.computeIfAbsent(object, obj -> doCloneObjectOrArray(obj, cloned));
+        Object clone = cloned.get(object);
+        return clone != null ? clone : doCloneObjectOrArray(object, cloned);
     }
 
     protected Object doCloneObjectOrArray(Object object, Map<Object, Object> cloned) {
