@@ -12,17 +12,18 @@ import java.util.WeakHashMap;
 import java.util.function.Supplier;
 
 /**
+ * Set builders.
  *
  * @author Maxim Butov
  */
-public class SetBuilder<X, S extends Set<X>> extends CollectionBuilder<X, S> {
+public class SetBuilder<X, S extends Set<X>> extends CollectionBuilder<X, S, SetBuilder<X, S>> {
 
     public SetBuilder(Supplier<S> supplier) {
         super(supplier);
     }
 
     public static <X, S extends Set<X>> SetBuilder<X, S> set(Supplier<S> supplier) {
-        return new SetBuilder<X, S>(supplier);
+        return new SetBuilder<>(supplier);
     }
 
     public static <X> SetBuilder<X, Set<X>> hashSet() {

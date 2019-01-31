@@ -3,7 +3,6 @@ package org.sugarcubes.builder.collection;
 import java.util.Collections;
 
 import org.junit.Test;
-import org.sugarcubes.builder.collection.SetBuilder;
 
 /**
  * @author Maxim Butov
@@ -14,8 +13,16 @@ public class SetBuilderTest {
     public void testUnmodifiable() throws Exception {
         SetBuilder.<Integer>hashSet()
             .add(1).add(2)
-            .cast()
-            .replace(Collections::unmodifiableCollection)
+            .replace(Collections::unmodifiableSet)
+            .build();
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testUnmodifiableCollection() throws Exception {
+
+        SetBuilder.<Integer>hashSet()
+            .replace(Collections::unmodifiableSet)
+            .add(1)
             .build();
 
     }

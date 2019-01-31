@@ -15,37 +15,29 @@ import org.sugarcubes.builder.MutableBuilder;
  *
  * @author Maxim Butov
  */
-public class CollectionBuilder<X, C extends Collection<X>> extends MutableBuilder<C, CollectionBuilder<X, C>> {
+public abstract class CollectionBuilder<X, C extends Collection<X>, B extends CollectionBuilder<X, C, B>> extends MutableBuilder<C, B> {
 
-    public CollectionBuilder(Supplier<C> supplier) {
+    protected CollectionBuilder(Supplier<C> supplier) {
         super(supplier);
     }
 
-    public static <X, C extends Collection<X>> CollectionBuilder<X, C> collection(Supplier<C> supplier) {
-        return new CollectionBuilder<>(supplier);
-    }
-
-    public <D extends Collection<X>> CollectionBuilder<X, D> cast() {
-        return (CollectionBuilder<X, D>) this;
-    }
-
-    public CollectionBuilder<X, C> add(X element) {
+    public B add(X element) {
         return apply(collection -> collection.add(element));
     }
 
-    public CollectionBuilder<X, C> add(Optional<X> element) {
+    public B add(Optional<X> element) {
         return apply(list -> element.ifPresent(list::add));
     }
 
-    public CollectionBuilder<X, C> addAll(Collection<X> elements) {
+    public B addAll(Collection<X> elements) {
         return apply(collection -> collection.addAll(elements));
     }
 
-    public CollectionBuilder<X, C> addAll(X... elements) {
+    public B addAll(X... elements) {
         return apply(collection -> collection.addAll(Arrays.asList(elements)));
     }
 
-    public CollectionBuilder<X, C> addAll(Stream<X> elements) {
+    public B addAll(Stream<X> elements) {
         return apply(list -> elements.forEach(list::add));
     }
 

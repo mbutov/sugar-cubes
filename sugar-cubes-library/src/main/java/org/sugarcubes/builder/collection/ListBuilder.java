@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
+ * List builders.
+ *
  * @author Maxim Butov
  */
-public class ListBuilder<X, L extends List<X>> extends CollectionBuilder<X, L> {
+public class ListBuilder<X, L extends List<X>> extends CollectionBuilder<X, L, ListBuilder<X, L>> {
 
     public ListBuilder(Supplier<L> supplier) {
         super(supplier);
