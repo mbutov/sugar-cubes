@@ -20,6 +20,7 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +37,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.sugarcubes.arg.Arg;
-import org.sugarcubes.builder.collection.ListBuilder;
 import org.sugarcubes.builder.collection.SetBuilder;
 import org.sugarcubes.reflection.XField;
 import org.sugarcubes.reflection.XMethod;
@@ -68,8 +68,12 @@ public class ReflectionCloner extends AbstractCloner {
      * @param objectFactory object factory to use
      */
     public ReflectionCloner(ClonerObjectFactory objectFactory) {
+
         Arg.notNull(objectFactory, "objectFactory is null");
         this.objectFactory = objectFactory;
+
+        initialize();
+
     }
 
     /**
@@ -105,12 +109,19 @@ public class ReflectionCloner extends AbstractCloner {
         .transform(Collections::unmodifiableSet)
         .build();
 
+    protected void initialize() {
+
+        skipModifiers(Modifier.STATIC);
+
+        immutableClasses(isAnyOf(DEFAULT_IMMUTABLE_CLASSES));
+        immutableClasses(Class::isEnum);
+
+    }
+
     /**
      * Fields to skip when cloning.
      */
-    private List<Predicate<Field>> skipFields = ListBuilder.<Predicate<Field>>arrayList()
-        .add(field -> Modifier.isStatic(field.getModifiers()))
-        .build();
+    private List<Predicate<Field>> skipFields = new ArrayList<>();
 
     /**
      * Returns true if the field should be skipped when cloning.
@@ -122,8 +133,7 @@ public class ReflectionCloner extends AbstractCloner {
     /**
      * Classes which instances are cleared (set to null) when cloning.
      */
-    private List<Predicate<Class<?>>> clearClasses = ListBuilder.<Predicate<Class<?>>>arrayList()
-        .build();
+    private List<Predicate<Class<?>>> clearClasses = new ArrayList<>();
 
     /**
      * Returns true if the class should be skipped when cloning.
@@ -135,9 +145,7 @@ public class ReflectionCloner extends AbstractCloner {
     /**
      * Classes which objects are copied without cloning.
      */
-    private List<Predicate<Class<?>>> immutableClasses = ListBuilder.<Predicate<Class<?>>>arrayList()
-        .add(isAnyOf(DEFAULT_IMMUTABLE_CLASSES))
-        .build();
+    private List<Predicate<Class<?>>> immutableClasses = new ArrayList<>();
 
     /**
      * Returns true if the class is immutable and object should not be cloned.
@@ -175,7 +183,7 @@ public class ReflectionCloner extends AbstractCloner {
      *
      * @see Modifier
      */
-    public ReflectionCloner skipModifiers(int modifier, int modifiers) {
+    public ReflectionCloner skipModifiers(int modifier, int... modifiers) {
         int modifiersToExclude = IntStream.of(modifiers).reduce(modifier, (x, y) -> x | y);
         return skipFields(field -> XReflection.of(field).isModifier(modifiersToExclude));
     }

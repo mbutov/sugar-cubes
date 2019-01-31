@@ -20,7 +20,12 @@ public abstract class AbstractClonerTests {
 
         byte[] xxx = {1, 2, 3,};
         Object[] yyy = {1, "2", 3.0, new int[] {4}, Collections.singletonMap(5, 5.0),};
+        Object[] zzz = new Object[2];
 
+        {
+            zzz[0] = this;
+            zzz[1] = zzz;
+        }
     }
 
     static class B extends A {
@@ -52,6 +57,8 @@ public abstract class AbstractClonerTests {
 
         Assert.assertTrue(Arrays.equals(b1.xxx, b2.xxx));
         Assert.assertTrue(Arrays.deepEquals(b1.yyy, b2.yyy));
+        Assert.assertSame(b2, b2.zzz[0]);
+        Assert.assertSame(b2.zzz, b2.zzz[1]);
 
         Assert.assertSame(b2, b2.a);
         Assert.assertEquals(b1.n, b2.n);
