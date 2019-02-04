@@ -1,6 +1,7 @@
 package org.sugarcubes.serialization;
 
 import java.io.DataInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -14,8 +15,7 @@ public class XObjectInputStream extends DataInputStream {
         super(in);
     }
 
-
-    public String readString() {
+    public Object readObject() throws IOException {
         return null;
     }
 

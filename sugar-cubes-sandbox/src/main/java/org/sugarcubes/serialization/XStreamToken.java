@@ -14,6 +14,11 @@ public enum XStreamToken {
 
     NULL('N') {
         @Override
+        boolean matches(Object value) {
+            return value == null;
+        }
+
+        @Override
         void writeValue(XObjectOutputStream out, Object value) throws IOException {
         }
 
@@ -24,6 +29,11 @@ public enum XStreamToken {
     },
 
     REFERENCE('R') {
+        @Override
+        boolean matches(Object value) {
+            return false;
+        }
+
         @Override
         void writeValue(XObjectOutputStream out, Object value) throws IOException {
             out.writeInt((Integer) value);
@@ -37,6 +47,11 @@ public enum XStreamToken {
 
     STRING('S') {
         @Override
+        boolean matches(Object value) {
+            return value instanceof String;
+        }
+
+        @Override
         void writeValue(XObjectOutputStream out, Object value) throws IOException {
             out.writeUTF((String) value);
         }
@@ -47,30 +62,44 @@ public enum XStreamToken {
         }
     },
 
-    STRING_REFERENCE('Q') {
-        @Override
-        void writeValue(XObjectOutputStream out, Object value) throws IOException {
-            out.writeInt((Integer) value);
-        }
-
-        @Override
-        Object readValue(XObjectInputStream in) throws IOException, ClassNotFoundException {
-            return in.readInt();
-        }
-    },
-
     ENUM('E') {
+        @Override
+        boolean matches(Object value) {
+            return value instanceof Enum;
+        }
+
         @Override
         void writeValue(XObjectOutputStream out, Object value) throws IOException {
             Enum e = (Enum) value;
-            out.writeString(e.getClass().getName());
-            out.writeString(e.name());
+            out.writeObject(e.getClass().getName());
+            out.writeObject(e.name());
         }
 
         @Override
         Object readValue(XObjectInputStream in) throws IOException, ClassNotFoundException {
-            String className = in.readString();
-            String name = in.readString();
+            String className = (String) in.readObject();
+            String name = (String) in.readObject();
+            return Enum.valueOf((Class) Class.forName(className), name);
+        }
+    },
+
+    OBJECT('O') {
+        @Override
+        boolean matches(Object value) {
+            return value instanceof Enum;
+        }
+
+        @Override
+        void writeValue(XObjectOutputStream out, Object value) throws IOException {
+            Enum e = (Enum) value;
+            out.writeObject(e.getClass().getName());
+            out.writeObject(e.name());
+        }
+
+        @Override
+        Object readValue(XObjectInputStream in) throws IOException, ClassNotFoundException {
+            String className = (String) in.readObject();
+            String name = (String) in.readObject();
             return Enum.valueOf((Class) Class.forName(className), name);
         }
     },
@@ -83,8 +112,10 @@ public enum XStreamToken {
         this.marker = marker;
     }
 
-    static XStreamToken findByMarker(int marker) {
-        return Arrays.stream(values()).filter(token -> token.marker == marker).collect(ZeroOneCollectors.onlyElement());
+    abstract boolean matches(Object value);
+
+    static XStreamToken forValue(Object value) {
+        return Arrays.stream(values()).filter(token -> token.matches(value)).findFirst().get();
     }
 
     void write(XObjectOutputStream out, Object value) throws IOException {
@@ -94,7 +125,11 @@ public enum XStreamToken {
 
     abstract void writeValue(XObjectOutputStream out, Object value) throws IOException;
 
-    Object read(XObjectInputStream in) throws IOException, ClassNotFoundException {
+    static XStreamToken findByMarker(int marker) {
+        return Arrays.stream(values()).filter(token -> token.marker == marker).collect(ZeroOneCollectors.onlyElement());
+    }
+
+    static Object read(XObjectInputStream in) throws IOException, ClassNotFoundException {
         int marker = in.readInt();
         XStreamToken token = findByMarker(marker);
         return token.readValue(in);
