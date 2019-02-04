@@ -10,7 +10,7 @@ import static org.sugarcubes.reflection.XReflectionUtils.execute;
  * @author Maxim Butov
  */
 public class XConstructor<T> extends XReloadableReflectionObject<Constructor<T>>
-    implements XAnnotated<Constructor<T>>, XExecutable<T>, XMember<Constructor<T>>, XModifiers, XTyped<T> {
+    implements XAnnotated<Constructor<T>>, XExecutable<T>, XMember<Constructor<T>>, XModifiers {
 
     private final Class<T> declaringClass;
     private final Class<?>[] parameterTypes;
@@ -29,11 +29,6 @@ public class XConstructor<T> extends XReloadableReflectionObject<Constructor<T>>
     @Override
     public Class<?>[] getParameterTypes() {
         return parameterTypes;
-    }
-
-    @Override
-    public Class<T> getType() {
-        return declaringClass;
     }
 
     public T newInstance(Object... args) {

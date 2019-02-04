@@ -20,7 +20,7 @@ import static org.sugarcubes.stream.ZeroOneCollectors.toOptional;
  *
  * @author Maxim Butov
  */
-public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnotated<Class<C>>, XModifiers, XTyped<C> {
+public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnotated<Class<C>>, XModifiers {
 
     private final Class<C> reflectionObject;
 
@@ -33,9 +33,16 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
         return reflectionObject;
     }
 
-    @Override
-    public Class<C> getType() {
-        return reflectionObject;
+    public boolean isExactClass(Class<?> clazz) {
+        return getReflectionObject().equals(clazz);
+    }
+
+    public boolean isAssignableFrom(Class<?> clazz) {
+        return getReflectionObject().isAssignableFrom(clazz);
+    }
+
+    public boolean isSubclassOf(Class<?> clazz) {
+        return clazz.isAssignableFrom(getReflectionObject());
     }
 
     @Override

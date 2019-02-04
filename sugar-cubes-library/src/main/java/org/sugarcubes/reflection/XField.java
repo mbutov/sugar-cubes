@@ -12,7 +12,7 @@ import static org.sugarcubes.reflection.XReflectionUtils.execute;
  * @author Maxim Butov
  */
 public class XField<T> extends XReloadableReflectionObject<Field>
-    implements XAnnotated<Field>, XMember<Field>, XModifiers, XTyped<T> {
+    implements XAnnotated<Field>, XMember<Field>, XModifiers {
 
     /**
      * {@link Field#getDeclaringClass()}
@@ -45,11 +45,6 @@ public class XField<T> extends XReloadableReflectionObject<Field>
         return fieldWithModifiers(loadField(), modifiers);
     }
 
-    @Override
-    public Class<T> getType() {
-        return (Class) getReflectionObject().getType();
-    }
-
     public T get(Object obj) {
         return execute(() -> getReflectionObject().get(obj));
     }
@@ -58,7 +53,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
         execute(() -> getReflectionObject().set(obj, value));
     }
 
-    public T getAndSet(Object obj, T value) {
+    public T put(Object obj, T value) {
         T oldValue = get(obj);
         set(obj, value);
         return oldValue;

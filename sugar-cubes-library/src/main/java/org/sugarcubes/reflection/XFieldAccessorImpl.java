@@ -26,6 +26,11 @@ class XFieldAccessorImpl<T> implements XFieldAccessor<T> {
     }
 
     @Override
+    public T put(T value) {
+        return xField.put(obj, value);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

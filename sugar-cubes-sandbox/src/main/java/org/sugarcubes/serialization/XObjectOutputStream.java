@@ -11,12 +11,12 @@ import java.util.Map;
  *
  * @author Maxim Butov
  */
-public class XDataOutputStream extends DataOutputStream {
+public class XObjectOutputStream extends DataOutputStream {
 
-    private Map<Object, Integer> objects = new IdentityHashMap<>();
-    private Map<String, Integer> strings = new IdentityHashMap<>();
+    final Map<Object, Integer> objects = new IdentityHashMap<>();
+    final Map<String, Integer> strings = new IdentityHashMap<>();
 
-    public XDataOutputStream(OutputStream out) {
+    public XObjectOutputStream(OutputStream out) {
         super(out);
     }
 
@@ -39,10 +39,11 @@ public class XDataOutputStream extends DataOutputStream {
         }
     }
 
-    private void writeNull() throws IOException {
+    public void writeNull() throws IOException {
+        XStreamToken.NULL.write(this, null);
     }
 
-    private void writeString(String string) throws IOException {
+    public void writeString(String string) throws IOException {
         Integer index = strings.get(string);
         if (index != null) {
             writeStringReference(index);
@@ -54,19 +55,18 @@ public class XDataOutputStream extends DataOutputStream {
     }
 
     private void writeReference(int reference) throws IOException {
+        XStreamToken.REFERENCE.write(this, reference);
     }
 
     private void writeNewObject(Object object) throws IOException {
     }
 
     private void writeStringReference(int reference) throws IOException {
-        writeByte('S');
-        writeInt(reference);
+        XStreamToken.STRING_REFERENCE.write(this, reference);
     }
 
     private void writeNewString(String string) throws IOException {
-        writeByte('S');
-        writeUTF(string);
+        XStreamToken.STRING.write(this, string);
     }
 
 }

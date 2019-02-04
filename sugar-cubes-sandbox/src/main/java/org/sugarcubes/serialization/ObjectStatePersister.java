@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.sugarcubes.reflection.XClass;
@@ -25,20 +26,20 @@ public class ObjectStatePersister {
         OBJECT('O'),
         ;
 
-        private final int data;
+        private final int marker;
 
-        N(int data) {
-            this.data = data;
+        N(int marker) {
+            this.marker = marker;
         }
 
         void write(DataOutputStream out, Object object, Map<Object, Integer> saved) throws IOException {
-            out.writeByte(data);
+            out.writeByte(marker);
             write1(out, object, saved);
         }
 
         void write1(DataOutputStream out, Object object, Map<Object, Integer> saved) throws IOException {
         }
-        
+
     }
 
     public void save(OutputStream out, Object object) throws IOException {
@@ -48,12 +49,12 @@ public class ObjectStatePersister {
     private void save(DataOutputStream out, Object object, Map<Object, Integer> saved) throws IOException {
 
         if (object == null) {
-            out.write(N.NULL.data);
+            out.write(N.NULL.marker);
         }
         else {
             Integer reference = saved.get(object);
             if (reference != null) {
-                out.write(N.REFERENCE.data);
+                out.write(N.REFERENCE.marker);
                 out.writeInt(reference);
             }
             else {
@@ -66,12 +67,12 @@ public class ObjectStatePersister {
 
     private void saveObject(DataOutputStream out, Object object, Map<Object, Integer> saved) throws IOException {
         if (object instanceof Enum) {
-            out.write(N.ENUM.data);
+            out.write(N.ENUM.marker);
             out.writeUTF(object.getClass().getName());
             out.writeUTF(((Enum) object).name());
         }
         else {
-            out.write(N.OBJECT.data);
+            out.write(N.OBJECT.marker);
             XClass<?> xClass = XReflection.of(object.getClass());
             saveFields(out, object, xClass, true, saved);
         }
@@ -80,6 +81,9 @@ public class ObjectStatePersister {
 
     private void saveFields(DataOutputStream out, Object object, XClass<?> xClass, boolean root, Map<Object, Integer> saved) throws IOException {
         if (!xClass.isNull()) {
+            Map<XClass<?>, List<? extends XFieldAccessor<?>>> scopes = xClass.getInheritance().collect(Collectors.toMap(Function.identity(),
+                cls -> cls.getDeclaredFields().map(field -> field.getAccessor(object)).collect(Collectors.toList())));
+
             List<XFieldAccessor> accessors = xClass.getDeclaredFields()
                 .map(field -> field.getAccessor(object))
                 .filter(acc -> acc.get() != null)

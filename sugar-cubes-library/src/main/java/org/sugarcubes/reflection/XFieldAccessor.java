@@ -9,4 +9,6 @@ public interface XFieldAccessor<T> {
 
     void set(T value);
 
+    T put(T value);
+
 }

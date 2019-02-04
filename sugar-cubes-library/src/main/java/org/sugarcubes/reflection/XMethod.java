@@ -14,7 +14,7 @@ import static org.sugarcubes.reflection.XReflectionUtils.execute;
  * @author Maxim Butov
  */
 public class XMethod<R> extends XReloadableReflectionObject<Method>
-    implements XAnnotated<Method>, XExecutable<R>, XMember<Method>, XModifiers, XTyped<R> {
+    implements XAnnotated<Method>, XExecutable<R>, XMember<Method>, XModifiers {
 
     private final Class<?> declaringClass;
     private final String name;
@@ -35,11 +35,6 @@ public class XMethod<R> extends XReloadableReflectionObject<Method>
     @Override
     public Class<?>[] getParameterTypes() {
         return parameterTypes.clone();
-    }
-
-    @Override
-    public Class<R> getType() {
-        return (Class) getReflectionObject().getReturnType();
     }
 
     public boolean hasNameAndParameterTypes(String name, Class... types) {
