@@ -64,6 +64,10 @@ public class XField<T> extends XReloadableReflectionObject<Field>
         return oldValue;
     }
 
+    public XFieldAccessor<T> getAccessor(Object obj) {
+        return new XFieldAccessorImpl<>(this, obj);
+    }
+
     public <X> XField<X> cast() {
         return (XField) this;
     }

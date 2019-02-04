@@ -1,7 +1,6 @@
 package org.sugarcubes.reflection;
 
 import org.junit.Test;
-import org.springframework.core.BridgeMethodResolver;
 
 /**
  * todo: document it
@@ -33,9 +32,6 @@ public class XMethodTest {
 
         XMethod<String> aMethod1 = XReflection.of(A.class).getMethod("method", Object.class);
         XMethod<String> bMethod1 = XReflection.of(B.class).getMethod("method", Integer.class);
-
-        System.out.println(bMethod1.getReflectionObject());
-        System.out.println(BridgeMethodResolver.findBridgedMethod(bMethod1.getReflectionObject()));
 
     }
 
