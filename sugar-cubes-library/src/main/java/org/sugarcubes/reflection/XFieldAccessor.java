@@ -5,6 +5,8 @@ package org.sugarcubes.reflection;
  */
 public interface XFieldAccessor<T> {
 
+    XField<T> getField();
+
     T get();
 
     void set(T value);

@@ -15,41 +15,40 @@ import java.util.Map;
 public class XObjectOutputStream extends DataOutputStream {
 
     private final Map<Object, Integer> objects = new IdentityHashMap<>();
-    private final Map<Object, Integer> strings = new HashMap<>();
+    private final Map<Object, Integer> immutables = new HashMap<>();
+
+    boolean isImmutable(Object object) {
+        return object instanceof String;
+    }
+
+    int getReference(Object object) {
+        Integer ref = objects.get(object);
+        if (ref == null) {
+            ref = immutables.get(object);
+        }
+        return ref != null ? ref : -1;
+    }
+
+    int putReference(Object object) {
+        int ref = objects.size();
+        objects.put(object, ref);
+        if (isImmutable(object)) {
+            immutables.put(object, ref);
+        }
+        return ref;
+    }
 
     public XObjectOutputStream(OutputStream out) {
         super(out);
     }
 
     public void writeObject(Object object) throws IOException {
-        if (object == null) {
-            writeNewObject(null);
-        }
-        else {
-            Integer index = objects.get(object);
-            if (index == null) {
-                index = strings.get(object);
-            }
-            if (index != null) {
-                writeReference(index);
-            }
-            else {
-                index = objects.size();
-                objects.put(object, index);
-                if (object instanceof String) {
-                    strings.put(object, index);
-                }
-                writeNewObject(object);
+        for (XSerializer serializer : XSerializers.values()) {
+            if (serializer.write(this, object)) {
+                return;
             }
         }
-    }
-
-    private void writeReference(int reference) throws IOException {
-        XStreamToken.REFERENCE.write(this, reference);
-    }
-
-    private void writeNewObject(Object object) throws IOException {
-        XStreamToken.forValue(object).write(this, object);
+        throw new IllegalStateException();
     }
 
 }

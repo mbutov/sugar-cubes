@@ -16,6 +16,11 @@ class XFieldAccessorImpl<T> implements XFieldAccessor<T> {
     }
 
     @Override
+    public XField<T> getField() {
+        return xField;
+    }
+
+    @Override
     public T get() {
         return xField.get(obj);
     }
