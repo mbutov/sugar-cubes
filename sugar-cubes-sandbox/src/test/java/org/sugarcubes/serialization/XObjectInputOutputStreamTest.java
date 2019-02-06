@@ -37,4 +37,9 @@ public class XObjectInputOutputStreamTest {
 
     }
 
+    @Test
+    public void testInnerClassForName() throws Exception {
+        Class.forName(Y.class.getName());
+    }
+    
 }

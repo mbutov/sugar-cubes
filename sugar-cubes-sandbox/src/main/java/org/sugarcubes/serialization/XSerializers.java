@@ -1,8 +1,10 @@
 package org.sugarcubes.serialization;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,11 +53,15 @@ public enum XSerializers implements XSerializer {
 
         @Override
         public Object readValue(XObjectInputStream in, int reference) throws IOException, ClassNotFoundException {
-            return in.readInt();
+            return in.get(in.readInt());
         }
     },
 
     STRING('S') {
+
+        final CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
+        final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+
         @Override
         public boolean matches(XObjectOutputStream out, Object value) {
             return value instanceof String;
@@ -64,19 +70,21 @@ public enum XSerializers implements XSerializer {
         @Override
         public void writeValue(XObjectOutputStream out, Object value) throws IOException {
             String string = (String) value;
-            out.writeInt(string.length());
-            new OutputStreamWriter(out, StandardCharsets.UTF_8).write(string);
+            ByteBuffer buffer = encoder.encode(CharBuffer.wrap(string));
+            byte[] bytes = buffer.array();
+            out.writeInt(bytes.length);
+            out.write(bytes);
         }
 
         @Override
         public Object readValue(XObjectInputStream in, int reference) throws IOException, ClassNotFoundException {
             int length = in.readInt();
-            char[] cbuf = new char[length];
-            int count = new InputStreamReader(in, StandardCharsets.UTF_8).read(cbuf);
+            byte[] bytes = new byte[length];
+            int count = in.read(bytes);
             if (count != length) {
                 throw new IOException("Cannot fully read string");
             }
-            return in.readUTF();
+            return decoder.decode(ByteBuffer.wrap(bytes)).toString();
         }
     },
 
@@ -88,12 +96,25 @@ public enum XSerializers implements XSerializer {
 
         @Override
         public void writeValue(XObjectOutputStream out, Object value) throws IOException {
-            out.writeObject(((Class) value).getName());
+            Class clazz = (Class) value;
+            String className = clazz.getName();
+            int index = className.lastIndexOf('.');
+            if (index >= 0) {
+                out.writeObject(className.substring(0, index));
+                out.writeObject(className.substring(index + 1));
+            }
+            else {
+                out.writeObject("");
+                out.writeObject(className);
+            }
         }
 
         @Override
         public Object readValue(XObjectInputStream in, int reference) throws IOException, ClassNotFoundException {
-            return Class.forName(in.readObject());
+            String packageName = in.readObject();
+            String classSimpleName = in.readObject();
+            String className = packageName.length() > 0 ? packageName + '.' + classSimpleName : classSimpleName;
+            return Class.forName(className);
         }
     },
 
@@ -196,7 +217,7 @@ public enum XSerializers implements XSerializer {
 
     @Override
     public int tag() {
-        return 0;
+        return tag;
     }
 
 }
