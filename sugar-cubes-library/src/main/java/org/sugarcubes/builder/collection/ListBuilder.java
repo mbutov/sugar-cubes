@@ -1,6 +1,7 @@
 package org.sugarcubes.builder.collection;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -26,6 +27,10 @@ public class ListBuilder<X, L extends List<X>> extends CollectionBuilder<X, L, L
 
     public static <X> ListBuilder<X, List<X>> linkedList() {
         return list(LinkedList::new);
+    }
+
+    public static <X> List<X> unmodifiableArrayList(X... elements) {
+        return ListBuilder.<X>arrayList().addAll(elements).transform(Collections::unmodifiableList).build();
     }
 
 }

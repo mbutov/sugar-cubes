@@ -50,4 +50,12 @@ public class SetBuilder<X, S extends Set<X>> extends CollectionBuilder<X, S, Set
         return fromMap(WeakHashMap<X, Boolean>::new);
     }
 
+    public static <X> Set<X> unmodifiableHashSet(X... elements) {
+        return SetBuilder.<X>hashSet().addAll(elements).transform(Collections::unmodifiableSet).build();
+    }
+
+    public static <X> Set<X> unmodifiableLinkedHashSet(X... elements) {
+        return SetBuilder.<X>linkedHashSet().addAll(elements).transform(Collections::unmodifiableSet).build();
+    }
+
 }

@@ -22,7 +22,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -86,28 +85,25 @@ public class ReflectionCloner extends AbstractCloner {
     /**
      * Some immutable classes.
      */
-    private static final Set<Class<?>> DEFAULT_IMMUTABLE_CLASSES = SetBuilder.<Class<?>>hashSet()
-        .addAll(new Class[] {
-            Class.class,
+    private static final Set<Class<?>> DEFAULT_IMMUTABLE_CLASSES = SetBuilder.unmodifiableHashSet(new Class[] {
+        Class.class,
 
-            Boolean.class, Byte.class, Short.class, Character.class, Integer.class, Long.class, Float.class, Double.class,
+        Boolean.class, Byte.class, Short.class, Character.class, Integer.class, Long.class, Float.class, Double.class,
 
-            String.class,
+        String.class,
 
-            BigInteger.class, BigDecimal.class,
+        BigInteger.class, BigDecimal.class,
 
-            Duration.class, Instant.class, LocalDate.class, LocalDateTime.class, LocalTime.class, MonthDay.class,
-            OffsetDateTime.class, OffsetTime.class, Period.class, Year.class, YearMonth.class,
-            ZonedDateTime.class, ZoneOffset.class,
+        Duration.class, Instant.class, LocalDate.class, LocalDateTime.class, LocalTime.class, MonthDay.class,
+        OffsetDateTime.class, OffsetTime.class, Period.class, Year.class, YearMonth.class,
+        ZonedDateTime.class, ZoneOffset.class,
 
-            URI.class, URL.class,
+        URI.class, URL.class,
 
-            UUID.class,
+        UUID.class,
 
-            Pattern.class,
-        })
-        .transform(Collections::unmodifiableSet)
-        .build();
+        Pattern.class,
+    });
 
     protected void initialize() {
 
