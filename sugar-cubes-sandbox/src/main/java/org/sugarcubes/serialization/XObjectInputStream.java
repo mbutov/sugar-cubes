@@ -4,8 +4,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import org.sugarcubes.serialization.serializer.XSerializers;
 
 /**
  * todo: document it
@@ -18,33 +19,41 @@ public class XObjectInputStream extends DataInputStream {
         super(in);
     }
 
-    private final List<Object> red = new ArrayList<>();
+    private final List<Object> objects = new ArrayList<>();
 
-    public Object getByReference(int reference) {
-        return red.get(reference);
+    private Object getByReference(int reference) {
+        return objects.get(reference);
     }
 
-    public int addReference(Object object) {
-        int reference = red.size();
-        red.add(object);
+    private int addReference() {
+        int reference = objects.size();
+        objects.add(null);
         return reference;
     }
 
-    public void putByReference(int reference, Object object) {
-        red.set(reference, object);
+    private void putReference(int reference, Object object) {
+        objects.set(reference, object);
     }
 
     public <T> T readObject() throws IOException, ClassNotFoundException {
-        byte tag = readByte();
-        XSerializer serializer = Arrays.stream(XSerializers.values())
-            .filter(s -> s.tag() == tag)
-            .findAny()
-            .get();
-        int reference = addReference(null);
-        T value = (T) serializer.create(this);
-        putByReference(reference, value);
-        serializer.readValue(this, value);
-        return value;
+        int tag = readByte();
+        switch (tag) {
+            case XSerializers.NULL:
+                return null;
+            case XSerializers.REFERENCE:
+                int ref = readInt();
+                return (T) getByReference(ref);
+            default:
+                XSerializer serializer = XSerializers.SERIALIZERS.get(tag);
+                if (serializer == null) {
+                    throw new IllegalStateException("Serializer nof found for tag " + (char) tag);
+                }
+                int reference = addReference();
+                Object object = serializer.create(this);
+                putReference(reference, object);
+                serializer.readValue(this, object);
+                return (T) object;
+        }
     }
 
 }

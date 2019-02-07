@@ -28,6 +28,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.sugarcubes.builder.collection.SetBuilder;
+import org.sugarcubes.serialization.serializer.XSerializers;
 
 /**
  * todo: document it
@@ -69,15 +70,15 @@ public class XObjectOutputStream extends DataOutputStream {
         return immutableClasses.contains(object.getClass());
     }
 
-    public int findReference(Object object) {
+    private Integer findReference(Object object) {
         Integer ref = objects.get(object);
         if (ref == null) {
             ref = immutables.get(object);
         }
-        return ref != null ? ref : -1;
+        return ref;
     }
 
-    public int addReference(Object object) {
+    private int addReference(Object object) {
         int ref = objects.size();
         objects.put(object, ref);
         if (isImmutable(object)) {
@@ -87,8 +88,22 @@ public class XObjectOutputStream extends DataOutputStream {
     }
 
     public void writeObject(Object object) throws IOException {
-        for (XSerializer serializer : XSerializers.values()) {
-            if (serializer.write(this, object)) {
+        if (object == null) {
+            writeByte(XSerializers.NULL);
+            return;
+        }
+        Integer ref = findReference(object);
+        if (ref != null) {
+            writeByte(XSerializers.REFERENCE);
+            writeInt(ref);
+            return;
+        }
+        addReference(object);
+        for (Map.Entry<Integer, XSerializer> entry : XSerializers.SERIALIZERS.entrySet()) {
+            XSerializer serializer = entry.getValue();
+            if (serializer.matches(this, object)) {
+                writeByte(entry.getKey());
+                serializer.writeValue(this, object);
                 return;
             }
         }

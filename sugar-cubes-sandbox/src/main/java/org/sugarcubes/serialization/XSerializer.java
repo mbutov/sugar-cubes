@@ -1,9 +1,6 @@
-package org.sugarcubes.serialization.serializer;
+package org.sugarcubes.serialization;
 
 import java.io.IOException;
-
-import org.sugarcubes.serialization.XObjectInputStream;
-import org.sugarcubes.serialization.XObjectOutputStream;
 
 /**
  * todo: document it

@@ -16,7 +16,7 @@ import org.sugarcubes.serialization.XSerializer;
  *
  * @author Maxim Butov
  */
-public class XObjectSerializaer implements XSerializer<Object> {
+public class XObjectSerializer implements XSerializer<Object> {
 
     @Override
     public boolean matches(XObjectOutputStream out, Object value) {

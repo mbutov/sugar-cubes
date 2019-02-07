@@ -1,11 +1,16 @@
 package org.sugarcubes.serialization.serializer;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+
 /**
  * todo: document it
  *
- * @author Q-MBU
  * @author Maxim Butov
  */
-public class ValueReader {
+@FunctionalInterface
+public interface ValueReader<T> {
+
+    T read(DataInputStream in) throws IOException;
 
 }

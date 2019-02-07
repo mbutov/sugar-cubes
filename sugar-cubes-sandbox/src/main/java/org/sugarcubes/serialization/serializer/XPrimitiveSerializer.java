@@ -1,7 +1,5 @@
 package org.sugarcubes.serialization.serializer;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.sugarcubes.serialization.XObjectInputStream;
@@ -13,23 +11,13 @@ import org.sugarcubes.serialization.XSerializer;
  *
  * @author Maxim Butov
  */
-public class XSimpleSerializer<T> implements XSerializer<T> {
-
-    interface Writer<T> {
-
-        void write(DataOutputStream out, T value) throws IOException;
-    }
-
-    interface Reader<T> {
-
-        T read(DataInputStream in) throws IOException;
-    }
+public class XPrimitiveSerializer<T> implements XSerializer<T> {
 
     private final Class<T> type;
-    private final Writer<T> writer;
-    private final Reader<T> reader;
+    private final ValueWriter<T> writer;
+    private final ValueReader<T> reader;
 
-    public XSimpleSerializer(Class<T> type, Writer<T> writer, Reader<T> reader) {
+    public XPrimitiveSerializer(Class<T> type, ValueWriter<T> writer, ValueReader<T> reader) {
         this.type = type;
         this.writer = writer;
         this.reader = reader;

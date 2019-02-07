@@ -12,7 +12,7 @@ import org.sugarcubes.serialization.XSerializer;
  *
  * @author Maxim Butov
  */
-public class XArraySerializer implements XSerializer<Object[]> {
+public class XObjectArraySerializer implements XSerializer<Object[]> {
 
     @Override
     public boolean matches(XObjectOutputStream out, Object value) {

@@ -5,16 +5,12 @@ import java.nio.charset.StandardCharsets;
 
 import org.sugarcubes.serialization.XObjectInputStream;
 import org.sugarcubes.serialization.XObjectOutputStream;
+import org.sugarcubes.serialization.XSerializer;
 
 /**
  * @author Maxim Butov
  */
 public class XStringSerializer implements XSerializer<String> {
-
-    @Override
-    public int tag() {
-        return 'S';
-    }
 
     @Override
     public boolean matches(XObjectOutputStream out, Object value) {
