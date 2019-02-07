@@ -6,27 +6,24 @@ import org.sugarcubes.serialization.XObjectInputStream;
 import org.sugarcubes.serialization.XObjectOutputStream;
 
 /**
+ * todo: document it
+ *
  * @author Maxim Butov
  */
-public class XNullSerializer implements XSerializer<Object> {
-
-    @Override
-    public int tag() {
-        return 'N';
-    }
+public class XTrueSerializer implements XSerializer<Boolean> {
 
     @Override
     public boolean matches(XObjectOutputStream out, Object value) {
-        return value == null;
+        return Boolean.TRUE.equals(value);
     }
 
     @Override
-    public void writeValue(XObjectOutputStream out, Object value) throws IOException {
+    public void writeValue(XObjectOutputStream out, Boolean value) throws IOException {
     }
 
     @Override
-    public Object create(XObjectInputStream in) throws IOException, ClassNotFoundException {
-        return null;
+    public Boolean create(XObjectInputStream in) throws IOException, ClassNotFoundException {
+        return Boolean.TRUE;
     }
 
 }

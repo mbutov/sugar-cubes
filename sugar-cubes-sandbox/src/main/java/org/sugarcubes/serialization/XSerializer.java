@@ -1,42 +1,24 @@
-package org.sugarcubes.serialization;
+package org.sugarcubes.serialization.serializer;
 
 import java.io.IOException;
+
+import org.sugarcubes.serialization.XObjectInputStream;
+import org.sugarcubes.serialization.XObjectOutputStream;
 
 /**
  * todo: document it
  *
  * @author Maxim Butov
  */
-public interface XSerializer {
+public interface XSerializer<T> {
 
-    int tag();
+    boolean matches(XObjectOutputStream out, Object value);
 
-    default boolean matches(XObjectOutputStream out, Object value) {
-        throw new UnsupportedOperationException();
-    }
+    void writeValue(XObjectOutputStream out, T value) throws IOException;
 
-    default void writeTag(XObjectOutputStream out) throws IOException {
-        out.writeByte(tag());
-    }
+    T create(XObjectInputStream in) throws IOException, ClassNotFoundException;
 
-    default boolean write(XObjectOutputStream out, Object value) throws IOException {
-        if (matches(out, value)) {
-            writeTag(out);
-            writeValue(out, value);
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    default void writeValue(XObjectOutputStream out, Object value) throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    Object create(XObjectInputStream in) throws IOException, ClassNotFoundException;
-
-    default void readValue(XObjectInputStream in, Object value) throws IOException, ClassNotFoundException {
+    default void readValue(XObjectInputStream in, T value) throws IOException, ClassNotFoundException {
     }
 
 }
