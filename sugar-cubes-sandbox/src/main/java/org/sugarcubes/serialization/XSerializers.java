@@ -1,10 +1,7 @@
 package org.sugarcubes.serialization;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +28,7 @@ public enum XSerializers implements XSerializer {
         }
 
         @Override
-        public Object readValue(XObjectInputStream in, int reference) throws IOException, ClassNotFoundException {
+        public Object create(XObjectInputStream in) throws IOException, ClassNotFoundException {
             return null;
         }
     },
@@ -39,28 +36,25 @@ public enum XSerializers implements XSerializer {
     REFERENCE('R') {
         @Override
         public boolean write(XObjectOutputStream out, Object value) throws IOException {
-            int reference = out.getReference(value);
+            int reference = out.findReference(value);
             if (reference != -1) {
                 writeTag(out);
                 out.writeInt(reference);
                 return true;
             }
             else {
-                out.putReference(value);
+                out.addReference(value);
                 return false;
             }
         }
 
         @Override
-        public Object readValue(XObjectInputStream in, int reference) throws IOException, ClassNotFoundException {
-            return in.get(in.readInt());
+        public Object create(XObjectInputStream in) throws IOException, ClassNotFoundException {
+            return in.getByReference(in.readInt());
         }
     },
 
     STRING('S') {
-
-        final CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder();
-        final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
 
         @Override
         public boolean matches(XObjectOutputStream out, Object value) {
@@ -70,21 +64,20 @@ public enum XSerializers implements XSerializer {
         @Override
         public void writeValue(XObjectOutputStream out, Object value) throws IOException {
             String string = (String) value;
-            ByteBuffer buffer = encoder.encode(CharBuffer.wrap(string));
-            byte[] bytes = buffer.array();
+            byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
             out.writeInt(bytes.length);
             out.write(bytes);
         }
 
         @Override
-        public Object readValue(XObjectInputStream in, int reference) throws IOException, ClassNotFoundException {
+        public Object create(XObjectInputStream in) throws IOException, ClassNotFoundException {
             int length = in.readInt();
             byte[] bytes = new byte[length];
             int count = in.read(bytes);
             if (count != length) {
                 throw new IOException("Cannot fully read string");
             }
-            return decoder.decode(ByteBuffer.wrap(bytes)).toString();
+            return new String(bytes, StandardCharsets.UTF_8);
         }
     },
 
@@ -110,7 +103,7 @@ public enum XSerializers implements XSerializer {
         }
 
         @Override
-        public Object readValue(XObjectInputStream in, int reference) throws IOException, ClassNotFoundException {
+        public Object create(XObjectInputStream in) throws IOException, ClassNotFoundException {
             String packageName = in.readObject();
             String classSimpleName = in.readObject();
             String className = packageName.length() > 0 ? packageName + '.' + classSimpleName : classSimpleName;
@@ -132,7 +125,7 @@ public enum XSerializers implements XSerializer {
         }
 
         @Override
-        public Object readValue(XObjectInputStream in, int reference) throws IOException, ClassNotFoundException {
+        public Object create(XObjectInputStream in) throws IOException, ClassNotFoundException {
             Class enumType = in.readObject();
             String name = in.readObject();
             return Enum.valueOf(enumType, name);
@@ -151,9 +144,42 @@ public enum XSerializers implements XSerializer {
         }
 
         @Override
-        public Object readValue(XObjectInputStream in, int reference) throws IOException, ClassNotFoundException {
+        public Object create(XObjectInputStream in) throws IOException, ClassNotFoundException {
             return in.readInt();
         }
+    },
+
+    ARRAY('A') {
+        @Override
+        public boolean matches(XObjectOutputStream out, Object value) {
+            return value instanceof Object[];
+        }
+
+        @Override
+        public void writeValue(XObjectOutputStream out, Object value) throws IOException {
+            Object[] array = (Object[]) value;
+            out.writeObject(array.getClass().getComponentType());
+            out.writeInt(array.length);
+            for (int k = 0; k < array.length; k++) {
+                out.writeObject(array[k]);
+            }
+        }
+
+        @Override
+        public Object create(XObjectInputStream in) throws IOException, ClassNotFoundException {
+            Class componentType = in.readObject();
+            int length = in.readInt();
+            return Array.newInstance(componentType, length);
+        }
+
+        @Override
+        public void readValue(XObjectInputStream in, Object value) throws IOException, ClassNotFoundException {
+            Object[] array = (Object[]) value;
+            for (int k = 0; k < array.length; k++) {
+                array[k] = in.readObject();
+            }
+        }
+
     },
 
     OBJECT('O') {
@@ -177,23 +203,20 @@ public enum XSerializers implements XSerializer {
         }
 
         @Override
-        public Object readValue(XObjectInputStream in, int reference) throws IOException, ClassNotFoundException {
-
+        public Object create(XObjectInputStream in) throws IOException, ClassNotFoundException {
             Class type = in.readObject();
+            return ObjenesisHelper.newInstance(type);
+        }
 
-            Object object = ObjenesisHelper.newInstance(type);
-
-            in.put(reference, object);
-
-            int count = in.readShort();
-            for (int k = 0; k < count; k++) {
+        @Override
+        public void readValue(XObjectInputStream in, Object value) throws IOException, ClassNotFoundException {
+            int classCount = in.readShort();
+            for (int k = 0; k < classCount; k++) {
                 Class<?> declaringClass = in.readObject();
-                String name = in.readObject();
-                Object value = in.readObject();
-                XReflection.of(declaringClass).getField(name).getAccessor(object).set(value);
+                String fieldName = in.readObject();
+                Object fieldValue = in.readObject();
+                XReflection.of(declaringClass).getField(fieldName).getAccessor(value).set(fieldValue);
             }
-
-            return object;
         }
     },
 
@@ -204,7 +227,7 @@ public enum XSerializers implements XSerializer {
         }
 
         @Override
-        public Object readValue(XObjectInputStream in, int reference) throws IOException, ClassNotFoundException {
+        public Object create(XObjectInputStream in) throws IOException, ClassNotFoundException {
             throw new IllegalStateException();
         }
     };

@@ -2,6 +2,7 @@ package org.sugarcubes.serialization;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -13,7 +14,7 @@ import org.junit.Test;
  */
 public class XObjectInputOutputStreamTest {
 
-    static class X {
+    static class X implements Serializable {
 
         int x = 1;
 
@@ -21,6 +22,13 @@ public class XObjectInputOutputStreamTest {
 
     static class Y extends X {
 
+        Object[] array = new Object[2];
+
+        {
+            array[0] = this;
+            array[1] = array;
+        }
+        
     }
 
     @Test

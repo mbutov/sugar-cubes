@@ -14,24 +14,24 @@ import java.util.List;
  */
 public class XObjectInputStream extends DataInputStream {
 
+    public XObjectInputStream(InputStream in) {
+        super(in);
+    }
+
     private final List<Object> red = new ArrayList<>();
 
-    Object get(int reference) {
+    public Object getByReference(int reference) {
         return red.get(reference);
     }
 
-    int add(Object object) {
+    public int addReference(Object object) {
         int reference = red.size();
         red.add(object);
         return reference;
     }
 
-    void put(int reference, Object object) {
+    public void putByReference(int reference, Object object) {
         red.set(reference, object);
-    }
-
-    public XObjectInputStream(InputStream in) {
-        super(in);
     }
 
     public <T> T readObject() throws IOException, ClassNotFoundException {
@@ -40,9 +40,10 @@ public class XObjectInputStream extends DataInputStream {
             .filter(s -> s.tag() == tag)
             .findAny()
             .get();
-        int reference = add(null);
-        T value = (T) serializer.readValue(this, reference);
-        put(reference, value);
+        int reference = addReference(null);
+        T value = (T) serializer.create(this);
+        putByReference(reference, value);
+        serializer.readValue(this, value);
         return value;
     }
 
