@@ -18,6 +18,10 @@ public class Arg {
         return arg;
     }
 
+    public static <T> T check(T arg, Predicate<T> predicate, String format, Object... args) {
+        return check(arg, predicate, format(format, args));
+    }
+
     public static <T> T notNull(T arg, Supplier<String> message) {
         return check(arg, Objects::nonNull, message);
     }

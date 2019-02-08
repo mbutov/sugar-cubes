@@ -1,8 +1,15 @@
 package org.sugarcubes.primitive;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.sugarcubes.arg.Arg;
+import org.sugarcubes.builder.collection.MapBuilder;
 import org.sugarcubes.builder.collection.SetBuilder;
 
 /**
@@ -65,11 +72,22 @@ public enum XPrimitive {
     public static final Set<XPrimitive> NUMBERS =
         SetBuilder.unmodifiableHashSet(BYTE, SHORT, INTEGER, LONG, FLOAT, DOUBLE);
 
+    private static final Map<Class<?>, XPrimitive> PRIMITIVES = MapBuilder.<Class<?>, XPrimitive>hashMap()
+        .putAll(Arrays.stream(values()).collect(Collectors.toMap(XPrimitive::getPrimitiveType, Function.identity())))
+        .putAll(Arrays.stream(values()).collect(Collectors.toMap(XPrimitive::getWrapperType, Function.identity())))
+        .transform(Collections::unmodifiableMap)
+        .build();
+
+    public static XPrimitive of(Class<?> type) {
+        return PRIMITIVES.get(type);
+    }
+
     private final Class<?> wrapperType;
     private final Class<?> primitiveType;
     private final Object defaultValue;
 
     XPrimitive(Class<?> primitiveType) {
+        Arg.check(primitiveType, Class::isPrimitive, "%s is not primitive", primitiveType);
         this.primitiveType = primitiveType;
         this.defaultValue = Array.get(Array.newInstance(primitiveType, 1), 0);
         this.wrapperType = this.defaultValue.getClass();
@@ -81,6 +99,10 @@ public enum XPrimitive {
 
     public Class<?> getWrapperType() {
         return wrapperType;
+    }
+
+    public boolean is(Class<?> primitiveOrWrapperType) {
+        return primitiveType.equals(primitiveOrWrapperType) || wrapperType.equals(primitiveOrWrapperType);
     }
 
     public Object getDefaultValue() {

@@ -1,8 +1,6 @@
 package org.sugarcubes.reflection;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static java.util.Arrays.stream;
@@ -59,50 +57,40 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
         return false;
     }
 
-    private enum CacheKey {
-        SUPER, INHERITANCE, DECLARED_INTERFACES, INTERFACES, CONSTRUCTORS, DECLARED_METHODS, METHODS, DECLARED_FIELDS, FIELDS,
-    }
-
-    private final Map<CacheKey, Object> cache = new XClassCache<>();
-
-    private <X> X computeIfAbsent(CacheKey key, Function<XClass<C>, X> function) {
-        return (X) cache.computeIfAbsent(key, k -> function.apply(this));
-    }
-
     public XClass<?> getSuperclass() {
-        return computeIfAbsent(CacheKey.SUPER, XClassUtils::getSuperclass);
+        return XClassCache.get(this, XClassUtils::getSuperclass);
     }
 
     public Stream<XClass<?>> getInheritance() {
-        return computeIfAbsent(CacheKey.INHERITANCE, XClassUtils::getInheritance).stream();
+        return XClassCache.get(this, XClassUtils::getInheritance).stream();
     }
 
     public Stream<XClass<?>> getDeclaredInterfaces() {
-        return computeIfAbsent(CacheKey.DECLARED_INTERFACES, XClassUtils::getDeclaredInterfaces).stream();
+        return XClassCache.get(this, XClassUtils::getDeclaredInterfaces).stream();
     }
 
     public Stream<XClass<?>> getInterfaces() {
-        return computeIfAbsent(CacheKey.INTERFACES, XClassUtils::getInterfaces).stream();
+        return XClassCache.get(this, XClassUtils::getInterfaces).stream();
     }
 
     public Stream<XConstructor<C>> getConstructors() {
-        return computeIfAbsent(CacheKey.CONSTRUCTORS, XClassUtils::getConstructors).stream();
+        return XClassCache.get(this, XClassUtils::getConstructors).stream();
     }
 
     public Stream<XField<?>> getDeclaredFields() {
-        return computeIfAbsent(CacheKey.DECLARED_FIELDS, XClassUtils::getDeclaredFields).stream();
+        return XClassCache.get(this, XClassUtils::getDeclaredFields).stream();
     }
 
     public Stream<XField<?>> getFields() {
-        return computeIfAbsent(CacheKey.FIELDS, XClassUtils::getFields).stream();
+        return XClassCache.get(this, XClassUtils::getFields).stream();
     }
 
     public Stream<XMethod<?>> getDeclaredMethods() {
-        return computeIfAbsent(CacheKey.DECLARED_METHODS, XClassUtils::getDeclaredMethods).stream();
+        return XClassCache.get(this, XClassUtils::getDeclaredMethods).stream();
     }
 
     public Stream<XMethod<?>> getMethods() {
-        return computeIfAbsent(CacheKey.METHODS, XClassUtils::getMethods).stream();
+        return XClassCache.get(this, XClassUtils::getMethods).stream();
     }
 
     public Optional<XConstructor<C>> findConstructor(Class... types) {

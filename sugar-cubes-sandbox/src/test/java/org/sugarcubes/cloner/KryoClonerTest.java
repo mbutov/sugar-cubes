@@ -1,27 +1,16 @@
 package org.sugarcubes.cloner;
 
-import org.junit.Test;
-
-import com.esotericsoftware.kryo.Kryo;
+import org.junit.Ignore;
 
 /**
  * @author Maxim Butov
  */
+@Ignore
 public class KryoClonerTest extends AbstractClonerTests {
 
     @Override
     protected Cloner getCloner() {
         return new KryoCloner();
-    }
-
-    @Test
-    public void testRecursiveArray() {
-
-        Object[] array = new Object[1];
-        array[0] = array;
-
-        Object[] copy = new Kryo().copy(array);
-
     }
 
 }
