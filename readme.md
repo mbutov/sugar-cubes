@@ -22,6 +22,32 @@ Maven:
 ### org.sugarcubes.builder
     
 Provides generic builder pattern as well as some builders for collections.
+
+Generic builder:
+```java
+    Map<String, Integer> map = Builders.<Map<String, Integer>>of(HashMap::new)
+        .apply(Invocations.call(Map::put, "teeth", 32))
+        .apply(Invocations.call(Map::put, "fingers", 8))
+        .transform(Collections::unmodifiableMap)
+        .build();
+```
+    
+Same thing done with MapBuilder:    
+```java
+    Map<String, Integer> map = MapBuilder.<String, Integer>hashMap()
+        .put("teeth", 32)
+        .put("fingers", 8)
+        .transform(Collections::unmodifiableMap)
+        .build();
+```
+
+Set builder:
+```java
+    Set<String> set = SetBuilder.<String>hashSet()
+        .addAll("ugly", "coyote")
+        .transform(Collections::unmodifiableSet)
+        .build();
+```
     
 ### org.sugarcubes.cloner          
     
