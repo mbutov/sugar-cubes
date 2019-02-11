@@ -17,6 +17,7 @@ public class XObjectInputOutputStreamTest {
     static class X implements Serializable {
 
         int x = 1;
+        int[] xx = {1, 2};
 
     }
 
@@ -45,9 +46,4 @@ public class XObjectInputOutputStreamTest {
 
     }
 
-    @Test
-    public void testInnerClassForName() throws Exception {
-        Class.forName(Y.class.getName());
-    }
-    
 }

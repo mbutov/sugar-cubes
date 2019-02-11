@@ -20,7 +20,7 @@ public class XSerializers {
         .put((int) 'F', new XConstantSerializer<>(false))
         .put((int) 'T', new XConstantSerializer<>(true))
 
-        .put((int) 'C', new XClassSerializer())
+        .put((int) 'Z', new XClassSerializer())
         .put((int) 'E', new XEnumSerializer())
 
         .put((int) 'b', new XPrimitiveSerializer<>(Byte.class, (out, value) -> out.writeByte(value), DataInputStream::readByte))
@@ -31,7 +31,15 @@ public class XSerializers {
         .put((int) 'f', new XPrimitiveSerializer<>(Float.class, DataOutputStream::writeFloat, DataInputStream::readFloat))
         .put((int) 'd', new XPrimitiveSerializer<>(Double.class, DataOutputStream::writeDouble, DataInputStream::readDouble))
 
-        .put((int) 'S', new XStringSerializer())
+        .put((int) 'B', new XPrimitiveArraySerializer<>(byte[].class, array -> array.length, byte[]::new, (array, k) -> array[k], (array, k, value) -> array[k] = value, (out, value) -> out.writeByte(value), DataInputStream::readByte))
+        .put((int) 'S', new XPrimitiveArraySerializer<>(short[].class, array -> array.length, short[]::new, (array, k) -> array[k], (array, k, value) -> array[k] = value, (out, value) -> out.writeShort(value), DataInputStream::readShort))
+        .put((int) 'C', new XPrimitiveArraySerializer<>(char[].class, array -> array.length, char[]::new, (array, k) -> array[k], (array, k, value) -> array[k] = value, (out, value) -> out.writeChar(value), DataInputStream::readChar))
+        .put((int) 'I', new XPrimitiveArraySerializer<>(int[].class, array -> array.length, int[]::new, (array, k) -> array[k], (array, k, value) -> array[k] = value, DataOutputStream::writeInt, DataInputStream::readInt))
+        .put((int) 'L', new XPrimitiveArraySerializer<>(long[].class, array -> array.length, long[]::new, (array, k) -> array[k], (array, k, value) -> array[k] = value, DataOutputStream::writeLong, DataInputStream::readLong))
+        .put((int) 'F', new XPrimitiveArraySerializer<>(float[].class, array -> array.length, float[]::new, (array, k) -> array[k], (array, k, value) -> array[k] = value, DataOutputStream::writeFloat, DataInputStream::readFloat))
+        .put((int) 'D', new XPrimitiveArraySerializer<>(double[].class, array -> array.length, double[]::new, (array, k) -> array[k], (array, k, value) -> array[k] = value, DataOutputStream::writeDouble, DataInputStream::readDouble))
+
+        .put((int) 'X', new XStringSerializer())
         .put((int) 'A', new XObjectArraySerializer())
 
         .put((int) 'O', new XObjectSerializer())

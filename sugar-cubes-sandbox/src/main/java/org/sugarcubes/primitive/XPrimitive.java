@@ -84,17 +84,24 @@ public enum XPrimitive {
 
     private final Class<?> wrapperType;
     private final Class<?> primitiveType;
+    private final Class<?> arrayType;
     private final Object defaultValue;
 
     XPrimitive(Class<?> primitiveType) {
         Arg.check(primitiveType, Class::isPrimitive, "%s is not primitive", primitiveType);
         this.primitiveType = primitiveType;
-        this.defaultValue = Array.get(Array.newInstance(primitiveType, 1), 0);
+        Object array = Array.newInstance(primitiveType, 1);
+        this.arrayType = array.getClass();
+        this.defaultValue = Array.get(array, 0);
         this.wrapperType = this.defaultValue.getClass();
     }
 
     public Class<?> getPrimitiveType() {
         return primitiveType;
+    }
+
+    public Class<?> getArrayType() {
+        return arrayType;
     }
 
     public Class<?> getWrapperType() {
