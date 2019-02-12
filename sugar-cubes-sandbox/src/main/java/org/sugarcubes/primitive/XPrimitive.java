@@ -19,55 +19,25 @@ import org.sugarcubes.builder.collection.SetBuilder;
  */
 public enum XPrimitive {
 
-    BOOLEAN(boolean.class) {
+    BOOLEAN(boolean.class, Function.identity()) {
         @Override
         public Object cast(Object value) {
             boolean b = (Boolean) value;
             return b;
         }
     },
-    BYTE(byte.class) {
-        @Override
-        public Object cast(Object value) {
-            return toNumber(value).byteValue();
-        }
-    },
-    CHARACTER(char.class) {
+    BYTE(byte.class, Number::byteValue),
+    SHORT(short.class, Number::shortValue),
+    CHARACTER(char.class, Function.identity()) {
         @Override
         public Object cast(Object value) {
             return (char) toNumber(value).intValue();
         }
     },
-    SHORT(short.class) {
-        @Override
-        public Object cast(Object value) {
-            return toNumber(value).shortValue();
-        }
-    },
-    INTEGER(int.class) {
-        @Override
-        public Object cast(Object value) {
-            return toNumber(value).intValue();
-        }
-    },
-    LONG(long.class) {
-        @Override
-        public Object cast(Object value) {
-            return toNumber(value).longValue();
-        }
-    },
-    FLOAT(float.class) {
-        @Override
-        public Object cast(Object value) {
-            return toNumber(value).floatValue();
-        }
-    },
-    DOUBLE(double.class) {
-        @Override
-        public Object cast(Object value) {
-            return toNumber(value).doubleValue();
-        }
-    };
+    INTEGER(int.class, Number::intValue),
+    LONG(long.class, Number::longValue),
+    FLOAT(float.class, Number::floatValue),
+    DOUBLE(double.class, Number::doubleValue);
 
     public static final Set<XPrimitive> NUMBERS =
         SetBuilder.unmodifiableHashSet(BYTE, SHORT, INTEGER, LONG, FLOAT, DOUBLE);
@@ -86,14 +56,16 @@ public enum XPrimitive {
     private final Class<?> primitiveType;
     private final Class<?> arrayType;
     private final Object defaultValue;
+    private final Function<Number, Number> fromNumber;
 
-    XPrimitive(Class<?> primitiveType) {
+    XPrimitive(Class<?> primitiveType, Function<Number, Number> fromNumber) {
         Arg.check(primitiveType, Class::isPrimitive, "%s is not primitive", primitiveType);
         this.primitiveType = primitiveType;
         Object array = Array.newInstance(primitiveType, 1);
         this.arrayType = array.getClass();
         this.defaultValue = Array.get(array, 0);
         this.wrapperType = this.defaultValue.getClass();
+        this.fromNumber = fromNumber;
     }
 
     public Class<?> getPrimitiveType() {
@@ -125,6 +97,8 @@ public enum XPrimitive {
         }
     }
 
-    public abstract Object cast(Object value);
+    public Object cast(Object value) {
+        return fromNumber.apply(toNumber(value));
+    }
 
 }
