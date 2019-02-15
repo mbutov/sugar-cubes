@@ -84,12 +84,10 @@ public class XPrimitives {
     public static final Set<XPrimitiveNumber<?, ?>> NUMBERS =
         SetBuilder.unmodifiableLinkedHashSet(BYTE, SHORT, INTEGER, LONG, FLOAT, DOUBLE);
 
-    private static final Map<Class<?>, XPrimitive> PRIMITIVES_BY_TYPE = MapBuilder.<Class<?>, XPrimitive>hashMap()
+    public static final Map<Class<?>, XPrimitive> PRIMITIVES_BY_TYPE = MapBuilder.<Class<?>, XPrimitive>hashMap()
         .putAll(PRIMITIVES.stream().collect(Collectors.toMap(XPrimitive::getPrimitiveType, Function.identity())))
         .putAll(PRIMITIVES.stream().collect(Collectors.toMap(XPrimitive::getWrapperType, Function.identity())))
         .transform(Collections::unmodifiableMap)
         .build();
-
-    public static XPrimitive<W, ?>
 
 }
