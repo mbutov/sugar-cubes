@@ -33,4 +33,8 @@ public class ListBuilder<X, L extends List<X>> extends CollectionBuilder<X, L, L
         return ListBuilder.<X>arrayList().addAll(elements).transform(Collections::unmodifiableList).build();
     }
 
+    public static <X> List<X> unmodifiableLinkedList(X... elements) {
+        return ListBuilder.<X>linkedList().addAll(elements).transform(Collections::unmodifiableList).build();
+    }
+
 }

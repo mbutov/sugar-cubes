@@ -1,6 +1,7 @@
 package org.sugarcubes.arg;
 
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -11,6 +12,14 @@ import java.util.function.Supplier;
  */
 public class Checks {
 
+    public static Supplier<String> string(String format) {
+        return () -> format;
+    }
+
+    public static Supplier<String> format(String format, Object... args) {
+        return () -> String.format(format, args);
+    }
+
     public static <T> T check(T arg, Predicate<T> predicate, Supplier<RuntimeException> exception) {
         if (!predicate.test(arg)) {
             throw exception.get();
@@ -18,8 +27,12 @@ public class Checks {
         return arg;
     }
 
+    public static <T> T check(T arg, Predicate<T> predicate, Function<String, RuntimeException> error, Supplier<String> message) {
+        return check(arg, predicate, () -> error.apply(message.get()));
+    }
+
     public static <T> T arg(T arg, Predicate<T> predicate, Supplier<String> message) {
-        return check(arg, predicate, () -> new IllegalArgumentException(message.get()));
+        return check(arg, predicate, IllegalArgumentException::new, message);
     }
 
     public static <T> T arg(T arg, Predicate<T> predicate, String format, Object... args) {
@@ -38,10 +51,5 @@ public class Checks {
         return check(arg, predicate, () -> new IllegalStateException(message.get()));
     }
 
-
-
-    private static Supplier<String> format(String format, Object... args) {
-        return () -> String.format(format, args);
-    }
 
 }

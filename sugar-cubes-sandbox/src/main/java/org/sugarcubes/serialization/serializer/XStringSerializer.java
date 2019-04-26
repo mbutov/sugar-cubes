@@ -1,6 +1,7 @@
 package org.sugarcubes.serialization.serializer;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.sugarcubes.serialization.XObjectInputStream;
@@ -12,6 +13,8 @@ import org.sugarcubes.serialization.XSerializer;
  */
 public class XStringSerializer implements XSerializer<String> {
 
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
+
     @Override
     public boolean matches(XObjectOutputStream out, Object value) {
         return value instanceof String;
@@ -19,7 +22,7 @@ public class XStringSerializer implements XSerializer<String> {
 
     @Override
     public void writeValue(XObjectOutputStream out, String value) throws IOException {
-        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = value.getBytes(CHARSET);
         out.writeInt(bytes.length);
         out.write(bytes);
     }
@@ -32,7 +35,7 @@ public class XStringSerializer implements XSerializer<String> {
         if (count != length) {
             throw new IOException("Cannot fully read string");
         }
-        return new String(bytes, StandardCharsets.UTF_8);
+        return new String(bytes, CHARSET);
     }
 
 }
