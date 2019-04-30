@@ -9,7 +9,7 @@ import java.util.Comparator;
  */
 public class TupleComparator<T> implements Comparator<Tuple<T>> {
 
-    public static final TupleComparator NATURAL_ORDER = new TupleComparator((Comparator) Comparator.naturalOrder());
+    public static final TupleComparator NATURAL_ORDER = new TupleComparator(Comparator.naturalOrder());
 
     public static <T extends Comparable> TupleComparator<T> naturalOrder() {
         return NATURAL_ORDER;

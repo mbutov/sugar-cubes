@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.objenesis.ObjenesisHelper;
-import org.sugarcubes.reflection.XFieldAccessor;
+import org.sugarcubes.reflection.XObjectFieldAccessor;
 import org.sugarcubes.reflection.XReflection;
 import org.sugarcubes.serialization.XObjectInputStream;
 import org.sugarcubes.serialization.XObjectOutputStream;
@@ -28,14 +28,14 @@ public class XObjectSerializer implements XSerializer<Object> {
 
         out.writeObject(value.getClass());
 
-        List<XFieldAccessor> fields = XReflection.of(value.getClass()).getFields()
+        List<XObjectFieldAccessor> fields = XReflection.of(value.getClass()).getFields()
             .filter(field -> !field.isStatic() && !field.isTransient())
             .map(field -> field.getAccessor(value))
             .collect(Collectors.toList());
 
         out.writeShort(fields.size());
 
-        for (XFieldAccessor field : fields) {
+        for (XObjectFieldAccessor field : fields) {
             out.writeObject(field.getField().getDeclaringClass().getReflectionObject());
             out.writeObject(field.getField().getName());
             out.writeObject(field.get());

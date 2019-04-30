@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static java.util.Arrays.stream;
 
-import org.sugarcubes.arg.Arg;
+import org.sugarcubes.check.Args;
 import static org.sugarcubes.reflection.XPredicates.withName;
 import static org.sugarcubes.reflection.XPredicates.withNameAndParameterTypes;
 import static org.sugarcubes.reflection.XPredicates.withParameterTypes;
@@ -23,7 +23,7 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     private final Class<C> reflectionObject;
 
     XClass(Class<C> reflectionObject) {
-        this.reflectionObject = Arg.notNull(reflectionObject, "Class must not be null");
+        this.reflectionObject = Args.notNull(reflectionObject, "Class must not be null");
     }
 
     @Override

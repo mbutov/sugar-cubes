@@ -1,9 +1,10 @@
 package org.sugarcubes.stream;
 
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
@@ -14,23 +15,24 @@ import java.util.stream.Collector;
  */
 public class ZeroOneCollectors {
 
-    private static final Supplier<RuntimeException> ILLEGAL_COLLECTOR_STATE =
-        () -> new IllegalStateException("Illegal collector state.");
+    private static final Supplier<RuntimeException> ILLEGAL_COLLECTOR_STATE = () -> {
+        throw new AssertionError("Must not happen.");
+    };
 
     private static final Supplier<RuntimeException> TOO_MANY_ELEMENTS_EXCEPTION =
-        () -> new IllegalStateException("Stream contains two or more elements.");
+        () -> new IllegalStateException("Stream contains more than one elements.");
 
     private static final Supplier<RuntimeException> NO_ELEMENTS_EXCEPTION =
         () -> new NoSuchElementException("No elements found.");
 
     private static class CollectorState<X> {
 
-        final Deque<X> values = new LinkedList<>();
+        final List<X> values = new ArrayList<>(1);
 
         final Supplier<? extends RuntimeException> tooManyElementsException;
         final Supplier<? extends RuntimeException> noElementsException;
 
-        public CollectorState(Supplier<? extends RuntimeException> tooManyElementsException, Supplier<? extends RuntimeException> noElementsException) {
+        CollectorState(Supplier<? extends RuntimeException> tooManyElementsException, Supplier<? extends RuntimeException> noElementsException) {
             this.tooManyElementsException = tooManyElementsException;
             this.noElementsException = noElementsException;
         }
@@ -55,9 +57,21 @@ public class ZeroOneCollectors {
             if (values.isEmpty()) {
                 throw noElementsException.get();
             }
-            return values.element();
+            return values.get(0);
         }
 
+    }
+
+    private static <X, Y> Collector<X, CollectorState<X>, Y> collector(
+        Supplier<? extends RuntimeException> tooManyElementsException, Supplier<? extends RuntimeException> noElementsException,
+        Function<CollectorState<X>, Y> finisher) {
+
+        return Collector.of(
+            () -> new CollectorState<>(tooManyElementsException, noElementsException),
+            CollectorState::accumulate,
+            CollectorState::combine,
+            finisher,
+            Collector.Characteristics.UNORDERED);
     }
 
     /**
@@ -68,12 +82,7 @@ public class ZeroOneCollectors {
      * @throws IllegalStateException if stream contains more than one element
      */
     public static <X> Collector<X, CollectorState<X>, Optional<X>> toOptional(Supplier<? extends RuntimeException> tooManyElementsException) {
-        return Collector.of(
-            () -> new CollectorState<>(tooManyElementsException, ILLEGAL_COLLECTOR_STATE),
-            CollectorState::accumulate,
-            CollectorState::combine,
-            CollectorState::toOptional,
-            Collector.Characteristics.UNORDERED);
+        return collector(tooManyElementsException, ILLEGAL_COLLECTOR_STATE, CollectorState::toOptional);
     }
 
     /**
@@ -96,12 +105,7 @@ public class ZeroOneCollectors {
      * @throws IllegalStateException if stream contains more than one element
      */
     public static <X> Collector<X, CollectorState<X>, X> onlyElement(Supplier<? extends RuntimeException> tooManyElementsException, Supplier<? extends RuntimeException> noElementsException) {
-        return Collector.of(
-            () -> new CollectorState<>(tooManyElementsException, noElementsException),
-            CollectorState::accumulate,
-            CollectorState::combine,
-            CollectorState::onlyElement,
-            Collector.Characteristics.UNORDERED);
+        return collector(tooManyElementsException, noElementsException, CollectorState::onlyElement);
     }
 
     /**

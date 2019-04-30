@@ -3,7 +3,7 @@ package org.sugarcubes.reflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import org.sugarcubes.arg.Arg;
+import org.sugarcubes.check.Args;
 import static org.sugarcubes.reflection.XReflectionUtils.execute;
 
 /**
@@ -59,14 +59,8 @@ public class XField<T> extends XReloadableReflectionObject<Field>
         return oldValue;
     }
 
-    public T copy(Object from, Object to) {
-        T value = get(from);
-        set(to, value);
-        return value;
-    }
-
-    public XFieldAccessor<T> getAccessor(Object obj) {
-        return new XFieldAccessorImpl<>(this, obj);
+    public XObjectFieldAccessor<T> getAccessor(Object obj) {
+        return new XObjectFieldAccessorImpl<>(obj, this);
     }
 
     public <X> XField<X> cast() {
@@ -79,7 +73,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
     }
 
     public XField<T> withModifier(int modifier, boolean newValue) {
-        Arg.check(modifier, XModifiers::isValidModifier, () -> "Invalid modifier 0x" + Integer.toHexString(modifier));
+        Args.check(modifier, XModifiers::isValidModifier, () -> "Invalid modifier 0x" + Integer.toHexString(modifier));
         int newModifiers = newValue ? modifiers | modifier : modifiers & ~modifier;
         return withModifiers(newModifiers);
     }

@@ -2,17 +2,19 @@ package org.sugarcubes.reflection;
 
 import java.util.Objects;
 
+import org.sugarcubes.check.Args;
+
 /**
  * @author Maxim Butov
  */
-class XFieldAccessorImpl<T> implements XFieldAccessor<T> {
+class XObjectFieldAccessorImpl<T> implements XObjectFieldAccessor<T> {
 
     private final XField<T> xField;
     private final Object obj;
 
-    XFieldAccessorImpl(XField<T> xField, Object obj) {
-        this.xField = xField;
-        this.obj = obj;
+    XObjectFieldAccessorImpl(Object obj, XField<T> xField) {
+        this.obj = Args.notNull(obj, "obj must not be null");
+        this.xField = Args.notNull(xField, "field must not be null");
     }
 
     @Override
@@ -21,18 +23,8 @@ class XFieldAccessorImpl<T> implements XFieldAccessor<T> {
     }
 
     @Override
-    public T get() {
-        return xField.get(obj);
-    }
-
-    @Override
-    public void set(T value) {
-        xField.set(obj, value);
-    }
-
-    @Override
-    public T put(T value) {
-        return xField.put(obj, value);
+    public Object getObject() {
+        return obj;
     }
 
     @Override
@@ -40,10 +32,10 @@ class XFieldAccessorImpl<T> implements XFieldAccessor<T> {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof XFieldAccessorImpl)) {
+        if (!(obj instanceof XObjectFieldAccessorImpl)) {
             return false;
         }
-        XFieldAccessorImpl that = (XFieldAccessorImpl) obj;
+        XObjectFieldAccessorImpl that = (XObjectFieldAccessorImpl) obj;
         return Objects.equals(xField, that.xField) && Objects.equals(this.obj, that.obj);
     }
 

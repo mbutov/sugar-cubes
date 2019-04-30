@@ -2,7 +2,7 @@ package org.sugarcubes.builder;
 
 import java.util.function.Supplier;
 
-import org.sugarcubes.arg.Arg;
+import org.sugarcubes.check.Args;
 
 /**
  * {@link Builder}s factory.
@@ -21,7 +21,7 @@ public class Builders {
      * @return builder returning {@code value}
      */
     public static <T> Builder<T> of(T value) {
-        Arg.notNull(value, "value must not be null");
+        Args.notNull(value, "value must not be null");
         return () -> value;
     }
 
