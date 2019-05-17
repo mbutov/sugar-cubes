@@ -31,7 +31,7 @@ public interface ClonerObjectFactory {
     }
 
     default <T> T newInstanceUnsafe(Class<T> clazz) throws Throwable {
-        throw new Error("Not implemented");
+        throw new AssertionError("Not implemented");
     }
 
 }

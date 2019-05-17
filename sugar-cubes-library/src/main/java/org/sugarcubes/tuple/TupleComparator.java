@@ -9,12 +9,21 @@ import java.util.Comparator;
  */
 public class TupleComparator<T> implements Comparator<Tuple<T>> {
 
+    /**
+     * An untyped natural order {@link TupleComparator}.
+     */
     public static final TupleComparator NATURAL_ORDER = new TupleComparator(Comparator.naturalOrder());
 
-    public static <T extends Comparable> TupleComparator<T> naturalOrder() {
+    /**
+     * A typed natural order {@link TupleComparator}.
+     */
+    public static <T> TupleComparator<T> naturalOrder() {
         return NATURAL_ORDER;
     }
 
+    /**
+     * Comparator for tuple components.
+     */
     private final Comparator<T> comparator;
 
     /**

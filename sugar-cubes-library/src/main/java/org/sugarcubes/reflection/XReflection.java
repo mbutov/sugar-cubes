@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.sugarcubes.cache.WeakKeysSoftValuesCache;
+import org.sugarcubes.cache.WeakKeyCaches;
 
 /**
  * Factory for xreflection objects.
@@ -34,7 +34,7 @@ public class XReflection {
     /**
      * Cache for xreflection objects.
      */
-    private static final Map<Object, XReflectionObject> CACHE = new WeakKeysSoftValuesCache<>();
+    private static final Map<Object, XReflectionObject> CACHE = WeakKeyCaches.softValues();
 
     public static <K, V> V computeIfAbsent(K key, Function<K, V> mappingFunction) {
         return ((Map<K, V>) CACHE).computeIfAbsent(key, mappingFunction);

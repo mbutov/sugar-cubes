@@ -44,7 +44,7 @@ public class TupleTest {
 
         assertArraySameTypeAndEqual(new Object[] {1, 2, 3}, tuple.toArray());
         assertArraySameTypeAndEqual(new Integer[] {1, 2, 3}, tuple.toArray(new Integer[0]));
-        assertArraySameTypeAndEqual(new Integer[] {1, 2, 3}, tuple.toArray(new Integer[10]));
+        assertArraySameTypeAndEqual(new Integer[] {1, 2, 3, null, 0}, tuple.toArray(new Integer[] {0, 0, 0, 0, 0}));
 
         Integer[] array = new Integer[tuple.size()];
         Assert.assertSame(array, tuple.toArray(array));

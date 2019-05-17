@@ -56,13 +56,7 @@ public class TupleImpl<T> extends AbstractList<T> implements Tuple<T>, RandomAcc
 
     @Override
     public <V> V[] toArray(V[] array) {
-        if (array.length == values.length) {
-            System.arraycopy(values, 0, array, 0, values.length);
-            return array;
-        }
-        else {
-            return Arrays.copyOf(values, values.length, (Class<V[]>) array.getClass());
-        }
+        return Arrays.asList(values).toArray(array);
     }
 
     @Override
@@ -84,7 +78,7 @@ public class TupleImpl<T> extends AbstractList<T> implements Tuple<T>, RandomAcc
 
     @Override
     public int compareTo(Tuple<T> that) {
-        return TupleComparator.NATURAL_ORDER.compare(this, that);
+        return TupleComparator.<T>naturalOrder().compare(this, that);
     }
 
     @Override

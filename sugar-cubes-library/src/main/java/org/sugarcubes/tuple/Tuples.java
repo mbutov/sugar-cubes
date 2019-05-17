@@ -41,14 +41,6 @@ public class Tuples {
         return new TupleImpl<>(false, Stream.of(left, right).flatMap(Collection::stream).toArray());
     }
 
-    public static <T> Tuple<T> append(Tuple<T> tuple, T... values) {
-        return union(tuple, of(values));
-    }
-
-    public static <T> Tuple<T> prepend(Tuple<T> tuple, T... values) {
-        return union(of(values), tuple);
-    }
-
     private static final Collector<Object, List, Tuple> COLLECTOR = Collector.of(
         ArrayList::new,
         List::add,
