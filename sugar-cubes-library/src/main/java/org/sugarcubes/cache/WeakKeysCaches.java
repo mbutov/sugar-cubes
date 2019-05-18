@@ -11,7 +11,7 @@ import java.util.function.Function;
  *
  * @author Maxim Butov
  */
-public class WeakKeyCaches {
+public class WeakKeysCaches {
 
     /**
      * Cache implementation with weak keys and custom referenced values.

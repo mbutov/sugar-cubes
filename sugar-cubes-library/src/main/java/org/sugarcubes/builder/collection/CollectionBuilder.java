@@ -38,7 +38,7 @@ public abstract class CollectionBuilder<X, C extends Collection<X>, B extends Co
     }
 
     public B addAll(Stream<X> elements) {
-        return apply(list -> elements.forEach(list::add));
+        return apply(collection -> elements.forEach(collection::add));
     }
 
     public X[] toArray(Class<? super X> componentType) {

@@ -62,7 +62,7 @@ public class ZeroOneCollectors {
 
     }
 
-    private static <X, Y> Collector<X, CollectorState<X>, Y> collector(
+    private static <X, Y> Collector<X, ?, Y> collector(
         Supplier<? extends RuntimeException> tooManyElementsException, Supplier<? extends RuntimeException> noElementsException,
         Function<CollectorState<X>, Y> finisher) {
 
@@ -81,7 +81,7 @@ public class ZeroOneCollectors {
      *
      * @throws IllegalStateException if stream contains more than one element
      */
-    public static <X> Collector<X, CollectorState<X>, Optional<X>> toOptional(Supplier<? extends RuntimeException> tooManyElementsException) {
+    public static <X> Collector<X, ?, Optional<X>> toOptional(Supplier<? extends RuntimeException> tooManyElementsException) {
         return collector(tooManyElementsException, ILLEGAL_COLLECTOR_STATE, CollectorState::toOptional);
     }
 
@@ -92,7 +92,7 @@ public class ZeroOneCollectors {
      *
      * @throws IllegalStateException if stream contains more than one element
      */
-    public static <X> Collector<X, CollectorState<X>, Optional<X>> toOptional() {
+    public static <X> Collector<X, ?, Optional<X>> toOptional() {
         return toOptional(TOO_MANY_ELEMENTS_EXCEPTION);
     }
 
@@ -104,7 +104,7 @@ public class ZeroOneCollectors {
      * @throws NoSuchElementException if stream contains no elements
      * @throws IllegalStateException if stream contains more than one element
      */
-    public static <X> Collector<X, CollectorState<X>, X> onlyElement(Supplier<? extends RuntimeException> tooManyElementsException, Supplier<? extends RuntimeException> noElementsException) {
+    public static <X> Collector<X, ?, X> onlyElement(Supplier<? extends RuntimeException> tooManyElementsException, Supplier<? extends RuntimeException> noElementsException) {
         return collector(tooManyElementsException, noElementsException, CollectorState::onlyElement);
     }
 
@@ -116,7 +116,7 @@ public class ZeroOneCollectors {
      * @throws NoSuchElementException if stream contains no elements
      * @throws IllegalStateException if stream contains more than one element
      */
-    public static <X> Collector<X, CollectorState<X>, X> onlyElement() {
+    public static <X> Collector<X, ?, X> onlyElement() {
         return onlyElement(TOO_MANY_ELEMENTS_EXCEPTION, NO_ELEMENTS_EXCEPTION);
     }
 

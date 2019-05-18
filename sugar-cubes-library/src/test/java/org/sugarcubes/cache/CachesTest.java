@@ -7,7 +7,7 @@ import java.util.Map;
 import org.junit.Test;
 
 /**
- * Tests {@link WeakKeyCaches} checking them to dispose entries.
+ * Tests {@link WeakKeysCaches} checking them to dispose entries.
  *
  * @author Maxim Butov
  */
@@ -15,10 +15,10 @@ public class CachesTest {
 
     @Test
     public void testCaches() {
-        testCache(false, WeakKeyCaches.softValues());
-        testCache(true, WeakKeyCaches.softValues());
-        testCache(false, WeakKeyCaches.weakValues());
-        testCache(true, WeakKeyCaches.weakValues());
+        testCache(false, WeakKeysCaches.softValues());
+        testCache(true, WeakKeysCaches.softValues());
+        testCache(false, WeakKeysCaches.weakValues());
+        testCache(true, WeakKeysCaches.weakValues());
     }
 
     private void testCache(boolean keepKeys, Map<Object, Object> cache) {
