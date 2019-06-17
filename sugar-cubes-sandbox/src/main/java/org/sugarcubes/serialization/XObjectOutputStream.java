@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -87,22 +88,26 @@ public class XObjectOutputStream extends DataOutputStream {
         return ref;
     }
 
+    private void writeTag(char tag) throws IOException {
+        write(String.valueOf(tag).getBytes(StandardCharsets.UTF_8));
+    }
+
     public void writeObject(Object object) throws IOException {
         if (object == null) {
-            writeByte(XSerializers.NULL);
+            writeTag(XSerializers.NULL);
             return;
         }
         Integer ref = findReference(object);
         if (ref != null) {
-            writeByte(XSerializers.REFERENCE);
+            writeTag(XSerializers.REFERENCE);
             writeInt(ref);
             return;
         }
         addReference(object);
-        for (Map.Entry<Integer, XSerializer> entry : XSerializers.SERIALIZERS.entrySet()) {
+        for (Map.Entry<Character, XSerializer> entry : XSerializers.SERIALIZERS.entrySet()) {
             XSerializer serializer = entry.getValue();
             if (serializer.matches(this, object)) {
-                writeByte(entry.getKey());
+                writeTag(entry.getKey());
                 serializer.writeValue(this, object);
                 return;
             }

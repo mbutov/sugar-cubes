@@ -7,7 +7,6 @@ import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sugarcubes.builder.collection.MapBuilder;
 
 /**
  * @author Maxim Butov
@@ -21,11 +20,20 @@ public class MapBuilderTest {
             .put(2, "two")
             .put(1, "one")
             .put(3, "three")
+            .put(2, "two too")
             .build();
 
         Assert.assertEquals(new TreeSet<>(Arrays.asList(1, 2, 3)), map.keySet());
-        Assert.assertEquals(Arrays.asList("one", "two", "three"), new ArrayList<>(map.values()));
+        Assert.assertEquals(Arrays.asList("one", "two too", "three"), new ArrayList<>(map.values()));
         
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testDuplicateKeys() {
+        MapBuilder.<String, String>hashMap().errorOnDuplicateKeys()
+            .put("one", "two")
+            .put("one", "three")
+            .build();
     }
 
 }

@@ -18,8 +18,15 @@ import org.sugarcubes.builder.MutableBuilder;
  */
 public class MapBuilder<K, V, M extends Map<K, V>> extends MutableBuilder<M, MapBuilder<K, V, M>> {
 
+    private boolean errorOnDuplicateKeys = false;
+
     public MapBuilder(Supplier<M> supplier) {
         super(supplier);
+    }
+
+    public MapBuilder<K, V, M> errorOnDuplicateKeys() {
+        errorOnDuplicateKeys = true;
+        return self();
     }
 
     public <D extends Map<K, V>> MapBuilder<K, V, D> cast() {
@@ -27,11 +34,17 @@ public class MapBuilder<K, V, M extends Map<K, V>> extends MutableBuilder<M, Map
     }
 
     public MapBuilder<K, V, M> put(K key, V value) {
-        return apply(map -> map.put(key, value));
+        return apply(map -> {
+            V previous = map.put(key, value);
+            if (errorOnDuplicateKeys && previous != null) {
+                throw new IllegalArgumentException("Duplicate values for key " + key);
+            }
+        });
     }
 
     public MapBuilder<K, V, M> putAll(Map<K, V> m) {
-        return apply(map -> map.putAll(m));
+        m.forEach(this::put);
+        return self();
     }
 
     /// STATIC STUFF

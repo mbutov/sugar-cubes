@@ -36,7 +36,7 @@ public class XReflection {
      */
     private static final Map<Object, XReflectionObject> CACHE = WeakKeysCaches.softValues();
 
-    public static <K, V> V computeIfAbsent(K key, Function<K, V> mappingFunction) {
+    private static <K, V> V computeIfAbsent(K key, Function<K, V> mappingFunction) {
         return ((Map<K, V>) CACHE).computeIfAbsent(key, mappingFunction);
     }
 

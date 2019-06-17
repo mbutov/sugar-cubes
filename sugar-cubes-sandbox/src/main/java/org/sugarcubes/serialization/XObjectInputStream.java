@@ -35,8 +35,42 @@ public class XObjectInputStream extends DataInputStream {
         objects.set(reference, object);
     }
 
+    private int nextByte() throws IOException {
+        int b = read();
+        if (b == -1) {
+            throw new IllegalStateException("Unexpected EOF");
+        }
+        return b;
+    }
+
+    private char readTag() throws IOException {
+        int b0 = nextByte();
+        // UTF-8:   [0xxx xxxx]
+        if (b0 < 0x80) {
+            return (char) b0;
+        }
+        // UTF-8:   [110y yyyy] [10xx xxxx]
+        if ((b0 & 0xE0) == 0xC0 && (b0 & 0x1E) != 0) {
+            int b1 = nextByte();
+            return (char) (((b0 << 6) & 0x07C0) | (b1 & 0x003F));
+        }
+        // UTF-8:   [1110 zzzz] [10yy yyyy] [10xx xxxx]
+        if ((b0 & 0xF0) == 0xE0) {
+            int b1 = nextByte();
+            if ((b1 & 0xC0) != 0x80 || (b0 == 0xED && b1 >= 0xA0) || ((b0 & 0x0F) == 0 && (b1 & 0x20) == 0)) {
+                throw new IllegalStateException("Unsupported character");
+            }
+            int b2 = nextByte();
+            if ((b2 & 0xC0) != 0x80) {
+                throw new IllegalStateException("Unsupported character");
+            }
+            return (char) (((b0 << 12) & 0xF000) | ((b1 << 6) & 0x0FC0) | (b2 & 0x003F));
+        }
+        throw new IllegalStateException("Unsupported character");
+    }
+
     public <T> T readObject() throws IOException, ClassNotFoundException {
-        int tag = readByte();
+        char tag = readTag();
         switch (tag) {
             case XSerializers.NULL:
                 return null;
@@ -46,7 +80,7 @@ public class XObjectInputStream extends DataInputStream {
             default:
                 XSerializer serializer = XSerializers.SERIALIZERS.get(tag);
                 if (serializer == null) {
-                    throw new IllegalStateException("Serializer nof found for tag " + (char) tag);
+                    throw new IllegalStateException("Serializer nof found for tag \\u" + Integer.toHexString(tag));
                 }
                 int reference = addReference();
                 Object object = serializer.create(this);
