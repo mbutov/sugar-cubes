@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -89,7 +88,7 @@ public class XObjectOutputStream extends DataOutputStream {
     }
 
     private void writeTag(char tag) throws IOException {
-        write(String.valueOf(tag).getBytes(StandardCharsets.UTF_8));
+        Utf8Utils.writeUtf8Char(this, tag);
     }
 
     public void writeObject(Object object) throws IOException {
