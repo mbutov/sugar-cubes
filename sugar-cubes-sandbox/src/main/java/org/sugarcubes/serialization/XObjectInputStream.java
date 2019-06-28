@@ -35,28 +35,25 @@ public class XObjectInputStream extends DataInputStream {
         objects.set(reference, object);
     }
 
-    private char readTag() throws IOException {
-        return Utf8Utils.readUtf8Char(this);
-    }
-
     public <T> T readObject() throws IOException, ClassNotFoundException {
-        char tag = readTag();
-        switch (tag) {
-            case XSerializers.NULL:
-                return null;
-            case XSerializers.REFERENCE:
-                int ref = readInt();
-                return (T) getByReference(ref);
-            default:
-                XSerializer serializer = XSerializers.SERIALIZERS.get(tag);
-                if (serializer == null) {
-                    throw new IllegalStateException("Serializer nof found for tag \\u" + Integer.toHexString(tag));
-                }
-                int reference = addReference();
-                Object object = serializer.create(this);
-                putReference(reference, object);
-                serializer.readValue(this, object);
-                return (T) object;
+        XTag tag = XTag.read(this);
+        if (XTag.NULL.equals(tag)) {
+            return null;
+        }
+        if (XTag.REFERENCE.equals(tag)) {
+            int ref = readInt();
+            return (T) getByReference(ref);
+        }
+        else {
+            XSerializer serializer = XSerializers.SERIALIZERS.get(tag);
+            if (serializer == null) {
+                throw new IllegalStateException("Serializer nof found for tag 0x" + Integer.toHexString(tag.getValue()));
+            }
+            int reference = addReference();
+            Object object = serializer.create(this);
+            putReference(reference, object);
+            serializer.readValue(this, object);
+            return (T) object;
         }
     }
 

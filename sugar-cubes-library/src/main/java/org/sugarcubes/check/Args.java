@@ -11,6 +11,10 @@ import java.util.function.Supplier;
  */
 public class Args {
 
+    public static void check(boolean condition, Supplier<String> message) {
+        Checks.check(condition, IllegalArgumentException::new, message);
+    }
+
     public static <T> T check(T arg, Predicate<T> predicate, Supplier<String> message) {
         return Checks.check(arg, predicate, IllegalArgumentException::new, message);
     }

@@ -1,6 +1,7 @@
 package org.sugarcubes.serialization.serializer;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import org.sugarcubes.serialization.XObjectInputStream;
 import org.sugarcubes.serialization.XObjectOutputStream;
@@ -21,7 +22,7 @@ public class XConstantSerializer<T> implements XSerializer<T> {
 
     @Override
     public boolean matches(XObjectOutputStream out, Object value) {
-        return constant.equals(value);
+        return Objects.equals(constant, value);
     }
 
     @Override

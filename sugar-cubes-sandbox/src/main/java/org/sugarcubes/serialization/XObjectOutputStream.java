@@ -87,26 +87,24 @@ public class XObjectOutputStream extends DataOutputStream {
         return ref;
     }
 
-    private void writeTag(char tag) throws IOException {
-        Utf8Utils.writeUtf8Char(this, tag);
-    }
-
     public void writeObject(Object object) throws IOException {
         if (object == null) {
-            writeTag(XSerializers.NULL);
+            XTag.NULL.write(this);
             return;
         }
+
         Integer ref = findReference(object);
         if (ref != null) {
-            writeTag(XSerializers.REFERENCE);
+            XTag.REFERENCE.write(this);
             writeInt(ref);
             return;
         }
         addReference(object);
-        for (Map.Entry<Character, XSerializer> entry : XSerializers.SERIALIZERS.entrySet()) {
+
+        for (Map.Entry<XTag, XSerializer> entry : XSerializers.SERIALIZERS.entrySet()) {
             XSerializer serializer = entry.getValue();
             if (serializer.matches(this, object)) {
-                writeTag(entry.getKey());
+                entry.getKey().write(this);
                 serializer.writeValue(this, object);
                 return;
             }
