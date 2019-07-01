@@ -26,7 +26,7 @@ public class XTag {
 
     public static XTag of(int value) {
 
-        Args.check(value > 0, Checks.format("Value must be > 0"));
+        Args.check(value > 1, Checks.format("Value must be > 1"));
         Args.check(value < WORD_WITH_HIGH_BIT, Checks.format("Value must be < 0x8000"));
 
         return new XTag(value);
@@ -45,7 +45,7 @@ public class XTag {
     private static final int BYTE_WITH_HIGH_BIT = 0x0080;
     private static final int WORD_WITH_HIGH_BIT = 0x8000;
 
-    private XTag(int value) {
+    /* test */ XTag(int value) {
         this.value = value;
     }
 
@@ -70,12 +70,17 @@ public class XTag {
         return value;
     }
 
+    @Override
+    public String toString() {
+        return "XTag[0x" + Integer.toHexString(value) + "]";
+    }
+
     public void write(OutputStream output) throws IOException {
         if (value < BYTE_WITH_HIGH_BIT) {
             output.write(value);
         }
         else {
-            output.write((value >> 8) & 0x7F + BYTE_WITH_HIGH_BIT);
+            output.write(((value >> 8) & 0x7F) + BYTE_WITH_HIGH_BIT);
             output.write(value & 0xFF);
         }
     }
