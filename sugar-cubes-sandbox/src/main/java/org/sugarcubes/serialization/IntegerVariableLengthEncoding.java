@@ -5,19 +5,35 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
+ * https://github.com/stoklund/varint
+ *
  * @author Maxim Butov
  */
 public class IntegerVariableLengthEncoding {
 
+    /**
+     * Tests the long value fits 32 bits. I.e. the value can be cast to int and back to long without data loss.
+     *
+     * @param value long value
+     *
+     * @return true if it can be represented as int
+     */
     public static boolean fits32(long value) {
         return value == (int) value;
     }
 
+    /**
+     * Finds the number of significant bits of a signed integer.
+     * If the highest significant bit is 1, then value is negative, and vice versa.
+     *
+     * @param value integer value
+     *
+     * @return number of significant bits
+     */
     public static int numBits(int value) {
         int bits = 1;
-        while (value != 0 && value != -1) {
+        for (int next, prev = value; (next = prev >> 1) != prev; prev = next) {
             bits++;
-            value >>= 1;
         }
         return bits;
     }
@@ -26,11 +42,11 @@ public class IntegerVariableLengthEncoding {
         return fits32(value) ? numBits((int) value) : 32 + numBits((int) (value >> 32));
     }
 
-    public static void writeInt(OutputStream out, int value) throws IOException {
-        writeLong(out, (long) value);
+    public static void writeIntLeb128(OutputStream out, int value) throws IOException {
+        writeLongLeb128(out, (long) value);
     }
 
-    public static void writeLong(OutputStream out, long value) throws IOException {
+    public static void writeLongLeb128(OutputStream out, long value) throws IOException {
         int numBits = numBits(value);
         int numBytes = (numBits + 6) / 7;
         byte[] bytes = new byte[numBytes];
@@ -45,15 +61,15 @@ public class IntegerVariableLengthEncoding {
         out.write(bytes);
     }
 
-    public static int readInt(InputStream in) throws IOException {
-        long value = readLong(in);
+    public static int readIntLeb128(InputStream in) throws IOException {
+        long value = readLongLeb128(in);
         if (!fits32(value)) {
             throw new IllegalStateException("Not an int32");
         }
         return (int) value;
     }
 
-    public static long readLong(InputStream in) throws IOException {
+    public static long readLongLeb128(InputStream in) throws IOException {
 
         int b = in.read();
         long value = (b & 0x40) == 0x40 ? -1L : 0;

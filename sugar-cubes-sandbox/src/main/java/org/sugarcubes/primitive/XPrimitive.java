@@ -1,38 +1,45 @@
 package org.sugarcubes.primitive;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
-import org.sugarcubes.function.TernaryConsumer;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 /**
+ * Primitive type descriptor which encapsulates information about primitive type, primitive array type,
+ * wrapper type, and can instantiate arrays, access elements by index, write/read values into/from stream.
+ *
  * @author Maxim Butov
  */
-public class XPrimitive<W, A> {
+public abstract class XPrimitive<W, A> {
 
-    private final Function<A, Integer> arrayLength;
-    private final Function<Integer, A> arrayFactory;
-    private final BiFunction<A, Integer, W> arrayGet;
-    private final TernaryConsumer<A, Integer, W> arraySet;
-
+    /**
+     * Primitive type.
+     */
     private final Class<W> primitiveType;
+
+    /**
+     * Array type.
+     */
     private final Class<A> arrayType;
+
+    /**
+     * Wrapper type.
+     */
     private final Class<W> wrapperType;
+
+    /**
+     * Default value.
+     */
     private final W defaultValue;
 
-    public XPrimitive(Function<A, Integer> arrayLength, Function<Integer, A> arrayFactory, BiFunction<A, Integer, W> arrayGet, TernaryConsumer<A, Integer, W> arraySet) {
+    XPrimitive() {
 
-        this.arrayLength = arrayLength;
-        this.arrayFactory = arrayFactory;
-        this.arrayGet = arrayGet;
-        this.arraySet = arraySet;
+        A array = newArray(1);
 
-        A array = arrayFactory.apply(1);
-
-        this.arrayType = (Class) array.getClass();
-        this.primitiveType = (Class) this.arrayType.getComponentType();
-        this.defaultValue = this.arrayGet.apply(array, 0);
-        this.wrapperType = (Class) this.defaultValue.getClass();
+        arrayType = (Class) array.getClass();
+        primitiveType = (Class) arrayType.getComponentType();
+        defaultValue = get(array, 0);
+        wrapperType = (Class) defaultValue.getClass();
 
     }
 
@@ -52,20 +59,37 @@ public class XPrimitive<W, A> {
         return defaultValue;
     }
 
-    public int length(A array) {
-        return arrayLength.apply(array);
+    public abstract A newArray(int length);
+
+    public abstract int length(A array);
+
+    public abstract W get(A array, int index);
+
+    public abstract void set(A array, int index, W value);
+
+    public abstract void write(DataOutputStream out, W value) throws IOException;
+
+    public abstract W read(DataInputStream in) throws IOException;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof XPrimitive)) {
+            return false;
+        }
+        return arrayType.equals(((XPrimitive) obj).arrayType);
     }
 
-    public A newArray(int length) {
-        return arrayFactory.apply(length);
+    @Override
+    public int hashCode() {
+        return arrayType.hashCode();
     }
 
-    public W get(A array, int index) {
-        return arrayGet.apply(array, index);
-    }
-
-    public void set(A array, int index, W value) {
-        arraySet.accept(array, index, value);
+    @Override
+    public String toString() {
+        return String.format("XPrimitive<%s,%s>", wrapperType.getSimpleName(), arrayType.getSimpleName());
     }
 
 }
