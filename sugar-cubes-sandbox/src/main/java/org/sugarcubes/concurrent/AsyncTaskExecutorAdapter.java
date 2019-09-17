@@ -5,6 +5,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.TaskRejectedException;
 
 /**
  * @author Maxim Butov
@@ -19,7 +20,12 @@ public class AsyncTaskExecutorAdapter implements AsyncExecutor {
 
     @Override
     public <V> Future<V> submit(Callable<V> task) throws RejectedExecutionException {
-        return executor.submit(task);
+        try {
+            return executor.submit(task);
+        }
+        catch (TaskRejectedException e) {
+            throw (RejectedExecutionException) e.getCause();
+        }
     }
 
 }
