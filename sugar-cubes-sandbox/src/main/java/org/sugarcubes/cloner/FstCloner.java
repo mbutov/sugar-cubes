@@ -1,6 +1,7 @@
 package org.sugarcubes.cloner;
 
-import org.nustaq.serialization.FSTConfiguration;
+import org.nustaq.serialization.simpleapi.DefaultCoder;
+import org.nustaq.serialization.simpleapi.FSTCoder;
 
 /**
  * The implementation of {@link Cloner} which uses FST serialization for cloning.
@@ -9,19 +10,19 @@ import org.nustaq.serialization.FSTConfiguration;
  */
 public class FstCloner extends AbstractCloner {
 
-    private final FSTConfiguration configuration;
+    private final FSTCoder coder;
 
     public FstCloner() {
-        this(FSTConfiguration.createDefaultConfiguration());
+        this(new DefaultCoder());
     }
 
-    public FstCloner(FSTConfiguration configuration) {
-        this.configuration = configuration;
+    public FstCloner(FSTCoder coder) {
+        this.coder = coder;
     }
 
     @Override
     protected Object doClone(Object object) throws Throwable {
-        return configuration.asObject(configuration.asByteArray(object));
+        return coder.toObject(coder.toByteArray(object));
     }
 
 }
