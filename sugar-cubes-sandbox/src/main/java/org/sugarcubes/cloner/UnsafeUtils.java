@@ -1,6 +1,6 @@
 package org.sugarcubes.cloner;
 
-import java.lang.reflect.Field;
+import org.sugarcubes.reflection.XReflection;
 
 import sun.misc.Unsafe;
 
@@ -11,18 +11,7 @@ import sun.misc.Unsafe;
  */
 public class UnsafeUtils {
 
-    private static final Unsafe UNSAFE;
-
-    static {
-        try {
-            Field field = Unsafe.class.getDeclaredField("theUnsafe");
-            field.setAccessible(true);
-            UNSAFE = (Unsafe) field.get(null);
-        }
-        catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private static final Unsafe UNSAFE = XReflection.of(Unsafe.class).<Unsafe>getDeclaredField("theUnsafe").staticGet();
 
     /**
      * @return {@link Unsafe} instance
