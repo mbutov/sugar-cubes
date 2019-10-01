@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.sugarcubes.check.States;
 import org.sugarcubes.rex.Rex;
 
 /**
@@ -25,7 +26,7 @@ import org.sugarcubes.rex.Rex;
  * <pre>
  *     DataSource dataSource = ...
  *     DataSourceDriver driver = new DataSourceDriver(dataSource);
- *     String jdbcUrl = driver.registerDriver();
+ *     String jdbcUrl = driver.register();
  *     try {
  *         ...
  *         try (Connection connection = DriverManager.getConnection(jdbcUrl)) {
@@ -33,11 +34,27 @@ import org.sugarcubes.rex.Rex;
  *         }
  *         ...
  *     } finally {
- *         driver.deregisterDriver();
+ *         driver.deregister();
  *     }
  * </pre>
  *
- * Useful in cases when some code accepts only JDBC URL and does not support data sources.
+ * or
+ *
+ * <pre>
+ *     DataSource dataSource = ...
+ *     String jdbcUrl = DataSourceDriver.register(dataSource);
+ *     try {
+ *         ...
+ *         try (Connection connection = DriverManager.getConnection(jdbcUrl)) {
+ *             ...
+ *         }
+ *         ...
+ *     } finally {
+ *         DataSourceDriver.deregister(jdbcUrl);
+ *     }
+ * </pre>
+ *
+ * Useful in cases when some code accepts JDBC URL or a driver instance and does not support data sources.
  *
  * @author Maxim Butov
  */
@@ -47,6 +64,54 @@ public class DataSourceDriver implements Driver {
      * Registered instances of {@link DataSourceDriver}.
      */
     private static final Map<String, DataSourceDriver> REGISTERED_DRIVERS = new HashMap<>();
+
+    /**
+     * Registers the data source driver in {@link DriverManager}. When registered, driver will not be disposed by GC,
+     * a developer should {@link #deregister(String)}.
+     *
+     * @param dataSource data source
+     *
+     * @return JDBC URL
+     */
+    public static String register(DataSource dataSource) {
+        return register(dataSource, true);
+    }
+
+    /**
+     * Registers the data source driver in {@link DriverManager}. When registered, driver will not be disposed by GC,
+     * a developer should {@link #deregister(String)}.
+     *
+     * @param dataSource data source
+     * @param jdbcCompliant value for {@link #jdbcCompliant()}
+     *
+     * @return JDBC URL
+     */
+    public static String register(DataSource dataSource, boolean jdbcCompliant) {
+        return register(dataSource, jdbcCompliant, null);
+    }
+
+    /**
+     * Registers the data source driver in {@link DriverManager}. When registered, driver will not be disposed by GC,
+     * a developer should {@link #deregister(String)}.
+     *
+     * @param dataSource data source
+     * @param jdbcCompliant value for {@link #jdbcCompliant()}
+     * @param url JDBC URL
+     *
+     * @return JDBC URL
+     */
+    public static String register(DataSource dataSource, boolean jdbcCompliant, String url) {
+        return new DataSourceDriver(dataSource, jdbcCompliant, url).register();
+    }
+
+    /**
+     * Deregisters the data source driver in {@link DriverManager}.
+     */
+    public static void deregister(String url) {
+        DataSourceDriver driver = REGISTERED_DRIVERS.get(url);
+        States.notNull(driver, "JDBC URL '%s' not registered.", url);
+        driver.deregister();
+    }
 
     /**
      * Data source.
@@ -114,12 +179,12 @@ public class DataSourceDriver implements Driver {
     }
 
     /**
-     * Registers this driver in {@link DriverManager}. When registered driver will not be disposed by GC,
-     * a developer should {@link #deregisterDriver()}.
+     * Registers this driver in {@link DriverManager}. When registered, driver will not be disposed by GC,
+     * a developer should {@link #deregister()}.
      *
      * @return JDBC URL
      */
-    public String registerDriver() {
+    public String register() {
         try {
             DriverManager.registerDriver(this, () -> REGISTERED_DRIVERS.remove(url));
         }
@@ -133,7 +198,7 @@ public class DataSourceDriver implements Driver {
     /**
      * Deregisters this driver in {@link DriverManager}.
      */
-    public void deregisterDriver() {
+    public void deregister() {
         try {
             DriverManager.deregisterDriver(this);
         }
