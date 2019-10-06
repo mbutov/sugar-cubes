@@ -5,10 +5,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
 import org.junit.Test;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * todo: document it
@@ -22,11 +26,11 @@ public class XReflectionTest {
 
         XClass<Integer> xClass = XReflection.of(Integer.class);
 
-        Assert.assertThat(xClass.getConstructors().count(), greaterThan(0L));
-        Assert.assertThat(xClass.getFields().count(), greaterThan(0L));
-        Assert.assertThat(xClass.getFields().count(), greaterThan(xClass.getDeclaredFields().count()));
-        Assert.assertThat(xClass.getMethods().count(), greaterThan(0L));
-        Assert.assertThat(xClass.getMethods().count(), greaterThan(xClass.getDeclaredMethods().count()));
+        assertThat(xClass.getConstructors().count(), greaterThan(0L));
+        assertThat(xClass.getFields().count(), greaterThan(0L));
+        assertThat(xClass.getFields().count(), greaterThan(xClass.getDeclaredFields().count()));
+        assertThat(xClass.getMethods().count(), greaterThan(0L));
+        assertThat(xClass.getMethods().count(), greaterThan(xClass.getDeclaredMethods().count()));
 
         Set<XField<?>> collect = xClass.getFields().filter(xField -> !xField.isPublic()).collect(Collectors.toSet());
 
@@ -37,7 +41,7 @@ public class XReflectionTest {
 
         List<Class> inheritance =
             XReflection.of(Integer.class).getInheritance().map(XClass::getReflectionObject).collect(Collectors.toList());
-        Assert.assertThat(inheritance, is(Arrays.asList(Integer.class, Number.class, Object.class)));
+        assertThat(inheritance, is(Arrays.asList(Integer.class, Number.class, Object.class)));
 
     }
 
@@ -49,8 +53,8 @@ public class XReflectionTest {
         Integer obj = new Integer(-1);
         Integer newValue = 1;
         xField.set(obj, newValue);
-        
-        Assert.assertEquals(newValue, xField.get(obj));
+
+        assertEquals(newValue, xField.get(obj));
 
     }
 
@@ -59,20 +63,24 @@ public class XReflectionTest {
 
         XClass<Integer> xClass = XReflection.of(Integer.class);
 
-        Assert.assertTrue(xClass.isPublic());
-        Assert.assertTrue(xClass.isFinal());
+        assertTrue(xClass.isPublic());
+        assertTrue(xClass.isFinal());
 
-        Assert.assertFalse(xClass.isAbstract());
-        Assert.assertFalse(xClass.isInterface());
-        Assert.assertFalse(xClass.isPackage());
-        Assert.assertFalse(xClass.isPrivate());
-        Assert.assertFalse(xClass.isProtected());
+        assertFalse(xClass.isAbstract());
+        assertFalse(xClass.isInterface());
+        assertFalse(xClass.isPackage());
+        assertFalse(xClass.isPrivate());
+        assertFalse(xClass.isProtected());
+
+        assertThat(xClass.getXModifiers(), containsInAnyOrder(XModifier.PUBLIC, XModifier.FINAL));
 
         XField<Object> xField = xClass.getDeclaredField("serialVersionUID");
 
-        Assert.assertTrue(xField.isPrivate());
-        Assert.assertTrue(xField.isStatic());
-        Assert.assertTrue(xField.isFinal());
+        assertTrue(xField.isPrivate());
+        assertTrue(xField.isStatic());
+        assertTrue(xField.isFinal());
+
+        assertThat(xField.getXModifiers(), containsInAnyOrder(XModifier.PRIVATE, XModifier.STATIC, XModifier.FINAL));
 
     }
 

@@ -1,7 +1,10 @@
 package org.sugarcubes.reflection;
 
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.function.IntPredicate;
+import java.util.stream.Collectors;
 
 /**
  * Modifiers-related methods.
@@ -32,6 +35,16 @@ public interface XModifiers {
 
     default boolean isModifier(IntPredicate method) {
         return method.test(getModifiers());
+    }
+
+    default Set<XModifier> getXModifiers() {
+        return Arrays.stream(XModifier.values())
+            .filter(this::isXModifier)
+            .collect(Collectors.toSet());
+    }
+
+    default boolean isXModifier(XModifier modifier) {
+        return (getModifiers() & modifier.getIntValue()) != 0;
     }
 
     default boolean isPublic() {

@@ -9,6 +9,10 @@ import java.util.function.Function;
 /**
  * Caches based on {@link java.util.WeakHashMap}.
  *
+ * These caches can be used without any cleaning up. GC takes care of them.
+ *
+ * These caches also do not guarantee the presence of previously cached entries.
+ *
  * @author Maxim Butov
  */
 public class WeakKeysCaches {

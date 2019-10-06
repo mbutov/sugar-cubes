@@ -45,7 +45,7 @@ public class WeakKeysReferencedValuesCache<K, V> extends AbstractMap<K, V> {
 
     @Override
     public boolean containsKey(Object key) {
-        return cache.containsKey(key);
+        return get(key) != null;
     }
 
     @Override
