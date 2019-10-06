@@ -167,15 +167,7 @@ public class DataSourceDriver implements Driver {
     public DataSourceDriver(DataSource dataSource, boolean jdbcCompliant, String url) {
         this.dataSource = Objects.requireNonNull(dataSource, "dataSource must be not null");
         this.jdbcCompliant = jdbcCompliant;
-        if (url != null) {
-            if (REGISTERED_DRIVERS.containsKey(url)) {
-                throw new IllegalArgumentException(String.format("JDBC URL '%s' already registered.", url));
-            }
-            this.url = url;
-        }
-        else {
-            this.url = String.format("jdbc:datasource:%s", UUID.randomUUID());
-        }
+        this.url = url != null ? url : String.format("jdbc:datasource:%s", UUID.randomUUID());
     }
 
     /**
@@ -185,6 +177,9 @@ public class DataSourceDriver implements Driver {
      * @return JDBC URL
      */
     public String register() {
+        if (REGISTERED_DRIVERS.containsKey(url)) {
+            throw new IllegalArgumentException(String.format("JDBC URL '%s' already registered.", url));
+        }
         try {
             DriverManager.registerDriver(this, () -> REGISTERED_DRIVERS.remove(url));
         }
