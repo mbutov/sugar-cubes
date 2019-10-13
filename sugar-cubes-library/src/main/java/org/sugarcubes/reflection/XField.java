@@ -47,7 +47,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
     }
 
     private void checkStatic() {
-        States.check(modifiers, Modifier::isStatic, () -> "Field is not static");
+        States.check(this, XModifiers::isStatic, () -> "Field is not static");
     }
 
     public T get(Object obj) {

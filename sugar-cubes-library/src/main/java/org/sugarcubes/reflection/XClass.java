@@ -1,10 +1,19 @@
 package org.sugarcubes.reflection;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.WeakHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static java.util.Arrays.stream;
 
+import org.sugarcubes.builder.collection.ListBuilder;
+import org.sugarcubes.builder.collection.SetBuilder;
 import org.sugarcubes.check.Args;
 import static org.sugarcubes.reflection.XPredicates.withName;
 import static org.sugarcubes.reflection.XPredicates.withNameAndParameterTypes;
@@ -31,16 +40,28 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
         return reflectionObject;
     }
 
-    public boolean isExactClass(Class<?> clazz) {
+    public boolean isSameClass(Class<?> clazz) {
         return getReflectionObject().equals(clazz);
+    }
+
+    public boolean isSameClass(XClass<?> xClass) {
+        return isSameClass(xClass.getReflectionObject());
     }
 
     public boolean isAssignableFrom(Class<?> clazz) {
         return getReflectionObject().isAssignableFrom(clazz);
     }
 
+    public boolean isAssignableFrom(XClass<?> xClass) {
+        return isAssignableFrom(xClass.getReflectionObject());
+    }
+
     public boolean isSubclassOf(Class<?> clazz) {
         return clazz.isAssignableFrom(getReflectionObject());
+    }
+
+    public boolean isSubclassOf(XClass<?> xClass) {
+        return isSubclassOf(xClass.getReflectionObject());
     }
 
     @Override
@@ -58,39 +79,43 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     }
 
     public XClass<?> getSuperclass() {
-        return XClassCache.get(this, XClassUtils::getSuperclass);
+        return computeIfAbsent(this::getSuperclassInternal);
     }
 
     public Stream<XClass<?>> getInheritance() {
-        return XClassCache.get(this, XClassUtils::getInheritance).stream();
+        return computeIfAbsent(this::getInheritanceInternal).stream();
     }
 
     public Stream<XClass<?>> getDeclaredInterfaces() {
-        return XClassCache.get(this, XClassUtils::getDeclaredInterfaces).stream();
+        return computeIfAbsent(this::getDeclaredInterfacesInternal).stream();
     }
 
     public Stream<XClass<?>> getInterfaces() {
-        return XClassCache.get(this, XClassUtils::getInterfaces).stream();
+        return computeIfAbsent(this::getInterfacesInternal).stream();
+    }
+
+    public Stream<XClass<?>> getAllInterfaces() {
+        return computeIfAbsent(this::getAllInterfacesInternal).stream();
     }
 
     public Stream<XConstructor<C>> getConstructors() {
-        return XClassCache.get(this, XClassUtils::getConstructors).stream();
+        return computeIfAbsent(this::getConstructorsInternal).stream();
     }
 
     public Stream<XField<?>> getDeclaredFields() {
-        return XClassCache.get(this, XClassUtils::getDeclaredFields).stream();
+        return computeIfAbsent(this::getDeclaredFieldsInternal).stream();
     }
 
     public Stream<XField<?>> getFields() {
-        return XClassCache.get(this, XClassUtils::getFields).stream();
+        return computeIfAbsent(this::getFieldsInternal).stream();
     }
 
     public Stream<XMethod<?>> getDeclaredMethods() {
-        return XClassCache.get(this, XClassUtils::getDeclaredMethods).stream();
+        return computeIfAbsent(this::getDeclaredMethodsInternal).stream();
     }
 
     public Stream<XMethod<?>> getMethods() {
-        return XClassCache.get(this, XClassUtils::getMethods).stream();
+        return computeIfAbsent(this::getMethodsInternal).stream();
     }
 
     public Optional<XConstructor<C>> findConstructor(Class... types) {
@@ -150,6 +175,99 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
 
     private static String getParameterNames(Class[] types) {
         return stream(types).map(Class::getName).collect(Collectors.joining(","));
+    }
+
+    private transient Map cache;
+
+    private <X> Map<Supplier<X>, X> getCache() {
+        if (this.cache == null) {
+            this.cache = new WeakHashMap();
+        }
+        return this.cache;
+    }
+
+    private <X> X computeIfAbsent(Supplier<X> method) {
+        Map<Supplier<X>, X> cache = getCache();
+        return cache.computeIfAbsent(method, key -> method.get());
+    }
+
+    private XClass<?> getSuperclassInternal() {
+        Class<?> superclass = getReflectionObject().getSuperclass();
+        return superclass != null ? XReflection.of(superclass) : XNullClass.INSTANCE;
+    }
+
+    private List<XClass<?>> getInheritanceInternal() {
+        return ListBuilder.<XClass<?>>arrayList()
+            .add(this)
+            .addAll(getSuperclass().getInheritance())
+            .transform(Collections::unmodifiableList)
+            .build();
+    }
+
+    private List<XClass<?>> getDeclaredInterfacesInternal() {
+        return ListBuilder.<XClass<?>>arrayList()
+            .addAll(stream(getReflectionObject().getInterfaces()).map(XReflection::of))
+            .transform(Collections::unmodifiableList)
+            .build();
+    }
+
+    private List<XClass<?>> getInterfacesInternal() {
+        return SetBuilder.<XClass<?>>linkedHashSet()
+            .add(Optional.<XClass<?>>of(this).filter(XClass::isInterface))
+            .addAll(getDeclaredInterfaces())
+            .addAll(getSuperclass().getInterfaces())
+            .transform(ArrayList::new)
+            .transform(Collections::unmodifiableList)
+            .build();
+    }
+
+    private List<XClass<?>> getAllInterfacesInternal() {
+        // todo
+        return SetBuilder.<XClass<?>>linkedHashSet()
+            .add(Optional.<XClass<?>>of(this).filter(XClass::isInterface))
+            .addAll(getDeclaredInterfaces().flatMap(XClass::getAllInterfaces))
+            .addAll(getSuperclass().getAllInterfaces())
+            .transform(ArrayList::new)
+            .transform(Collections::unmodifiableList)
+            .build();
+    }
+
+    private List<XConstructor<C>> getConstructorsInternal() {
+        Constructor<C>[] constructors = (Constructor[]) getReflectionObject().getDeclaredConstructors();
+        return ListBuilder.<XConstructor<C>>arrayList()
+            .addAll(stream(constructors).map(XReflection::of))
+            .transform(Collections::unmodifiableList)
+            .build();
+    }
+
+    private List<XField<?>> getDeclaredFieldsInternal() {
+        return ListBuilder.<XField<?>>arrayList()
+            .addAll(stream(getReflectionObject().getDeclaredFields()).map(XReflection::of))
+            .transform(Collections::unmodifiableList)
+            .build();
+    }
+
+    private List<XField<?>> getFieldsInternal() {
+        return ListBuilder.<XField<?>>arrayList()
+            .addAll(getDeclaredFields())
+            .addAll(getSuperclass().getFields())
+            .transform(Collections::unmodifiableList)
+            .build();
+    }
+
+    private List<XMethod<?>> getDeclaredMethodsInternal() {
+        return ListBuilder.<XMethod<?>>arrayList()
+            .addAll(stream(getReflectionObject().getDeclaredMethods()).map(XReflection::of))
+            .transform(Collections::unmodifiableList)
+            .build();
+    }
+
+    private List<XMethod<?>> getMethodsInternal() {
+        return ListBuilder.<XMethod<?>>arrayList()
+            .addAll(getDeclaredMethods())
+            .addAll(getSuperclass().getMethods())
+            .transform(Collections::unmodifiableList)
+            .build();
     }
 
 }

@@ -34,6 +34,7 @@ public class WeakKeysCaches {
      * @return cache implementation {@link WeakKeysReferencedValuesCache}
      *
      * @see WeakKeysReferencedValuesCache
+     * @see SoftReference
      */
     public static <K, V> Map<K, V> softValues() {
         return referenceValues(SoftReference::new);
@@ -45,6 +46,7 @@ public class WeakKeysCaches {
      * @return cache implementation {@link WeakKeysReferencedValuesCache}
      *
      * @see WeakKeysReferencedValuesCache
+     * @see WeakReference
      */
     public static <K, V> Map<K, V> weakValues() {
         return referenceValues(WeakReference::new);

@@ -1,7 +1,6 @@
 package org.sugarcubes.builder.collection;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.IntFunction;
@@ -34,7 +33,7 @@ public abstract class CollectionBuilder<X, C extends Collection<X>, B extends Co
     }
 
     public B addAll(X... elements) {
-        return apply(collection -> collection.addAll(Arrays.asList(elements)));
+        return addAll(Stream.of(elements));
     }
 
     public B addAll(Stream<X> elements) {
