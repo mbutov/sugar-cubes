@@ -63,12 +63,12 @@ public class SetBuilder<X, S extends Set<X>> extends CollectionBuilder<X, S, Set
         return SetBuilder.<X>hashSet().addAll(elements).unmodifiable();
     }
 
-    public static <X extends Enum<X>> Set<X> unmodifiableEnumSet(X first, X... rest) {
-        return set(() -> EnumSet.of(first, rest)).unmodifiable();
+    public static <X> Set<X> unmodifiableLinkedHashSet(X... elements) {
+        return SetBuilder.<X>linkedHashSet().addAll(elements).unmodifiable();
     }
 
-    public static <X extends Enum<X>> Set<X> unmodifiableEnumSet(X... elements) {
-        return SetBuilder.<X>linkedHashSet().addAll(elements).unmodifiable();
+    public static <X extends Enum<X>> Set<X> unmodifiableEnumSet(X first, X... rest) {
+        return set(() -> EnumSet.of(first, rest)).unmodifiable();
     }
 
 }
