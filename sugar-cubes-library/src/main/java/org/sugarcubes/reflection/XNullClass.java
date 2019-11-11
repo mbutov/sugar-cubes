@@ -1,7 +1,6 @@
 package org.sugarcubes.reflection;
 
 import java.util.stream.Stream;
-import static java.util.stream.Stream.empty;
 
 /**
  * A special kind of {@link XClass} meaning "no class".
@@ -23,6 +22,8 @@ public final class XNullClass extends XClass<Object> {
 
     public static XClass<Object> INSTANCE = new XNullClass();
 
+    private static final Stream EMPTY = Stream.empty();
+
     @Override
     public boolean isNull() {
         return true;
@@ -30,7 +31,7 @@ public final class XNullClass extends XClass<Object> {
 
     @Override
     public Stream<XClass<?>> getInheritance() {
-        return empty();
+        return EMPTY;
     }
 
     @Override
@@ -50,37 +51,37 @@ public final class XNullClass extends XClass<Object> {
 
     @Override
     public Stream<XClass<?>> getDeclaredInterfaces() {
-        return empty();
+        return EMPTY;
     }
 
     @Override
     public Stream<XClass<?>> getInterfaces() {
-        return empty();
+        return EMPTY;
     }
 
     @Override
     public Stream<XConstructor<Object>> getConstructors() {
-        return empty();
+        return EMPTY;
     }
 
     @Override
     public Stream<XField<?>> getDeclaredFields() {
-        return empty();
+        return EMPTY;
     }
 
     @Override
     public Stream<XField<?>> getFields() {
-        return empty();
+        return EMPTY;
     }
 
     @Override
     public Stream<XMethod<?>> getDeclaredMethods() {
-        return empty();
+        return EMPTY;
     }
 
     @Override
     public Stream<XMethod<?>> getMethods() {
-        return empty();
+        return EMPTY;
     }
 
     @Override

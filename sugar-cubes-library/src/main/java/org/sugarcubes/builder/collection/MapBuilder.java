@@ -1,5 +1,6 @@
 package org.sugarcubes.builder.collection;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
@@ -45,6 +46,10 @@ public class MapBuilder<K, V, M extends Map<K, V>> extends MutableBuilder<M, Map
     public MapBuilder<K, V, M> putAll(Map<K, V> m) {
         m.forEach(this::put);
         return self();
+    }
+
+    public Map<K, V> unmodifiable() {
+        return transform(Collections::unmodifiableMap).build();
     }
 
     /// STATIC STUFF

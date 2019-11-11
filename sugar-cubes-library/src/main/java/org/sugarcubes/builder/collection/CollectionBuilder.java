@@ -2,6 +2,7 @@ package org.sugarcubes.builder.collection;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
@@ -46,6 +47,10 @@ public abstract class CollectionBuilder<X, C extends Collection<X>, B extends Co
 
     public X[] toArray(IntFunction<X[]> generator) {
         return build().stream().toArray(generator);
+    }
+
+    public Collection<X> unmodifiable() {
+        return transform(Collections::unmodifiableCollection).build();
     }
 
 }

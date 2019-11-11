@@ -17,6 +17,10 @@ public class ListBuilder<X, L extends List<X>> extends CollectionBuilder<X, L, L
         super(supplier);
     }
 
+    public List<X> unmodifiable() {
+        return transform(Collections::unmodifiableList).build();
+    }
+
     public static <X, L extends List<X>> ListBuilder<X, L> list(Supplier<L> supplier) {
         return new ListBuilder<>(supplier);
     }
@@ -30,11 +34,11 @@ public class ListBuilder<X, L extends List<X>> extends CollectionBuilder<X, L, L
     }
 
     public static <X> List<X> unmodifiableArrayList(X... elements) {
-        return ListBuilder.<X>arrayList().addAll(elements).transform(Collections::unmodifiableList).build();
+        return ListBuilder.<X>arrayList().addAll(elements).unmodifiable();
     }
 
     public static <X> List<X> unmodifiableLinkedList(X... elements) {
-        return ListBuilder.<X>linkedList().addAll(elements).transform(Collections::unmodifiableList).build();
+        return ListBuilder.<X>linkedList().addAll(elements).unmodifiable();
     }
 
 }
