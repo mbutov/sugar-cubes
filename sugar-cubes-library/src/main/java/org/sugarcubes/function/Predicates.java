@@ -15,15 +15,17 @@ public class Predicates {
         return predicate.negate();
     }
 
+    @SafeVarargs
     public static <T> Predicate<T> and(Predicate<T> first, Predicate<T> second, Predicate<T>... rest) {
         return reduce(Predicate::and, first, second, rest);
     }
 
+    @SafeVarargs
     public static <T> Predicate<T> or(Predicate<T> first, Predicate<T> second, Predicate<T>... rest) {
         return reduce(Predicate::or, first, second, rest);
     }
 
-    private static <X> X reduce(BinaryOperator<X> accumulator, X first, X second, X... rest) {
+    private static <X> X reduce(BinaryOperator<X> accumulator, X first, X second, X[] rest) {
         return of(rest).reduce(accumulator.apply(first, second), accumulator);
     }
 
