@@ -29,7 +29,7 @@ public class CachesTest {
         for (int n = 0; ; n++) {
             String key = "Key " + n;
             if (key0 == null) {
-                key0 = new String(key.toCharArray());
+                key0 = new String(key);
             }
             if (keepKeys) {
                 keys.add(key);
