@@ -15,6 +15,11 @@ import org.sugarcubes.cache.WeakKeysCaches;
  */
 public class XReflection {
 
+    public static <T> XClass<T> forName(String className) {
+        Class<T> clazz = (Class) XReflectionUtils.execute(() -> Class.forName(className));
+        return of(clazz);
+    }
+
     public static <T> XClass<T> of(Class<T> clazz) {
         return computeIfAbsent(clazz, XClass::new);
     }

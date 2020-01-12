@@ -22,8 +22,6 @@ public final class XNullClass extends XClass<Object> {
 
     public static XClass<Object> INSTANCE = new XNullClass();
 
-    private static final Stream EMPTY = Stream.empty();
-
     @Override
     public boolean isNull() {
         return true;
@@ -31,7 +29,7 @@ public final class XNullClass extends XClass<Object> {
 
     @Override
     public Stream<XClass<?>> getInheritance() {
-        return EMPTY;
+        return Stream.empty();
     }
 
     @Override
@@ -51,37 +49,37 @@ public final class XNullClass extends XClass<Object> {
 
     @Override
     public Stream<XClass<?>> getDeclaredInterfaces() {
-        return EMPTY;
+        return Stream.empty();
     }
 
     @Override
     public Stream<XClass<?>> getInterfaces() {
-        return EMPTY;
+        return Stream.empty();
     }
 
     @Override
     public Stream<XConstructor<Object>> getConstructors() {
-        return EMPTY;
+        return Stream.empty();
     }
 
     @Override
     public Stream<XField<?>> getDeclaredFields() {
-        return EMPTY;
+        return Stream.empty();
     }
 
     @Override
     public Stream<XField<?>> getFields() {
-        return EMPTY;
+        return Stream.empty();
     }
 
     @Override
     public Stream<XMethod<?>> getDeclaredMethods() {
-        return EMPTY;
+        return Stream.empty();
     }
 
     @Override
     public Stream<XMethod<?>> getMethods() {
-        return EMPTY;
+        return Stream.empty();
     }
 
     @Override
