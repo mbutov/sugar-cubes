@@ -22,17 +22,17 @@ public class ThreadLocalsTest {
         ThreadLocal<Object> threadLocal = new ThreadLocal<>();
 
         Assert.assertNull(threadLocal.get());
-        Assert.assertNull(ThreadLocals.getValue(thread, threadLocal));
+        Assert.assertNull(ThreadLocals.get(thread, threadLocal));
 
-        Assert.assertNull(ThreadLocals.setValue(thread, threadLocal, 1));
+        Assert.assertNull(ThreadLocals.set(thread, threadLocal, 1));
 
         Assert.assertEquals(1, threadLocal.get());
-        Assert.assertEquals(1, ThreadLocals.getValue(thread, threadLocal));
+        Assert.assertEquals(1, ThreadLocals.get(thread, threadLocal));
 
         ThreadLocals.remove(thread, threadLocal);
 
         Assert.assertNull(threadLocal.get());
-        Assert.assertNull(ThreadLocals.getValue(thread, threadLocal));
+        Assert.assertNull(ThreadLocals.get(thread, threadLocal));
 
     }
 
@@ -47,7 +47,7 @@ public class ThreadLocalsTest {
 
         ThreadLocal<Object> tl2 = new ThreadLocal<>();
 
-        Map<ThreadLocal<?>, Object> locals = ThreadLocals.getThreadLocals(thread, new ThreadLocal<>());
+        Map<ThreadLocal<?>, Object> locals = ThreadLocals.getAll(thread, new ThreadLocal<>());
 
         Assert.assertThat(locals.keySet(), hasItem(tl1));
         Assert.assertThat(locals.keySet(), not(hasItem(tl2)));
@@ -62,9 +62,9 @@ public class ThreadLocalsTest {
                 synchronized (monitor) {
 
                     ThreadLocals.remove(thread, tl1);
-                    ThreadLocals.setValue(thread, tl2, 2);
+                    ThreadLocals.set(thread, tl2, 2);
 
-                    threadLocals.set(ThreadLocals.getThreadLocals(thread, new ThreadLocal<>()));
+                    threadLocals.set(ThreadLocals.getAll(thread, new ThreadLocal<>()));
 
                     monitor.notify();
 
