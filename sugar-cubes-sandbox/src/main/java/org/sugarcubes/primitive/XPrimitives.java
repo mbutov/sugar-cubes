@@ -1,7 +1,7 @@
 package org.sugarcubes.primitive;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -71,12 +71,12 @@ public class XPrimitives {
         }
 
         @Override
-        public void write(DataOutputStream out, Boolean value) throws IOException {
+        public void write(DataOutput out, Boolean value) throws IOException {
             out.writeBoolean(value);
         }
 
         @Override
-        public Boolean read(DataInputStream in) throws IOException {
+        public Boolean read(DataInput in) throws IOException {
             return in.readBoolean();
         }
 
@@ -105,12 +105,12 @@ public class XPrimitives {
         }
 
         @Override
-        public void write(DataOutputStream out, Character value) throws IOException {
+        public void write(DataOutput out, Character value) throws IOException {
             out.writeChar(value);
         }
 
         @Override
-        public Character read(DataInputStream in) throws IOException {
+        public Character read(DataInput in) throws IOException {
             return in.readChar();
         }
 
@@ -139,12 +139,12 @@ public class XPrimitives {
         }
 
         @Override
-        public void write(DataOutputStream out, Byte value) throws IOException {
+        public void write(DataOutput out, Byte value) throws IOException {
             out.writeByte(value);
         }
 
         @Override
-        public Byte read(DataInputStream in) throws IOException {
+        public Byte read(DataInput in) throws IOException {
             return in.readByte();
         }
 
@@ -178,12 +178,12 @@ public class XPrimitives {
         }
 
         @Override
-        public void write(DataOutputStream out, Short value) throws IOException {
+        public void write(DataOutput out, Short value) throws IOException {
             out.writeShort(value);
         }
 
         @Override
-        public Short read(DataInputStream in) throws IOException {
+        public Short read(DataInput in) throws IOException {
             return in.readShort();
         }
 
@@ -217,12 +217,12 @@ public class XPrimitives {
         }
 
         @Override
-        public void write(DataOutputStream out, Integer value) throws IOException {
+        public void write(DataOutput out, Integer value) throws IOException {
             out.writeInt(value);
         }
 
         @Override
-        public Integer read(DataInputStream in) throws IOException {
+        public Integer read(DataInput in) throws IOException {
             return in.readInt();
         }
 
@@ -256,12 +256,12 @@ public class XPrimitives {
         }
 
         @Override
-        public void write(DataOutputStream out, Long value) throws IOException {
+        public void write(DataOutput out, Long value) throws IOException {
             out.writeLong(value);
         }
 
         @Override
-        public Long read(DataInputStream in) throws IOException {
+        public Long read(DataInput in) throws IOException {
             return in.readLong();
         }
 
@@ -295,12 +295,12 @@ public class XPrimitives {
         }
 
         @Override
-        public void write(DataOutputStream out, Float value) throws IOException {
+        public void write(DataOutput out, Float value) throws IOException {
             out.writeFloat(value);
         }
 
         @Override
-        public Float read(DataInputStream in) throws IOException {
+        public Float read(DataInput in) throws IOException {
             return in.readFloat();
         }
 
@@ -334,12 +334,12 @@ public class XPrimitives {
         }
 
         @Override
-        public void write(DataOutputStream out, Double value) throws IOException {
+        public void write(DataOutput out, Double value) throws IOException {
             out.writeDouble(value);
         }
 
         @Override
-        public Double read(DataInputStream in) throws IOException {
+        public Double read(DataInput in) throws IOException {
             return in.readDouble();
         }
 

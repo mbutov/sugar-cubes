@@ -1,14 +1,11 @@
 package org.sugarcubes.thread;
 
-import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.stream.Collectors;
 
 import org.sugarcubes.reflection.XClass;
 import org.sugarcubes.reflection.XField;
@@ -20,18 +17,30 @@ import org.sugarcubes.reflection.XReflection;
  */
 public class ThreadLocals {
 
-    public static Set<ThreadLocal<?>> getThreadLocals(Thread thread, ThreadLocal<?> threadLocal) {
+    public static Map<ThreadLocal<?>, Object> getThreadLocals(Thread thread, ThreadLocal<?> threadLocal) {
         Object map = TL_GET_MAP_METHOD.invoke(threadLocal, thread);
         if (map != null) {
-            WeakReference<ThreadLocal<?>>[] table = TLM_TABLE_FIELD.get(map);
-            return Arrays.stream(table)
+            Map<ThreadLocal<?>, Object> threadLocalsMap = new WeakHashMap<>();
+            Arrays.stream(TLM_TABLE_FIELD.get(map))
                 .filter(Objects::nonNull)
-                .map(Reference::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(() -> Collections.newSetFromMap(new WeakHashMap<>())));
+                .forEach(entry -> {
+                    ThreadLocal<?> key = entry.get();
+                    if (key != null) {
+                        threadLocalsMap.put(key, TLME_VALUE_FIELD.get(entry));
+                    }
+                });
+            return threadLocalsMap;
         }
         else {
-            return Collections.emptySet();
+            return Collections.emptyMap();
+        }
+    }
+
+    public static void clearThreadLocals(Thread thread, ThreadLocal<?> threadLocal) {
+        Object map = TL_GET_MAP_METHOD.invoke(threadLocal, thread);
+        if (map != null) {
+            TL_CREATE_MAP_METHOD.invoke(threadLocal, thread, null);
+            remove(thread, threadLocal);
         }
     }
 
@@ -49,8 +58,8 @@ public class ThreadLocals {
     public static <X> X setValue(Thread thread, ThreadLocal<X> threadLocal, X newValue) {
         Object map = TL_GET_MAP_METHOD.invoke(threadLocal, thread);
         if (map == null) {
-            TL_CREATE_MAP_METHOD.invoke(threadLocal, thread);
-            map = TL_GET_MAP_METHOD.invoke(threadLocal, thread);
+            TL_CREATE_MAP_METHOD.invoke(threadLocal, thread, newValue);
+            return null;
         }
         WeakReference<ThreadLocal<?>> entry = TLM_GET_ENTRY_METHOD.invoke(map, threadLocal);
         if (entry != null) {
@@ -69,20 +78,19 @@ public class ThreadLocals {
         }
     }
 
-    static final XClass<ThreadLocal<?>> TL_XCLASS = XReflection.forName("java.lang.ThreadLocal");
+    private static final XClass<ThreadLocal<?>> TL_XCLASS = XReflection.forName("java.lang.ThreadLocal");
+    private static final XMethod<Object> TL_GET_MAP_METHOD = TL_XCLASS.getMethod("getMap", Thread.class);
+    private static final XMethod<Object> TL_CREATE_MAP_METHOD = TL_XCLASS.getMethod("createMap", Thread.class, Object.class);
 
-    static final XMethod<Object> TL_GET_MAP_METHOD = TL_XCLASS.getMethod("getMap", Thread.class);
-    static final XMethod<Object> TL_CREATE_MAP_METHOD = TL_XCLASS.getMethod("createMap", Thread.class, Object.class);
+    private static final XClass<Object> TLM_XCLASS = XReflection.forName("java.lang.ThreadLocal$ThreadLocalMap");
+    private static final XField<WeakReference<ThreadLocal<?>>[]> TLM_TABLE_FIELD = TLM_XCLASS.getField("table");
+    private static final XMethod<WeakReference<ThreadLocal<?>>> TLM_GET_ENTRY_METHOD =
+        TLM_XCLASS.getMethod("getEntry", ThreadLocal.class);
+    private static final XMethod<Void> TLM_SET_METHOD = TLM_XCLASS.getMethod("set", ThreadLocal.class, Object.class);
+    private static final XMethod<Void> TLM_REMOVE_METHOD = TLM_XCLASS.getMethod("remove", ThreadLocal.class);
 
-    static final XClass<Object> TLM_XCLASS = XReflection.forName("java.lang.ThreadLocal$ThreadLocalMap");
-
-    static final XField<WeakReference<ThreadLocal<?>>[]> TLM_TABLE_FIELD = TLM_XCLASS.getField("table");
-    static final XMethod<WeakReference<ThreadLocal<?>>> TLM_GET_ENTRY_METHOD = TLM_XCLASS.getMethod("getEntry", ThreadLocal.class);
-    static final XMethod<Void> TLM_SET_METHOD = TLM_XCLASS.getMethod("set", ThreadLocal.class, Object.class);
-    static final XMethod<Void> TLM_REMOVE_METHOD = TLM_XCLASS.getMethod("remove", ThreadLocal.class);
-
-    static final XClass<WeakReference<ThreadLocal<?>>> TLME_XCLASS = XReflection.forName("java.lang.ThreadLocal$ThreadLocalMap$Entry");
-    static final Object[] TLME_EMPTY_ARRAY = (Object[]) Array.newInstance(TLME_XCLASS.getReflectionObject(), 0);
-    static final XField<Object> TLME_VALUE_FIELD = TLME_XCLASS.getField("value");
+    private static final XClass<WeakReference<ThreadLocal<?>>> TLME_XCLASS =
+        XReflection.forName("java.lang.ThreadLocal$ThreadLocalMap$Entry");
+    private static final XField<Object> TLME_VALUE_FIELD = TLME_XCLASS.getField("value");
 
 }

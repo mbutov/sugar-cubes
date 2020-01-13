@@ -1,7 +1,7 @@
 package org.sugarcubes.primitive;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 /**
@@ -67,9 +67,9 @@ public abstract class XPrimitive<W, A> {
 
     public abstract void set(A array, int index, W value);
 
-    public abstract void write(DataOutputStream out, W value) throws IOException;
+    public abstract void write(DataOutput out, W value) throws IOException;
 
-    public abstract W read(DataInputStream in) throws IOException;
+    public abstract W read(DataInput in) throws IOException;
 
     @Override
     public boolean equals(Object obj) {
