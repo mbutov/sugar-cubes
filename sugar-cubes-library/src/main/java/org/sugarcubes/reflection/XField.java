@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import org.sugarcubes.check.Args;
-import org.sugarcubes.check.States;
+import org.sugarcubes.check.Check;
 import static org.sugarcubes.reflection.XReflectionUtils.execute;
 
 /**
@@ -47,7 +47,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
     }
 
     private void checkStatic() {
-        States.check(this, XModifiers::isStatic, () -> "Field is not static");
+        Check.state().check(this, XModifiers::isStatic, Check.format("Field is not static"));
     }
 
     public T get(Object obj) {
@@ -68,15 +68,15 @@ public class XField<T> extends XReloadableReflectionObject<Field>
         set(null, value);
     }
 
-    public T put(Object obj, T value) {
+    public T getAndSet(Object obj, T value) {
         T oldValue = get(obj);
         set(obj, value);
         return oldValue;
     }
 
-    public T staticPut(T value) {
+    public T staticGetAndSet(T value) {
         checkStatic();
-        return put(null, value);
+        return getAndSet(null, value);
     }
 
     public XObjectFieldAccessor<T> getAccessor(Object obj) {

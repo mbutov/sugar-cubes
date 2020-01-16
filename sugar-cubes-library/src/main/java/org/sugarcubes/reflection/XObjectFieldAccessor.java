@@ -18,7 +18,7 @@ public interface XObjectFieldAccessor<T> {
     }
 
     default T put(T value) {
-        return getField().put(getObject(), value);
+        return getField().getAndSet(getObject(), value);
     }
 
 }

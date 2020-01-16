@@ -75,7 +75,7 @@ public class ThreadLocals {
         }
         WeakReference<ThreadLocal<?>> entry = TLM_GET_ENTRY_METHOD.invoke(map, threadLocal);
         if (entry != null) {
-            return (X) TLME_VALUE_FIELD.put(entry, newValue);
+            return (X) TLME_VALUE_FIELD.getAndSet(entry, newValue);
         }
         else {
             TLM_SET_METHOD.invoke(map, threadLocal, newValue);

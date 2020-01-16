@@ -36,7 +36,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.sugarcubes.builder.collection.SetBuilder;
-import org.sugarcubes.check.Args;
+import org.sugarcubes.check.Check;
 import org.sugarcubes.reflection.XField;
 import org.sugarcubes.reflection.XMethod;
 import org.sugarcubes.reflection.XReflection;
@@ -68,7 +68,7 @@ public class ReflectionCloner extends AbstractCloner {
      */
     public ReflectionCloner(ClonerObjectFactory objectFactory) {
 
-        Args.notNull(objectFactory, "objectFactory is null");
+        Check.arg().notNull(objectFactory, Check.format("objectFactory is null"));
         this.objectFactory = objectFactory;
 
         initialize();
@@ -323,7 +323,7 @@ public class ReflectionCloner extends AbstractCloner {
     }
 
     private static <X> Set<X> asSet(X first, X... others) {
-        Args.notNull(first, "first argument must be not null");
+        Check.arg().notNull(first, Check.format("first argument must be not null"));
         return SetBuilder.<X>hashSet().add(first).addAll(others).build();
     }
 
