@@ -14,7 +14,7 @@ import static java.util.Arrays.stream;
 
 import org.sugarcubes.builder.collection.ListBuilder;
 import org.sugarcubes.builder.collection.SetBuilder;
-import org.sugarcubes.check.Args;
+import org.sugarcubes.check.Checks;
 import static org.sugarcubes.reflection.XPredicates.withName;
 import static org.sugarcubes.reflection.XPredicates.withNameAndParameterTypes;
 import static org.sugarcubes.reflection.XPredicates.withParameterTypes;
@@ -32,7 +32,7 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
     private final Class<C> reflectionObject;
 
     XClass(Class<C> reflectionObject) {
-        this.reflectionObject = Args.notNull(reflectionObject, "Class must not be null");
+        this.reflectionObject = Checks.arg().notNull(reflectionObject, "Class must not be null");
     }
 
     @Override

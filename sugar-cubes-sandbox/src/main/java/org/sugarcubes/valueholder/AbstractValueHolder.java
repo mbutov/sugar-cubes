@@ -2,7 +2,7 @@ package org.sugarcubes.valueholder;
 
 import java.util.function.Supplier;
 
-import org.sugarcubes.check.Args;
+import org.sugarcubes.check.Checks;
 
 /**
  * Абстрактный {@link ValueHolder}.
@@ -39,13 +39,13 @@ public abstract class AbstractValueHolder<T> implements ValueHolder<T> {
     @Override
     public T required() {
         T value = get();
-        Args.notNull(value, "Value must not be null");
+        Checks.arg().notNull(value, "Value must not be null");
         return value;
     }
 
     @Override
     public T create() {
-        Args.notNull(supplier, "Cannot create without supplier");
+        Checks.arg().notNull(supplier, "Cannot create without supplier");
         remove();
         T value = supplier.get();
         set(value);

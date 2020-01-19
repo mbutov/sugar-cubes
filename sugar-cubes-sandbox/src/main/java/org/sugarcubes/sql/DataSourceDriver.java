@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.sugarcubes.check.States;
+import org.sugarcubes.check.Checks;
 import org.sugarcubes.rex.Rex;
 
 /**
@@ -109,7 +109,7 @@ public class DataSourceDriver implements Driver {
      */
     public static void deregister(String url) {
         DataSourceDriver driver = REGISTERED_DRIVERS.get(url);
-        States.notNull(driver, "JDBC URL '%s' not registered.", url);
+        Checks.state().notNull(driver, "JDBC URL '%s' not registered.", url);
         driver.deregister();
     }
 

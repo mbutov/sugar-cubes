@@ -3,8 +3,7 @@ package org.sugarcubes.reflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import org.sugarcubes.check.Args;
-import org.sugarcubes.check.Check;
+import org.sugarcubes.check.Checks;
 import static org.sugarcubes.reflection.XReflectionUtils.execute;
 
 /**
@@ -47,7 +46,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
     }
 
     private void checkStatic() {
-        Check.state().check(this, XModifiers::isStatic, Check.format("Field is not static"));
+        Checks.state().check(this, XModifiers::isStatic, "Field is not static");
     }
 
     public T get(Object obj) {
@@ -93,7 +92,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
     }
 
     public XField<T> withModifier(int modifier, boolean newValue) {
-        Args.check(modifier, XModifiers::isValidModifier, () -> "Invalid modifier 0x" + Integer.toHexString(modifier));
+        Checks.arg().check(modifier, XModifiers::isValidModifier, () -> "Invalid modifier 0x" + Integer.toHexString(modifier));
         int newModifiers = newValue ? modifiers | modifier : modifiers & ~modifier;
         return withModifiers(newModifiers);
     }

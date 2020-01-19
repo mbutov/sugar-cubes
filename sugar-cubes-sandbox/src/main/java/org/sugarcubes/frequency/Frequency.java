@@ -3,7 +3,7 @@ package org.sugarcubes.frequency;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import org.sugarcubes.check.Args;
+import org.sugarcubes.check.Checks;
 
 /**
  * Frequency representation.
@@ -18,7 +18,7 @@ public class Frequency implements Serializable, Comparable<Frequency> {
     private final int seconds;
 
     private Frequency(int count, int seconds) {
-        Args.check(seconds != 0, () -> "seconds must be != 0");
+        Checks.arg().check(seconds != 0, "seconds must be != 0");
         if (seconds < 0) {
             count = -count;
             seconds = -seconds;

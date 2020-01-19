@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.sugarcubes.check.Args;
 import org.sugarcubes.check.Checks;
 
 /**
@@ -26,8 +25,8 @@ public class XTag {
 
     public static XTag of(int value) {
 
-        Args.check(value > 1, Checks.format("Value must be > 1"));
-        Args.check(value < WORD_WITH_HIGH_BIT, Checks.format("Value must be < 0x8000"));
+        Checks.arg().check(value > 1, "Value must be > 1");
+        Checks.arg().check(value < WORD_WITH_HIGH_BIT, "Value must be < 0x8000");
 
         return new XTag(value);
     }

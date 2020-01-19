@@ -2,7 +2,7 @@ package org.sugarcubes.reflection;
 
 import java.util.function.Predicate;
 
-import org.sugarcubes.check.Args;
+import org.sugarcubes.check.Checks;
 import static org.sugarcubes.function.Predicates.and;
 
 /**
@@ -13,12 +13,12 @@ import static org.sugarcubes.function.Predicates.and;
 public class XPredicates {
 
     public static <X, R extends XReflectionObject<X>> Predicate<R> withName(String name) {
-        Args.notNull(name, "name must not be null");
+        Checks.arg().notNull(name, "name must not be null");
         return obj -> obj.hasName(name);
     }
 
     public static <T, R extends XExecutable<T>> Predicate<R> withParameterTypes(Class... types) {
-        Args.notNull(types, "types must not be null");
+        Checks.arg().notNull(types, "types must not be null");
         return obj -> obj.hasParameterTypes(types);
     }
 

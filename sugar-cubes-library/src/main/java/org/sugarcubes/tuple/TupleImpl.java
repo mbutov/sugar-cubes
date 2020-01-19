@@ -4,9 +4,10 @@ import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.RandomAccess;
 
-import org.sugarcubes.check.Args;
+import org.sugarcubes.check.Checks;
 
 /**
  * {@link Tuple} implementation.
@@ -28,8 +29,8 @@ public class TupleImpl<T> extends AbstractList<T> implements Tuple<T>, RandomAcc
     }
 
     protected TupleImpl(boolean clone, Object[] values) {
-        for (Object value : values) {
-            Args.notNull(value, "Values contains null");
+        if (Arrays.stream(values).anyMatch(Objects::isNull)) {
+            Checks.arg().fail("Values contains null");
         }
         this.values = clone ? values.clone() : values;
     }

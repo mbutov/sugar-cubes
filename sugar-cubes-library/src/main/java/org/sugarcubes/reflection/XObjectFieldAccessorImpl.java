@@ -2,7 +2,7 @@ package org.sugarcubes.reflection;
 
 import java.util.Objects;
 
-import org.sugarcubes.check.Args;
+import org.sugarcubes.check.Checks;
 
 /**
  * @author Maxim Butov
@@ -13,8 +13,8 @@ class XObjectFieldAccessorImpl<T> implements XObjectFieldAccessor<T> {
     private final Object obj;
 
     XObjectFieldAccessorImpl(Object obj, XField<T> xField) {
-        this.obj = Args.notNull(obj, "obj must not be null");
-        this.xField = Args.notNull(xField, "field must not be null");
+        this.obj = Checks.arg().notNull(obj, "obj must not be null");
+        this.xField = Checks.arg().notNull(xField, "field must not be null");
     }
 
     @Override
