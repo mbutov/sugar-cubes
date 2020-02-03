@@ -2,8 +2,6 @@ package org.sugarcubes.executable;
 
 import java.util.concurrent.Callable;
 
-import org.sugarcubes.rex.Rex;
-
 /**
  * The variant of {@link Callable} which throws specific exception instead of {@link Exception}.
  * To be used as method reference.
@@ -11,15 +9,18 @@ import org.sugarcubes.rex.Rex;
  * @author Maxim Butov
  */
 @FunctionalInterface
-public interface XCallable<T, E extends Throwable> extends XExecutable<T> {
+public interface XCallable<T, E extends Throwable> extends XSupplier<T> {
 
     @Override
-    default T execute() {
+    default T get() {
         try {
             return call();
         }
+        catch (Error | RuntimeException e) {
+            throw e;
+        }
         catch (Throwable e) {
-            throw Rex.rethrowAsRuntime(e);
+            throw new XRuntimeException(e);
         }
     }
 
@@ -31,21 +32,6 @@ public interface XCallable<T, E extends Throwable> extends XExecutable<T> {
      * @throws E if unable to compute a result
      */
     T call() throws E;
-
-    @Override
-    default Callable<T> asCallable() {
-        return () -> {
-            try {
-                return call();
-            }
-            catch (Error | Exception e) {
-                throw e;
-            }
-            catch (Throwable e) {
-                throw Rex.rethrowAsRuntime(e);
-            }
-        };
-    }
 
     /**
      * {@link XCallable} of method reference

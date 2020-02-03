@@ -1,15 +1,14 @@
 package org.sugarcubes.executable;
 
-import org.sugarcubes.rex.Rex;
-
 /**
  * A modification of {@link Runnable} which throws exception.
- * To be used as method reference.
+ *
+ * To be used as method reference of void methods.
  *
  * @author Maxim Butov
  */
 @FunctionalInterface
-public interface XRunnable<E extends Throwable> extends XExecutable<Void> {
+public interface XRunnable<E extends Throwable> extends XSupplier<Void> {
 
     /**
      * Executes some code without result, or throws an exception if unable to do so.
@@ -19,12 +18,15 @@ public interface XRunnable<E extends Throwable> extends XExecutable<Void> {
     void run() throws E;
 
     @Override
-    default Void execute() {
+    default Void get() {
         try {
             run();
         }
+        catch (Error | RuntimeException e) {
+            throw e;
+        }
         catch (Throwable e) {
-            throw Rex.of(e).rethrowAsRuntime();
+            throw new XRuntimeException(e);
         }
         return null;
     }
