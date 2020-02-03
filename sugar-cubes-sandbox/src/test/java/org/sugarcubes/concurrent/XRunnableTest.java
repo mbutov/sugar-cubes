@@ -3,6 +3,7 @@ package org.sugarcubes.concurrent;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.sugarcubes.executable.XRunnable;
 
 /**
  * @author Maxim Butov

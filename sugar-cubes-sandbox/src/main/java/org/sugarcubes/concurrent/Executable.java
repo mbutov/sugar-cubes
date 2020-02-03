@@ -4,6 +4,8 @@ import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.sugarcubes.executable.XCallable;
+import org.sugarcubes.executable.XRunnable;
 import org.sugarcubes.rex.Rex;
 
 /**
@@ -97,19 +99,7 @@ public interface Executable<T, E extends Exception> extends Callable<T>, XCallab
      * {@link Runnable} -> {@link Executable}
      */
     static <T> Executable<T, RuntimeException> of(Runnable runnable) {
-        return ofx(XRunnable.of(runnable));
-    }
-
-    /**
-     * {@link Supplier} -> {@link Executable}
-     */
-    static <T> Executable<T, RuntimeException> of(Supplier<T> supplier) {
-        return new Executable<T, RuntimeException>() {
-            @Override
-            public T call() throws RuntimeException {
-                return supplier.get();
-            }
-        };
+        return ofx(runnable::run);
     }
 
     /**

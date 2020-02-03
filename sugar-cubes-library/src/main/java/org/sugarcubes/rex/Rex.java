@@ -9,6 +9,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.sugarcubes.check.Checks;
+
 /**
  * Rex means "runtime exceptions".
  *
@@ -53,7 +55,7 @@ public class Rex<T extends Throwable> implements Serializable {
     private final T error;
 
     public Rex(T error) {
-        this.error = error;
+        this.error = Checks.arg().notNull(error, "Error must be not null.");
     }
 
     /**
