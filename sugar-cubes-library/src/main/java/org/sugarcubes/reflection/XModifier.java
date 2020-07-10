@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * @author Maxim Butov
  */
-public enum XModifier {
+public enum XModifier implements XModifiers {
 
     PUBLIC(0x00000001),
     PRIVATE(0x00000002),
@@ -50,7 +50,12 @@ public enum XModifier {
         this.intValue = intValue;
     }
 
-    public int getIntValue() {
+    public int intValue() {
+        return intValue;
+    }
+
+    @Override
+    public int getModifiers() {
         return intValue;
     }
 

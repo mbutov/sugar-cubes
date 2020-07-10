@@ -44,7 +44,7 @@ public interface XModifiers {
     }
 
     default boolean isXModifier(XModifier modifier) {
-        return (getModifiers() & modifier.getIntValue()) != 0;
+        return isAnyModifier(modifier.intValue());
     }
 
     default boolean isPublic() {
