@@ -17,7 +17,7 @@ public abstract class XReflectionObjectImpl<T> implements XReflectionObject<T>, 
         if (!(obj instanceof XReflectionObject)) {
             return false;
         }
-        XReflectionObject that = (XReflectionObject) obj;
+        XReflectionObject<?> that = (XReflectionObject) obj;
         return getReflectionObject().equals(that.getReflectionObject());
     }
 

@@ -1,5 +1,6 @@
 package org.sugarcubes.reflection;
 
+import java.io.ObjectStreamException;
 import java.util.stream.Stream;
 
 /**
@@ -95,6 +96,10 @@ public final class XNullClass extends XClass<Object> {
     @Override
     public String toString() {
         return "XNullClass";
+    }
+
+    private Object readResolve() throws ObjectStreamException {
+        return INSTANCE;
     }
 
 }

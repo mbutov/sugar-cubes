@@ -68,7 +68,7 @@ public class XReflectionTest {
 
         assertFalse(xClass.isAbstract());
         assertFalse(xClass.isInterface());
-        assertFalse(xClass.isPackage());
+        assertFalse(xClass.isPackageLocal());
         assertFalse(xClass.isPrivate());
         assertFalse(xClass.isProtected());
 

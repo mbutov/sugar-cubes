@@ -17,7 +17,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
     /**
      * {@link Field#getDeclaringClass()}
      */
-    private final Class declaringClass;
+    private final Class<?> declaringClass;
 
     /**
      * {@link Field#getName()}
@@ -45,8 +45,8 @@ public class XField<T> extends XReloadableReflectionObject<Field>
         return fieldWithModifiers(loadField(), modifiers);
     }
 
-    private void checkStatic() {
-        Checks.state().check(this, XModifiers::isStatic, "Field is not static");
+    public XField<T> checkStatic() {
+        return Checks.state().check(this, XModifiers::isStatic, "Field is not static");
     }
 
     public T get(Object obj) {
@@ -54,8 +54,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
     }
 
     public T staticGet() {
-        checkStatic();
-        return get(null);
+        return checkStatic().get(null);
     }
 
     public void set(Object obj, T value) {
@@ -63,8 +62,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
     }
 
     public void staticSet(T value) {
-        checkStatic();
-        set(null, value);
+        checkStatic().set(null, value);
     }
 
     public T getAndSet(Object obj, T value) {
@@ -74,8 +72,7 @@ public class XField<T> extends XReloadableReflectionObject<Field>
     }
 
     public T staticGetAndSet(T value) {
-        checkStatic();
-        return getAndSet(null, value);
+        return checkStatic().getAndSet(null, value);
     }
 
     public XObjectFieldAccessor<T> getAccessor(Object obj) {

@@ -1,11 +1,7 @@
 package org.sugarcubes.reflection;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
-import org.sugarcubes.stream.ZeroOneCollectors;
-import static org.sugarcubes.reflection.XPredicates.withName;
-import static org.sugarcubes.reflection.XPredicates.withReflectionObject;
 import static org.sugarcubes.reflection.XReflectionUtils.execute;
 
 /**
@@ -13,18 +9,13 @@ import static org.sugarcubes.reflection.XReflectionUtils.execute;
  *
  * @author Maxim Butov
  */
-public class XMethod<R> extends XReloadableReflectionObject<Method>
-    implements XAnnotated<Method>, XExecutable<R>, XMember<Method>, XModifiers {
+public class XMethod<R> extends XExecutable<R, Method> {
 
-    private final Class<?> declaringClass;
     private final String name;
-    private final Class<?>[] parameterTypes;
 
     XMethod(Method reflectionObject) {
-        super(reflectionObject);
-        this.declaringClass = reflectionObject.getDeclaringClass();
+        super(reflectionObject, reflectionObject.getParameterTypes());
         this.name = reflectionObject.getName();
-        this.parameterTypes = reflectionObject.getParameterTypes();
     }
 
     @Override
@@ -32,12 +23,7 @@ public class XMethod<R> extends XReloadableReflectionObject<Method>
         return declaringClass.getDeclaredMethod(name, parameterTypes);
     }
 
-    @Override
-    public Class<?>[] getParameterTypes() {
-        return parameterTypes.clone();
-    }
-
-    public boolean hasNameAndParameterTypes(String name, Class... types) {
+    public boolean hasNameAndParameterTypes(String name, Class<?>... types) {
         return hasName(name) && hasParameterTypes(types);
     }
 
@@ -50,19 +36,8 @@ public class XMethod<R> extends XReloadableReflectionObject<Method>
     }
 
     public <X> XMethod<X> getSuper() {
-        Method method = getReflectionObject();
-        if (method.isBridge()) {
-            // todo: this is not working
-            return getDeclaringClass().getSuperclass().getMethods()
-                .filter(withName(name))
-                .filter(withReflectionObject(candidate -> candidate.getReturnType().isAssignableFrom(method.getReturnType()) &&
-                    Arrays.equals(method.getGenericParameterTypes(), candidate.getGenericParameterTypes())))
-                .collect(ZeroOneCollectors.onlyElement())
-                .cast();
-        }
-        else {
-            return getDeclaringClass().getSuperclass().<R>findMethod(name, parameterTypes).orElse(this).cast();
-        }
+        // todo: check this
+        return getDeclaringClass().getSuperclass().<R>findMethod(name, parameterTypes).orElse(this).cast();
     }
 
     public <X> XMethod<X> getRoot() {

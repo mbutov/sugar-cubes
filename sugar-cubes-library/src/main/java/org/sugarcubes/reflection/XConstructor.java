@@ -9,26 +9,15 @@ import static org.sugarcubes.reflection.XReflectionUtils.execute;
  *
  * @author Maxim Butov
  */
-public class XConstructor<T> extends XReloadableReflectionObject<Constructor<T>>
-    implements XAnnotated<Constructor<T>>, XExecutable<T>, XMember<Constructor<T>>, XModifiers {
-
-    private final Class<T> declaringClass;
-    private final Class<?>[] parameterTypes;
+public class XConstructor<T> extends XExecutable<T, Constructor<T>> {
 
     XConstructor(Constructor<T> reflectionObject) {
-        super(reflectionObject);
-        this.declaringClass = reflectionObject.getDeclaringClass();
-        this.parameterTypes = reflectionObject.getParameterTypes();
+        super(reflectionObject, reflectionObject.getParameterTypes());
     }
 
     @Override
     protected Constructor<T> loadReflectionObject() throws ReflectiveOperationException {
         return declaringClass.getDeclaredConstructor(parameterTypes);
-    }
-
-    @Override
-    public Class<?>[] getParameterTypes() {
-        return parameterTypes;
     }
 
     public T newInstance(Object... args) {

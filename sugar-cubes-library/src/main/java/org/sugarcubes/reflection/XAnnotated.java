@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  *
  * @author Maxim Butov
  */
-public interface XAnnotated<T extends AnnotatedElement> extends XReflectionObject<T> {
+public interface XAnnotated<AE extends AnnotatedElement> extends XReflectionObject<AE> {
 
     default Stream<? extends Annotation> getDeclaredAnnotations() {
         return Arrays.stream(getReflectionObject().getDeclaredAnnotations());

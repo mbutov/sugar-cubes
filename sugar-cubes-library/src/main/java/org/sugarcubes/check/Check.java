@@ -29,8 +29,8 @@ public class Check<E extends Throwable> {
     }
 
     public void check(boolean condition, Supplier<String> message) throws E {
-        if (condition) {
-            fail(message.get());
+        if (!condition) {
+            throw fail(message.get());
         }
     }
 

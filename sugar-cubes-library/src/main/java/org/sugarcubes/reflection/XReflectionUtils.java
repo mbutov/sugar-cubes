@@ -47,13 +47,14 @@ class XReflectionUtils {
         }
     }
 
-    static void tryToMakeAccessible(AccessibleObject obj) {
+    static <A extends AccessibleObject> A tryToMakeAccessible(A obj) {
         try {
             obj.setAccessible(true);
         }
         catch (SecurityException e) {
             // ignore
         }
+        return obj;
     }
 
 }

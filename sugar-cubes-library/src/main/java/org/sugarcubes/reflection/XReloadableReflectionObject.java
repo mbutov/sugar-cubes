@@ -15,15 +15,13 @@ public abstract class XReloadableReflectionObject<T extends AccessibleObject> ex
     private transient T reflectionObject;
 
     protected XReloadableReflectionObject(T reflectionObject) {
-        this.reflectionObject = reflectionObject;
-        XReflectionUtils.tryToMakeAccessible(reflectionObject);
+        this.reflectionObject = XReflectionUtils.tryToMakeAccessible(reflectionObject);
     }
 
     @Override
     public T getReflectionObject() {
         if (reflectionObject == null) {
-            reflectionObject = XReflectionUtils.execute(this::loadReflectionObject);
-            XReflectionUtils.tryToMakeAccessible(reflectionObject);
+            reflectionObject = XReflectionUtils.tryToMakeAccessible(XReflectionUtils.execute(this::loadReflectionObject));
         }
         return reflectionObject;
     }

@@ -7,7 +7,7 @@ import java.lang.reflect.Member;
  *
  * @author Maxim Butov
  */
-public interface XMember<T extends Member> extends XModifiers, XReflectionObject<T> {
+public interface XMember<M extends Member> extends XModifiers, XReflectionObject<M> {
 
     @Override
     default String getName() {

@@ -14,13 +14,13 @@ public final class Empty<T> extends TupleImpl<T> {
     /**
      * An untyped instance of {@link Empty}.
      */
-    public static final Empty INSTANCE = new Empty();
+    public static final Empty<?> INSTANCE = new Empty<>();
 
     /**
      * A typed instance of {@link Empty}.
      */
     public static <T> Empty<T> instance() {
-        return INSTANCE;
+        return (Empty) INSTANCE;
     }
 
     /**

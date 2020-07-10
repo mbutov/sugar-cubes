@@ -11,12 +11,12 @@ import java.util.function.Predicate;
  */
 public class EqualsHelper {
 
-    public static final BiPredicate<Class, Class> SAME_CLASS = Class::equals;
-    public static final BiPredicate<Class, Class> IS_ASSIGNABLE_FROM = Class::isAssignableFrom;
+    public static final BiPredicate<Class<?>, Class<?>> SAME_CLASS = Class::equals;
+    public static final BiPredicate<Class<?>, Class<?>> IS_ASSIGNABLE_FROM = Class::isAssignableFrom;
 
     public static <T> boolean genericEquals(
         T self, Object that, BiPredicate<T, T> instancePredicate,
-        BiPredicate<Class, Class> classPredicate, Class<T> selfClass
+        BiPredicate<Class<?>, Class<?>> classPredicate, Class<T> selfClass
     ) {
         if (self == that) {
             return true;
@@ -29,7 +29,7 @@ public class EqualsHelper {
 
     public static <T> boolean genericEquals(
         T self, Object that, BiPredicate<T, T> instancePredicate,
-        BiPredicate<Class, Class> classPredicate
+        BiPredicate<Class<?>, Class<?>> classPredicate
     ) {
         return genericEquals(self, that, instancePredicate, classPredicate, (Class) self.getClass());
     }

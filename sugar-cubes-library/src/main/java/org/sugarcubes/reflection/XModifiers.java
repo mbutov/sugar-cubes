@@ -29,7 +29,7 @@ public interface XModifiers {
      */
     int getModifiers();
 
-    default boolean isModifier(int modifier) {
+    default boolean isAnyModifier(int modifier) {
         return (getModifiers() & modifier) != 0;
     }
 
@@ -59,7 +59,7 @@ public interface XModifiers {
         return isModifier(Modifier::isProtected);
     }
 
-    default boolean isPackage() {
+    default boolean isPackageLocal() {
         return !isPublic() && !isPrivate() && !isProtected();
     }
 

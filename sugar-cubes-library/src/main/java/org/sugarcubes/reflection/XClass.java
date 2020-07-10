@@ -118,11 +118,11 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
         return computeIfAbsent(this::getMethodsInternal).stream();
     }
 
-    public Optional<XConstructor<C>> findConstructor(Class... types) {
+    public Optional<XConstructor<C>> findConstructor(Class<?>... types) {
         return getConstructors().filter(withParameterTypes(types)).collect(toOptional());
     }
 
-    public XConstructor<C> getConstructor(Class... types) {
+    public XConstructor<C> getConstructor(Class<?>... types) {
         return findConstructor(types)
             .orElseThrow(withMessage(() -> String.format("Constructor %s(%s) not found", getName(), getParameterNames(types))));
     }
@@ -148,32 +148,32 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
             ));
     }
 
-    public <X> Optional<XMethod<X>> findDeclaredMethod(String name, Class... types) {
+    public <X> Optional<XMethod<X>> findDeclaredMethod(String name, Class<?>... types) {
         return getDeclaredMethods()
             .map(XMethod::<X>cast)
             .filter(withNameAndParameterTypes(name, types))
             .collect(toOptional());
     }
 
-    public <X> XMethod<X> getDeclaredMethod(String name, Class... types) {
+    public <X> XMethod<X> getDeclaredMethod(String name, Class<?>... types) {
         return this.<X>findDeclaredMethod(name, types)
             .orElseThrow(withMessage(() ->
                 String.format("Method %s.%s(%s) not found", getName(), name, getParameterNames(types))));
     }
 
-    public <X> Optional<XMethod<X>> findMethod(String name, Class... types) {
+    public <X> Optional<XMethod<X>> findMethod(String name, Class<?>... types) {
         return getMethods()
             .map(XMethod::<X>cast)
             .filter(withNameAndParameterTypes(name, types))
             .findFirst();
     }
 
-    public <X> XMethod<X> getMethod(String name, Class... types) {
+    public <X> XMethod<X> getMethod(String name, Class<?>... types) {
         return this.<X>findMethod(name, types)
             .orElseThrow(withMessage(() -> String.format("Method %s.%s(%s) not found in class hierarchy", getName(), name, getParameterNames(types))));
     }
 
-    private static String getParameterNames(Class[] types) {
+    private static String getParameterNames(Class<?>[] types) {
         return stream(types).map(Class::getName).collect(Collectors.joining(","));
     }
 
@@ -181,7 +181,7 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
 
     private <X> Map<Supplier<X>, X> getCache() {
         if (this.cache == null) {
-            this.cache = new WeakHashMap();
+            this.cache = new WeakHashMap<>();
         }
         return this.cache;
     }
