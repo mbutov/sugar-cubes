@@ -4,6 +4,8 @@ dependencies {
 
     compile project(':sugar-cubes-library')
 
+    compileOnly libs.commons_math3
+
     compileOnly libs.objenesis
 
     compileOnly libs.kryo

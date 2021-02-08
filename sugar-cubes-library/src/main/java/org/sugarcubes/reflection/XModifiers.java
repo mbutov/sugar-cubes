@@ -2,9 +2,9 @@ package org.sugarcubes.reflection;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.IntPredicate;
-import java.util.stream.Collectors;
 
 /**
  * Modifiers-related methods.
@@ -38,9 +38,11 @@ public interface XModifiers {
     }
 
     default Set<XModifier> getXModifiers() {
-        return Arrays.stream(XModifier.values())
+        EnumSet<XModifier> xModifiers = EnumSet.noneOf(XModifier.class);
+        Arrays.stream(XModifier.values())
             .filter(this::isXModifier)
-            .collect(Collectors.toSet());
+            .forEach(xModifiers::add);
+        return xModifiers;
     }
 
     default boolean isXModifier(XModifier modifier) {

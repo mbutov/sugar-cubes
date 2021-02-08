@@ -30,16 +30,34 @@ public class Fractional extends Number implements Comparable<Fractional> {
             new Fractional(numerator.divide(gcd), denominator.divide(gcd));
     }
 
-    public static Fractional of(BigInteger integer) {
-        return new Fractional(integer, BigInteger.ONE);
+    public static Fractional of(BigInteger value) {
+        return new Fractional(value, BigInteger.ONE);
     }
 
     public static Fractional of(long numerator, long denominator) {
         return of(BigInteger.valueOf(numerator), BigInteger.valueOf(denominator));
     }
 
-    public static Fractional of(long integer) {
-        return of(BigInteger.valueOf(integer));
+    public static Fractional of(long value) {
+        return of(BigInteger.valueOf(value));
+    }
+
+    public static Fractional of(double value) {
+        return of(BigDecimal.valueOf(value));
+    }
+
+    public static Fractional of(BigDecimal decimal) {
+        BigInteger unscaledValue = decimal.unscaledValue();
+        int scale = decimal.scale();
+        if (scale < 0) {
+            return of(unscaledValue.multiply(BigInteger.TEN.pow(-scale)));
+        }
+        else if (scale == 0) {
+            return of(unscaledValue);
+        }
+        else {
+            return of(unscaledValue, BigInteger.TEN.pow(scale));
+        }
     }
 
     public static Fractional parse(String value) {
@@ -71,6 +89,10 @@ public class Fractional extends Number implements Comparable<Fractional> {
 
     public BigInteger getWholePart() {
         return numerator.divide(denominator);
+    }
+
+    public Fractional getFractionalPart() {
+        return new Fractional(numerator.remainder(denominator), denominator);
     }
 
     public int signum() {
