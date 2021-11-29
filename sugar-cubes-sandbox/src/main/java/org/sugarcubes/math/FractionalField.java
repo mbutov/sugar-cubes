@@ -27,7 +27,7 @@ public class FractionalField extends NumberField<Fractional> {
 
     @Override
     public Fractional negate(Fractional fractional) {
-        return fractional.negate()
+        return fractional.negate();
     }
 
     @Override

@@ -52,4 +52,16 @@ public class WeakKeysCaches {
         return referenceValues(WeakReference::new);
     }
 
+    /**
+     * Cache implementation with weak keys and hard values.
+     *
+     * @return cache implementation {@link WeakKeysReferencedValuesCache}
+     *
+     * @see WeakKeysReferencedValuesCache
+     * @see WeakReference
+     */
+    public static <K, V> Map<K, V> hardValues() {
+        return referenceValues(HardReference::new);
+    }
+
 }

@@ -41,7 +41,7 @@ public class ComplexNumberField<T extends Number> extends NumberField<ComplexNum
 
     @Override
     public ComplexNumber<T> negate(ComplexNumber<T> tComplexNumber) {
-        return super.negate(tComplexNumber);
+        return newComplexNumber(numberField.negate(tComplexNumber.getReal()), numberField.negate(tComplexNumber.getImaginary()));
     }
 
     @Override

@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Extra means "exception translator".
+ * "Extra" means "exception translator".
  *
  * A helper to translate checked exceptions into unchecked.
  *

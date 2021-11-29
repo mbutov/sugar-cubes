@@ -22,6 +22,7 @@ dependencies {
     compileOnly libs.spring
 
     testCompile libs.test
+    testCompile libs.commons_lang3
     testCompile project(':sugar-cubes-library').sourceSets.test.output
     testCompile 'com.google.protobuf:protobuf-java:3.8.0'
 
