@@ -11,10 +11,10 @@ import org.sugarcubes.check.Checks;
  *
  * @author Q-MBU
  */
-public class XTag {
+public final class XTag {
 
     /**
-     * Tag for references.
+     * Tag for null.
      */
     public static final XTag NULL = new XTag(0);
 

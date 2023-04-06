@@ -6,8 +6,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.SerializationUtils;
 
 import net.sf.cglib.proxy.Enhancer;
@@ -31,20 +31,20 @@ public abstract class AbstractProxyProviderTests {
         DefaultProxyProvider proxyProvider = getProxyProvider();
         proxyProvider.setUseJavaProxiesIfPossible(true);
 
-        Assert.assertFalse(proxyProvider.isProxy(new Object()));
+        Assertions.assertFalse(proxyProvider.isProxy(new Object()));
 
         ProxyFactory<TestInterface> proxyFactory = proxyProvider.getFactory(TestInterface.class);
-        Assert.assertSame(proxyFactory, proxyProvider.getFactory(TestInterface.class));
+        Assertions.assertSame(proxyFactory, proxyProvider.getFactory(TestInterface.class));
         Class<? extends TestInterface> proxyClass = proxyFactory.getProxyClass();
         System.out.println("proxyClass = " + proxyClass);
         System.out.println("ProxyUtils.maybeProxy(proxyClass) = " + ProxyUtils.maybeProxy(proxyClass));
-        Assert.assertTrue(ProxyUtils.isProxyClass(proxyClass));
+        Assertions.assertTrue(ProxyUtils.isProxyClass(proxyClass));
 
-        Assert.assertFalse(proxyClass.isInterface());
-        Assert.assertTrue(TestInterface.class.isAssignableFrom(proxyClass));
+        Assertions.assertFalse(proxyClass.isInterface());
+        Assertions.assertTrue(TestInterface.class.isAssignableFrom(proxyClass));
 
-        Assert.assertTrue(java.lang.reflect.Proxy.isProxyClass(proxyClass));
-        Assert.assertFalse(Enhancer.isEnhanced(proxyClass));
+        Assertions.assertTrue(java.lang.reflect.Proxy.isProxyClass(proxyClass));
+        Assertions.assertFalse(Enhancer.isEnhanced(proxyClass));
 
         InvocationHandler handler1 = new InvocationHandler() {
             @Override
@@ -53,11 +53,11 @@ public abstract class AbstractProxyProviderTests {
             }
         };
         TestInterface proxy1 = proxyFactory.newProxy(handler1);
-        Assert.assertSame(proxyProvider.getInvocationHandler(proxy1), handler1);
-        Assert.assertTrue(proxyProvider.isProxy(proxy1));
-        Assert.assertSame(proxy1.getClass(), proxyClass);
-        Assert.assertNotSame(proxy1, proxyFactory.newProxy(handler1));
-        Assert.assertEquals("xx", proxy1.test("x"));
+        Assertions.assertSame(proxyProvider.getInvocationHandler(proxy1), handler1);
+        Assertions.assertTrue(proxyProvider.isProxy(proxy1));
+        Assertions.assertSame(proxy1.getClass(), proxyClass);
+        Assertions.assertNotSame(proxy1, proxyFactory.newProxy(handler1));
+        Assertions.assertEquals("xx", proxy1.test("x"));
     }
 
     static class TestClass implements TestInterface {
@@ -87,21 +87,21 @@ public abstract class AbstractProxyProviderTests {
         DefaultProxyProvider proxyProvider = getProxyProvider();
         proxyProvider.setUseJavaProxiesIfPossible(true);
 
-        Assert.assertFalse(proxyProvider.isProxy(new Object()));
+        Assertions.assertFalse(proxyProvider.isProxy(new Object()));
 
         ProxyFactory<TestClass> proxyFactory = proxyProvider.getFactory(TestClass.class);
-        Assert.assertSame(proxyFactory, proxyProvider.getFactory(TestClass.class));
+        Assertions.assertSame(proxyFactory, proxyProvider.getFactory(TestClass.class));
 
         Class<? extends TestInterface> proxyClass = proxyFactory.getProxyClass();
         System.out.println("proxyClass = " + proxyClass);
         System.out.println("ProxyUtils.maybeProxy(proxyClass) = " + ProxyUtils.maybeProxy(proxyClass));
-        Assert.assertTrue(ProxyUtils.isProxyClass(proxyClass));
+        Assertions.assertTrue(ProxyUtils.isProxyClass(proxyClass));
 
-        Assert.assertFalse(proxyClass.isInterface());
-        Assert.assertTrue(TestInterface.class.isAssignableFrom(proxyClass));
-        Assert.assertTrue(TestClass.class.isAssignableFrom(proxyClass));
+        Assertions.assertFalse(proxyClass.isInterface());
+        Assertions.assertTrue(TestInterface.class.isAssignableFrom(proxyClass));
+        Assertions.assertTrue(TestClass.class.isAssignableFrom(proxyClass));
 
-        Assert.assertFalse(java.lang.reflect.Proxy.isProxyClass(proxyClass));
+        Assertions.assertFalse(java.lang.reflect.Proxy.isProxyClass(proxyClass));
 
         InvocationHandler handler1 = new InvocationHandler() {
             @Override
@@ -110,12 +110,12 @@ public abstract class AbstractProxyProviderTests {
             }
         };
         TestClass proxy1 = proxyFactory.newProxy(handler1);
-        Assert.assertSame(proxyProvider.getInvocationHandler(proxy1), handler1);
-        Assert.assertTrue(proxyProvider.isProxy(proxy1));
-        Assert.assertSame(proxy1.getClass(), proxyClass);
-        Assert.assertNotSame(proxy1, proxyFactory.newProxy(handler1));
-        Assert.assertEquals("xx", proxy1.test("x"));
-        Assert.assertEquals("final", proxy1.testFinal("x"));
+        Assertions.assertSame(proxyProvider.getInvocationHandler(proxy1), handler1);
+        Assertions.assertTrue(proxyProvider.isProxy(proxy1));
+        Assertions.assertSame(proxy1.getClass(), proxyClass);
+        Assertions.assertNotSame(proxy1, proxyFactory.newProxy(handler1));
+        Assertions.assertEquals("xx", proxy1.test("x"));
+        Assertions.assertEquals("final", proxy1.testFinal("x"));
 
     }
 
@@ -123,10 +123,10 @@ public abstract class AbstractProxyProviderTests {
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testFinalClass() {
-
-        getProxyProvider().getFactory(TestFinalClass.class);
+                 Assertions.assertThrows(RuntimeException.class, () ->
+        getProxyProvider().getFactory(TestFinalClass.class));
 
     }
 
@@ -159,12 +159,12 @@ public abstract class AbstractProxyProviderTests {
         ProxyFactory<TestSerializableInterface> factory1 = proxyProvider.getFactory(TestSerializableInterface.class);
         TestSerializableInterface proxy11 = factory1.newProxy(new SerializableInvocationHandlerImpl());
         TestSerializableInterface proxy12 = (TestSerializableInterface) SerializationUtils.deserialize(SerializationUtils.serialize(proxy11));
-        Assert.assertNotSame(proxy11, proxy12);
+        Assertions.assertNotSame(proxy11, proxy12);
 
         ProxyFactory<TestSerializableClass> factory2 = proxyProvider.getFactory(TestSerializableClass.class);
         TestSerializableClass proxy21 = factory2.newProxy(new SerializableInvocationHandlerImpl());
         TestSerializableClass proxy22 = (TestSerializableClass) SerializationUtils.deserialize(SerializationUtils.serialize(proxy21));
-        Assert.assertNotSame(proxy21, proxy22);
+        Assertions.assertNotSame(proxy21, proxy22);
 
     }
 

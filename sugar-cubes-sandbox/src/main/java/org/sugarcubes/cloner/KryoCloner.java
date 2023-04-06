@@ -16,7 +16,7 @@ public class KryoCloner extends AbstractCloner {
 
     public KryoCloner() {
         this(Builders.of(Kryo::new)
-            .apply(kryo -> kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy())))
+            .apply(kryo -> kryo.setInstantiatorStrategy(new StdInstantiatorStrategy()))
             .build());
     }
 

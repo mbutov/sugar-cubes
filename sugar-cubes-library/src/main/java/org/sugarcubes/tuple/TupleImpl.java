@@ -14,7 +14,7 @@ import org.sugarcubes.check.Checks;
  *
  * @author Maxim Butov
  */
-public class TupleImpl<T> extends AbstractList<T> implements Tuple<T>, RandomAccess, Serializable, Comparable<Tuple<T>> {
+public class TupleImpl<T> extends AbstractList<T> implements Tuple<T>, RandomAccess, Comparable<Tuple<T>>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,7 +30,7 @@ public class TupleImpl<T> extends AbstractList<T> implements Tuple<T>, RandomAcc
 
     protected TupleImpl(boolean clone, Object[] values) {
         if (Arrays.stream(values).anyMatch(Objects::isNull)) {
-            Checks.arg().fail("Values contains null");
+            throw Checks.arg().fail("Values contains null");
         }
         this.values = clone ? values.clone() : values;
     }

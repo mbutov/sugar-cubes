@@ -3,6 +3,8 @@ package org.sugarcubes.reflection;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 
+import org.sugarcubes.executable.XCallable;
+import org.sugarcubes.executable.XRunnable;
 import org.sugarcubes.rex.Rex;
 
 /**
@@ -12,30 +14,11 @@ import org.sugarcubes.rex.Rex;
  */
 class XReflectionUtils {
 
-    interface XCallable<X> {
-
-        X call() throws Throwable;
-
+    static <X, Y extends X> void execute(XRunnable<Throwable> runnable) {
+        execute(XCallable.of(runnable));
     }
 
-    interface XRunnable {
-
-        void run() throws Throwable;
-
-        default XCallable<Void> toCallable() {
-            return () -> {
-                run();
-                return null;
-            };
-        }
-
-    }
-
-    static void execute(XRunnable runnable) {
-        execute(runnable.toCallable());
-    }
-
-    static <X, Y extends X> Y execute(XCallable<X> callable) {
+    static <X, Y extends X> Y execute(XCallable<X, Throwable> callable) {
         try {
             return (Y) callable.call();
         }

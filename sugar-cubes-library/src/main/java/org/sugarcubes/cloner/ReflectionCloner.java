@@ -117,7 +117,7 @@ public class ReflectionCloner extends AbstractCloner {
     /**
      * Fields to skip when cloning.
      */
-    private List<Predicate<Field>> skipFields = new ArrayList<>();
+    private final List<Predicate<Field>> skipFields = new ArrayList<>();
 
     /**
      * Returns true if the field should be skipped when cloning.
@@ -129,7 +129,7 @@ public class ReflectionCloner extends AbstractCloner {
     /**
      * Classes which instances are cleared (set to null) when cloning.
      */
-    private List<Predicate<Class<?>>> clearClasses = new ArrayList<>();
+    private final List<Predicate<Class<?>>> clearClasses = new ArrayList<>();
 
     /**
      * Returns true if the class should be skipped when cloning.
@@ -141,7 +141,7 @@ public class ReflectionCloner extends AbstractCloner {
     /**
      * Classes which objects are copied without cloning.
      */
-    private List<Predicate<Class<?>>> immutableClasses = new ArrayList<>();
+    private final List<Predicate<Class<?>>> immutableClasses = new ArrayList<>();
 
     /**
      * Returns true if the class is immutable and object should not be cloned.

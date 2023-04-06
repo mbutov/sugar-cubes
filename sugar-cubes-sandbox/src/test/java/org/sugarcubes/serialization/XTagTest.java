@@ -4,8 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Maxim Butov
@@ -22,11 +22,10 @@ public class XTagTest {
             XTag tag1 = new XTag(n);
             tag1.write(buffer);
             XTag tag2 = XTag.read(new ByteArrayInputStream(buffer.toByteArray()));
-            Assert.assertEquals(tag1, tag2);
+            Assertions.assertEquals(tag1, tag2);
         }
 
     }
-
 
 
 }

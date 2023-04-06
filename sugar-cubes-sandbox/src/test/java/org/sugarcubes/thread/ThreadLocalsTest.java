@@ -3,8 +3,9 @@ package org.sugarcubes.thread;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -21,18 +22,18 @@ public class ThreadLocalsTest {
         Thread thread = Thread.currentThread();
         ThreadLocal<Object> threadLocal = new ThreadLocal<>();
 
-        Assert.assertNull(threadLocal.get());
-        Assert.assertNull(ThreadLocals.get(thread, threadLocal));
+        Assertions.assertNull(threadLocal.get());
+        Assertions.assertNull(ThreadLocals.get(thread, threadLocal));
 
-        Assert.assertNull(ThreadLocals.set(thread, threadLocal, 1));
+        Assertions.assertNull(ThreadLocals.set(thread, threadLocal, 1));
 
-        Assert.assertEquals(1, threadLocal.get());
-        Assert.assertEquals(1, ThreadLocals.get(thread, threadLocal));
+        Assertions.assertEquals(1, threadLocal.get());
+        Assertions.assertEquals(1, ThreadLocals.get(thread, threadLocal));
 
         ThreadLocals.remove(thread, threadLocal);
 
-        Assert.assertNull(threadLocal.get());
-        Assert.assertNull(ThreadLocals.get(thread, threadLocal));
+        Assertions.assertNull(threadLocal.get());
+        Assertions.assertNull(ThreadLocals.get(thread, threadLocal));
 
     }
 
@@ -49,10 +50,10 @@ public class ThreadLocalsTest {
 
         Map<ThreadLocal<?>, Object> locals = ThreadLocals.getAll(thread, new ThreadLocal<>());
 
-        Assert.assertThat(locals.keySet(), hasItem(tl1));
-        Assert.assertThat(locals.keySet(), not(hasItem(tl2)));
-        Assert.assertThat(tl1.get(), is(1));
-        Assert.assertThat(tl2.get(), nullValue());
+        MatcherAssert.assertThat(locals.keySet(), hasItem(tl1));
+        MatcherAssert.assertThat(locals.keySet(), not(hasItem(tl2)));
+        MatcherAssert.assertThat(tl1.get(), is(1));
+        MatcherAssert.assertThat(tl2.get(), nullValue());
 
         AtomicReference<Map<ThreadLocal<?>, Object>> threadLocals = new AtomicReference<>();
 
@@ -74,10 +75,10 @@ public class ThreadLocalsTest {
             monitor.wait();
         }
 
-        Assert.assertThat(threadLocals.get().keySet(), not(hasItem(tl1)));
-        Assert.assertThat(threadLocals.get().keySet(), hasItem(tl2));
-        Assert.assertThat(tl1.get(), nullValue());
-        Assert.assertThat(tl2.get(), is(2));
+        MatcherAssert.assertThat(threadLocals.get().keySet(), not(hasItem(tl1)));
+        MatcherAssert.assertThat(threadLocals.get().keySet(), hasItem(tl2));
+        MatcherAssert.assertThat(tl1.get(), nullValue());
+        MatcherAssert.assertThat(tl2.get(), is(2));
 
     }
 

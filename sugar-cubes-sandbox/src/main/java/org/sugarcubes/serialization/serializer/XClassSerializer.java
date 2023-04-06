@@ -12,7 +12,7 @@ import org.sugarcubes.serialization.XSerializer;
  * @author Q-MBU
  * @author Maxim Butov
  */
-public class XClassSerializer implements XSerializer<Class> {
+public class XClassSerializer implements XSerializer<Class<?>> {
 
     @Override
     public boolean matches(XObjectOutputStream out, Object value) {
@@ -20,21 +20,17 @@ public class XClassSerializer implements XSerializer<Class> {
     }
 
     @Override
-    public void writeValue(XObjectOutputStream out, Class value) throws IOException {
+    public void writeValue(XObjectOutputStream out, Class<?> value) throws IOException {
         String className = value.getName();
         int index = className.lastIndexOf('.');
-        if (index >= 0) {
-            out.writeObject(className.substring(0, index));
-            out.writeObject(className.substring(index + 1));
-        }
-        else {
-            out.writeObject("");
-            out.writeObject(className);
-        }
+        String packageName = index > 0 ? className.substring(0, index) : "";
+        String classSimpleName = className.substring(index + 1);
+        out.writeObject(packageName);
+        out.writeObject(classSimpleName);
     }
 
     @Override
-    public Class create(XObjectInputStream in) throws IOException, ClassNotFoundException {
+    public Class<?> create(XObjectInputStream in) throws IOException, ClassNotFoundException {
         String packageName = in.readObject();
         String classSimpleName = in.readObject();
         String className = packageName.length() > 0 ? packageName + '.' + classSimpleName : classSimpleName;

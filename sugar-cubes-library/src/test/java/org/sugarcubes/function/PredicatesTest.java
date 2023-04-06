@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import static org.sugarcubes.function.Predicates.and;
 import static org.sugarcubes.function.Predicates.not;
 import static org.sugarcubes.function.Predicates.or;

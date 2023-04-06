@@ -1,6 +1,6 @@
 package org.sugarcubes.reflection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * todo: document it

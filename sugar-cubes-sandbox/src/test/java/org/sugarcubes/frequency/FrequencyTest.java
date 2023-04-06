@@ -1,10 +1,10 @@
 package org.sugarcubes.frequency;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertThat;
 import static org.sugarcubes.frequency.Frequency.perDay;
 import static org.sugarcubes.frequency.Frequency.perHour;
 import static org.sugarcubes.frequency.Frequency.perMinute;

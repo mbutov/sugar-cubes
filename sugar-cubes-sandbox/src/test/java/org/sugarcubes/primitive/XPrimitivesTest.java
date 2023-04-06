@@ -1,7 +1,7 @@
 package org.sugarcubes.primitive;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 import static org.hamcrest.Matchers.is;
 
 /**
@@ -14,8 +14,8 @@ public class XPrimitivesTest {
     @Test
     public void testCast() {
 
-        Assert.assertThat(XPrimitives.BYTE.cast((long) 1), is((byte) 1));
-        Assert.assertThat(XPrimitives.SHORT.cast((float) 1.0), is((short) 1));
+        MatcherAssert.assertThat(XPrimitives.BYTE.cast((long) 1), is((byte) 1));
+        MatcherAssert.assertThat(XPrimitives.SHORT.cast((float) 1.0), is((short) 1));
 
     }
 

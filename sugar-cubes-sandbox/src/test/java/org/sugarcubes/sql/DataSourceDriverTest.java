@@ -5,9 +5,9 @@ import java.sql.DriverManager;
 
 import javax.sql.DataSource;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
@@ -22,7 +22,7 @@ public class DataSourceDriverTest {
         DataSource dataSource = Mockito.mock(DataSource.class);
         Mockito.doReturn(connection).when(dataSource).getConnection();
         String jdbcUrl = DataSourceDriver.register(dataSource);
-        Assert.assertThat(DriverManager.getConnection(jdbcUrl), Matchers.sameInstance(connection));
+        MatcherAssert.assertThat(DriverManager.getConnection(jdbcUrl), Matchers.sameInstance(connection));
         DataSourceDriver.deregister(jdbcUrl);
 
     }

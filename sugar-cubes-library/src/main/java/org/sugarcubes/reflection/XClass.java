@@ -1,19 +1,17 @@
 package org.sugarcubes.reflection;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.WeakHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static java.util.Arrays.stream;
 
 import org.sugarcubes.builder.collection.ListBuilder;
-import org.sugarcubes.builder.collection.SetBuilder;
 import org.sugarcubes.check.Checks;
 import static org.sugarcubes.reflection.XPredicates.withName;
 import static org.sugarcubes.reflection.XPredicates.withNameAndParameterTypes;
@@ -92,10 +90,6 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
 
     public Stream<XClass<?>> getInterfaces() {
         return computeIfAbsent(this::getInterfacesInternal).stream();
-    }
-
-    public Stream<XClass<?>> getAllInterfaces() {
-        return computeIfAbsent(this::getAllInterfacesInternal).stream();
     }
 
     public Stream<XConstructor<C>> getConstructors() {
@@ -177,59 +171,41 @@ public class XClass<C> extends XReflectionObjectImpl<Class<C>> implements XAnnot
         return stream(types).map(Class::getName).collect(Collectors.joining(","));
     }
 
-    private transient Map cache;
+    private transient Map<Supplier<?>, Object> cache;
 
     private <X> Map<Supplier<X>, X> getCache() {
         if (this.cache == null) {
-            this.cache = new WeakHashMap<>();
+            this.cache = new IdentityHashMap<>();
         }
-        return this.cache;
+        return (Map) this.cache;
     }
 
     private <X> X computeIfAbsent(Supplier<X> method) {
         Map<Supplier<X>, X> cache = getCache();
-        return cache.computeIfAbsent(method, key -> method.get());
+        return cache.computeIfAbsent(method, Supplier::get);
     }
 
     private XClass<?> getSuperclassInternal() {
-        Class<?> superclass = getReflectionObject().getSuperclass();
-        return superclass != null ? XReflection.of(superclass) : XNullClass.INSTANCE;
+        return Optional.ofNullable(getReflectionObject().getSuperclass())
+            .map(XReflection::of)
+            .orElse((XClass) XNullClass.INSTANCE);
     }
 
     private List<XClass<?>> getInheritanceInternal() {
-        return ListBuilder.<XClass<?>>arrayList()
-            .add(this)
-            .addAll(getSuperclass().getInheritance())
-            .transform(Collections::unmodifiableList)
-            .build();
+        return Stream.concat(Stream.of(this), getSuperclass().getInheritance()).collect(Collectors.toList());
     }
 
     private List<XClass<?>> getDeclaredInterfacesInternal() {
-        return ListBuilder.<XClass<?>>arrayList()
-            .addAll(stream(getReflectionObject().getInterfaces()).map(XReflection::of))
-            .transform(Collections::unmodifiableList)
-            .build();
+        return Stream.of(getReflectionObject().getInterfaces()).map(XReflection::of).collect(Collectors.toList());
     }
 
     private List<XClass<?>> getInterfacesInternal() {
-        return SetBuilder.<XClass<?>>linkedHashSet()
-            .add(Optional.<XClass<?>>of(this).filter(XClass::isInterface))
-            .addAll(getDeclaredInterfaces())
-            .addAll(getSuperclass().getInterfaces())
-            .transform(ArrayList::new)
-            .transform(Collections::unmodifiableList)
-            .build();
-    }
-
-    private List<XClass<?>> getAllInterfacesInternal() {
-        // todo
-        return SetBuilder.<XClass<?>>linkedHashSet()
-            .add(Optional.<XClass<?>>of(this).filter(XClass::isInterface))
-            .addAll(getDeclaredInterfaces().flatMap(XClass::getAllInterfaces))
-            .addAll(getSuperclass().getAllInterfaces())
-            .transform(ArrayList::new)
-            .transform(Collections::unmodifiableList)
-            .build();
+        if (isInterface()) {
+            return Collections.singletonList(this);
+        }
+        return Stream.concat(getDeclaredInterfaces(), getSuperclass().getDeclaredInterfaces())
+            .distinct()
+            .collect(Collectors.toList());
     }
 
     private List<XConstructor<C>> getConstructorsInternal() {

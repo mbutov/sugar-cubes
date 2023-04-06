@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Maxim Butov
@@ -23,17 +23,19 @@ public class MapBuilderTest {
             .put(2, "two too")
             .build();
 
-        Assert.assertEquals(new TreeSet<>(Arrays.asList(1, 2, 3)), map.keySet());
-        Assert.assertEquals(Arrays.asList("one", "two too", "three"), new ArrayList<>(map.values()));
-        
+        Assertions.assertEquals(new TreeSet<>(Arrays.asList(1, 2, 3)), map.keySet());
+        Assertions.assertEquals(Arrays.asList("one", "two too", "three"), new ArrayList<>(map.values()));
+
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testDuplicateKeys() {
-        MapBuilder.<String, String>hashMap().errorOnDuplicateKeys()
-            .put("one", "two")
-            .put("one", "three")
-            .build();
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+            MapBuilder.<String, String>hashMap().errorOnDuplicateKeys()
+                .put("one", "two")
+                .put("one", "three")
+                .build()
+        );
     }
 
 }

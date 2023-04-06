@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.sugarcubes.cache.WeakKeysCaches;
+import org.sugarcubes.serialization.IntegerVariableLengthEncoding;
 import org.sugarcubes.serialization.XObjectInputStream;
 import org.sugarcubes.serialization.XObjectOutputStream;
 import org.sugarcubes.serialization.XSerializer;
@@ -16,7 +17,7 @@ import org.sugarcubes.serialization.XSerializer;
 public class XStringSerializer implements XSerializer<String> {
 
     private static final Charset CHARSET = StandardCharsets.UTF_8;
-    private static final Map<String, byte[]> CACHE = WeakKeysCaches.softValues();
+    private static final Map<String, byte[]> CACHE = WeakKeysCaches.weakValues();
 
     private static byte[] getBytes(String value) {
         return CACHE.computeIfAbsent(value, s -> s.getBytes(CHARSET));
@@ -30,13 +31,13 @@ public class XStringSerializer implements XSerializer<String> {
     @Override
     public void writeValue(XObjectOutputStream out, String value) throws IOException {
         byte[] bytes = getBytes(value);
-        out.writeInt(bytes.length);
+        IntegerVariableLengthEncoding.writeIntLeb128(out, bytes.length);
         out.write(bytes);
     }
 
     @Override
     public String create(XObjectInputStream in) throws IOException, ClassNotFoundException {
-        int length = in.readInt();
+        int length = IntegerVariableLengthEncoding.readIntLeb128(in);
         byte[] bytes = new byte[length];
         int count = in.read(bytes);
         if (count != length) {

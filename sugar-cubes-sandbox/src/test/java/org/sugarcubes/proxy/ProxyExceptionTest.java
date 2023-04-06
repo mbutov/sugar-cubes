@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Maxim Butov
@@ -17,7 +18,7 @@ public class ProxyExceptionTest {
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testProxyException() throws Throwable {
 
         X test = new JavaProxyProvider().getFactory(X.class).newProxy(new InvocationHandler() {
@@ -27,7 +28,7 @@ public class ProxyExceptionTest {
             }
         });
 
-        test.x();
+        Assertions.assertThrows(RuntimeException.class, () -> test.x());
     }
 
 }

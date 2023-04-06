@@ -5,9 +5,11 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.lang.reflect.Executable;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.sugarcubes.check.Checks;
 
@@ -46,15 +48,15 @@ import org.sugarcubes.check.Checks;
  *
  * @author Maxim Butov
  */
-public class Rex<T extends Throwable> implements Serializable {
+public class Rex<E extends Throwable> implements Serializable {
 
-    public static <T extends Throwable> Rex<T> of(T error) {
+    public static <E extends Throwable> Rex<E> of(E error) {
         return new Rex<>(error);
     }
 
-    private final T error;
+    private final E error;
 
-    public Rex(T error) {
+    private Rex(E error) {
         this.error = Checks.arg().notNull(error, "Error must be not null.");
     }
 
@@ -63,7 +65,7 @@ public class Rex<T extends Throwable> implements Serializable {
      *
      * @return the original throwable
      */
-    public T getError() {
+    public E getError() {
         return error;
     }
 
@@ -79,11 +81,9 @@ public class Rex<T extends Throwable> implements Serializable {
     }
 
     public static Throwable root(Throwable throwable) {
-        Throwable p = throwable;
-        for (Throwable q; (q = cause(p)) != null; ) {
-            p = q;
-        }
-        return p;
+        return Stream.iterate(throwable, Objects::nonNull, Throwable::getCause)
+            .reduce((p, q) -> q)
+            .orElseThrow();
     }
 
     /**
@@ -112,7 +112,7 @@ public class Rex<T extends Throwable> implements Serializable {
      * @param errorType type to check
      * @return true if the original throwable is of this type
      */
-    public <E extends Throwable> boolean is(Class<E> errorType) {
+    public <X extends Throwable> boolean is(Class<X> errorType) {
         return errorType.isInstance(error);
     }
 
@@ -121,7 +121,7 @@ public class Rex<T extends Throwable> implements Serializable {
      *
      * @return same Rex instance
      */
-    public <E extends Throwable> Rex<E> cast() {
+    public <X extends Throwable> Rex<X> cast() {
         return (Rex) this;
     }
 
@@ -132,7 +132,7 @@ public class Rex<T extends Throwable> implements Serializable {
      * @return same Rex instance
      * @throws IllegalArgumentException if the original throwable is not instance of {@code errorType}
      */
-    public <E extends Throwable> Rex<E> cast(Class<E> errorType) {
+    public <X extends Throwable> Rex<X> cast(Class<X> errorType) {
         if (!is(errorType)) {
             throw new IllegalArgumentException(String.format("%s is not %s", error.getClass(), errorType));
         }
@@ -147,7 +147,7 @@ public class Rex<T extends Throwable> implements Serializable {
      * @return never returns result, the return type {@link Error} is needed to write code like
      * "{@code throw rex.throwUndeclared();}" and tell compiler that execution will not go further.
      */
-    public Error rethrow() throws T {
+    public Error rethrow() throws E {
         throw error;
     }
 
@@ -159,7 +159,7 @@ public class Rex<T extends Throwable> implements Serializable {
      * @return never returns result, the return type {@link Error} is needed to write code like
      * "{@code throw rex.throwUndeclared();}" and tell compiler that execution will not go further.
      */
-    public <E extends Throwable> Error rethrow(Function<T, E> function) throws E {
+    public <X extends Throwable> Error rethrow(Function<E, X> function) throws X {
         return replace(function).rethrow();
     }
 
@@ -182,21 +182,21 @@ public class Rex<T extends Throwable> implements Serializable {
         return of(error).rethrowAsRuntime();
     }
 
-    public <E extends Throwable> Rex<T> rethrowIf(Class<E> errorType) throws E {
+    public <X extends Throwable> Rex<E> rethrowIf(Class<X> errorType) throws X {
         if (is(errorType)) {
-            throw this.<E>cast().rethrow();
+            throw this.<X>cast().rethrow();
         }
         return this;
     }
 
-    public <E extends Throwable, X extends Throwable> Rex<T> rethrowIf(Class<E> errorType, Function<E, X> function) throws X {
+    public <X extends Throwable, Y extends Throwable> Rex<E> rethrowIf(Class<X> errorType, Function<X, Y> function) throws Y {
         if (is(errorType)) {
-            throw this.<E>cast().replace(function).rethrow();
+            throw this.<X>cast().replace(function).rethrow();
         }
         return this;
     }
 
-    public Rex<T> rethrowIfDeclared(Executable executable) throws T {
+    public Rex<E> rethrowIfDeclared(Executable executable) throws E {
         Class<Throwable>[] exceptionTypes = (Class[]) executable.getExceptionTypes();
         if (Arrays.stream(exceptionTypes).anyMatch(this::is)) {
             rethrow();
@@ -204,27 +204,27 @@ public class Rex<T extends Throwable> implements Serializable {
         return this;
     }
 
-    public Rex<T> rethrowIfRuntime() {
+    public Rex<E> rethrowIfRuntime() {
         return rethrowIf(RuntimeException.class);
     }
 
-    public Rex<T> rethrowIfError() {
+    public Rex<E> rethrowIfError() {
         return rethrowIf(Error.class);
     }
 
-    public Rex<T> rethrowIfUnchecked() {
+    public Rex<E> rethrowIfUnchecked() {
         return rethrowIfRuntime().rethrowIfError();
     }
 
     /// replace
 
-    public <E extends Throwable> Rex<E> replace(Function<T, E> function) {
+    public <X extends Throwable> Rex<X> replace(Function<E, X> function) {
         return of(function.apply(error));
     }
 
-    public <E extends Throwable> Rex<Throwable> replaceIf(Class<E> errorType, Function<E, Throwable> function) {
+    public <X extends Throwable> Rex<Throwable> replaceIf(Class<X> errorType, Function<X, Throwable> function) {
         if (is(errorType)) {
-            return this.<E>cast().replace(function);
+            return this.<X>cast().replace(function);
         }
         return cast();
     }
@@ -241,12 +241,12 @@ public class Rex<T extends Throwable> implements Serializable {
      *          .throwIfUnchecked()
      *          .throwIf(IOException.class)
      *          .throwIf(ServletException.class)
-     *          .submit(e -> logger.error("Unexpected error", e));
+     *          .peek(e -> logger.error("Unexpected error", e));
      * </pre>
      *
      * @param consumer the action to perform with the throwable
      */
-    public Rex<T> submit(Consumer<T> consumer) {
+    public Rex<E> peek(Consumer<E> consumer) {
         consumer.accept(error);
         return this;
     }
@@ -257,9 +257,9 @@ public class Rex<T extends Throwable> implements Serializable {
      * @param errorType type of error
      * @param consumer the action to perform with the throwable
      */
-    public <E extends Throwable> Rex<T> submitIf(Class<E> errorType, Consumer<E> consumer) {
+    public <X extends Throwable> Rex<E> peekIf(Class<X> errorType, Consumer<X> consumer) {
         if (is(errorType)) {
-            this.<E>cast().submit(consumer);
+            this.<X>cast().peek(consumer);
         }
         return this;
     }

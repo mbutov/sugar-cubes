@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
 /**
@@ -18,35 +19,53 @@ public class XClassTest {
         XClass<Integer> xClass = XReflection.of(Integer.class);
         List<XMethod<?>> methods1 = xClass.getMethods().collect(Collectors.toList());
         List<XMethod<?>> methods2 = xClass.getMethods().collect(Collectors.toList());
-        Assert.assertEquals(methods1, methods2);
-        Assert.assertNotSame(methods1, methods2);
+        Assertions.assertEquals(methods1, methods2);
+        Assertions.assertNotSame(methods1, methods2);
         for (int k = 0; k < methods1.size(); k++) {
-             Assert.assertSame(methods1.get(k), methods2.get(k));
+            Assertions.assertSame(methods1.get(k), methods2.get(k));
         }
     }
 
-    interface A{}
-    interface B{}
-    interface C extends B{}
-    interface D extends C{}
+    interface A {
 
-    class E implements D, A{}
+    }
 
-    interface U {}
-    class V extends E implements U {}
+    interface B {
+
+    }
+
+    interface C extends B {
+
+    }
+
+    interface D extends C {
+
+    }
+
+    class E implements D, A {
+
+    }
+
+    interface U {
+
+    }
+
+    class V extends E implements U {
+
+    }
 
     @Test
     public void testXxx() {
 
-        Assert.assertThat(
+        assertThat(
             XReflection.of(D.class).getDeclaredInterfaces().collect(Collectors.toList()),
             containsInAnyOrder(Stream.of(C.class).map(XReflection::of).toArray())
         );
-        Assert.assertThat(
+        assertThat(
             XReflection.of(D.class).getInterfaces().collect(Collectors.toList()),
             containsInAnyOrder(Stream.of(C.class).map(XReflection::of).toArray())
         );
-        Assert.assertThat(
+        assertThat(
             XReflection.of(E.class).getDeclaredInterfaces().collect(Collectors.toList()),
             containsInAnyOrder(Stream.of(D.class, A.class).map(XReflection::of).toArray())
         );

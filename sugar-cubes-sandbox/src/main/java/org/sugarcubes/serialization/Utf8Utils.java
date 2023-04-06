@@ -1,5 +1,6 @@
 package org.sugarcubes.serialization;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,7 +17,7 @@ public class Utf8Utils {
     private static int nextByte(InputStream input) throws IOException {
         int b = input.read();
         if (b == -1) {
-            throw new IllegalStateException("Unexpected EOF");
+            throw new EOFException("Unexpected EOF");
         }
         return b;
     }

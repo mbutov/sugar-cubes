@@ -2,61 +2,72 @@ package org.sugarcubes.rex;
 
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Maxim Butov
  */
 public class RexTest {
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testTranslated() {
-        try {
-            throw new IOException();
-        }
-        catch (Throwable e) {
-            throw Rex.of(e).rethrowAsRuntime();
-        }
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            try {
+                throw new IOException();
+            }
+            catch (Throwable e) {
+                throw Rex.of(e).rethrowAsRuntime();
+            }
+        });
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testRuntimeException() {
-        try {
-            throw new NullPointerException();
-        }
-        catch (Throwable e) {
-            throw Rex.of(e).rethrowAsRuntime();
-        }
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            try {
+                throw new NullPointerException();
+            }
+            catch (Throwable e) {
+                throw Rex.of(e).rethrowAsRuntime();
+            }
+        });
     }
 
-    @Test(expected = NoClassDefFoundError.class)
+    @Test
     public void testError() {
-        try {
-            throw new NoClassDefFoundError();
-        }
-        catch (Throwable e) {
-            throw Rex.of(e).rethrowAsRuntime();
-        }
+        Assertions.assertThrows(NoClassDefFoundError.class, () -> {
+            try {
+                throw new NoClassDefFoundError();
+            }
+            catch (Throwable e) {
+                throw Rex.of(e).rethrowAsRuntime();
+            }
+        });
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void testOriginal() throws Throwable {
-        try {
-            throw new IOException();
-        }
-        catch (Throwable e) {
-            throw Rex.of(e).rethrow();
-        }
+        Assertions.assertThrows(IOException.class, () -> {
+            try {
+                throw new IOException();
+            }
+            catch (Throwable e) {
+                throw Rex.of(e).rethrow();
+            }
+        });
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void testOriginalUndeclared() {
-        try {
-            throw new IOException();
-        }
-        catch (Throwable e) {
-            throw Rex.of(e).rethrowUndeclared();
-        }
+        Assertions.assertThrows(IOException.class, () -> {
+            try {
+                throw new IOException();
+            }
+            catch (Throwable e) {
+                throw Rex.of(e).rethrowUndeclared();
+            }
+        });
     }
 
 }

@@ -21,7 +21,7 @@ public final class XNullClass extends XClass<Object> {
         super(NULL);
     }
 
-    public static XClass<Object> INSTANCE = new XNullClass();
+    public static XClass<?> INSTANCE = new XNullClass();
 
     @Override
     public boolean isNull() {

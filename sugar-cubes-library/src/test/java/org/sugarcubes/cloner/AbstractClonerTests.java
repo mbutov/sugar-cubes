@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Maxim Butov
@@ -45,23 +45,23 @@ public abstract class AbstractClonerTests {
 
         Cloner cloner = getCloner();
 
-        Assert.assertNull(cloner.clone(null));
+        Assertions.assertNull(cloner.clone(null));
 
         B b1 = new B(1);
         B b2 = cloner.clone(b1);
 
-        Assert.assertEquals(b1.x, b2.x);
-        Assert.assertSame(b1.y, b2.y);
-        Assert.assertNull(b2.z);
-        Assert.assertSame(b2.a, b2);
+        Assertions.assertEquals(b1.x, b2.x);
+        Assertions.assertSame(b1.y, b2.y);
+        Assertions.assertNull(b2.z);
+        Assertions.assertSame(b2.a, b2);
 
-        Assert.assertTrue(Arrays.equals(b1.xxx, b2.xxx));
-        Assert.assertTrue(Arrays.deepEquals(b1.yyy, b2.yyy));
-        Assert.assertSame(b2, b2.zzz[0]);
-        Assert.assertSame(b2.zzz, b2.zzz[1]);
+        Assertions.assertTrue(Arrays.equals(b1.xxx, b2.xxx));
+        Assertions.assertTrue(Arrays.deepEquals(b1.yyy, b2.yyy));
+        Assertions.assertSame(b2, b2.zzz[0]);
+        Assertions.assertSame(b2.zzz, b2.zzz[1]);
 
-        Assert.assertSame(b2, b2.a);
-        Assert.assertEquals(b1.n, b2.n);
+        Assertions.assertSame(b2, b2.a);
+        Assertions.assertEquals(b1.n, b2.n);
 
     }
 

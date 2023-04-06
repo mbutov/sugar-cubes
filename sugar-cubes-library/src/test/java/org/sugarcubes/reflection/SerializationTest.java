@@ -1,8 +1,8 @@
 package org.sugarcubes.reflection;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.SerializationUtils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * todo: document it
@@ -23,7 +23,7 @@ public class SerializationTest {
 
     private static void assertIsSerializable(Object obj1) {
         Object obj2 = SerializationUtils.deserialize(SerializationUtils.serialize(obj1));
-        Assert.assertEquals(obj1, obj2);
+        assertEquals(obj1, obj2);
     }
 
 }

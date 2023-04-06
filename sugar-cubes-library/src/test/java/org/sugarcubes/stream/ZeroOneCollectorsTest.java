@@ -3,8 +3,8 @@ package org.sugarcubes.stream;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import static org.sugarcubes.stream.ZeroOneCollectors.onlyElement;
 import static org.sugarcubes.stream.ZeroOneCollectors.toOptional;
 
@@ -15,11 +15,11 @@ public class ZeroOneCollectorsTest {
 
     @Test
     public void testToOptional() {
-        Assert.assertFalse(Stream.empty().collect(toOptional()).isPresent());
-        Assert.assertEquals("x", Stream.of("x").collect(toOptional()).get());
+        Assertions.assertFalse(Stream.empty().collect(toOptional()).isPresent());
+        Assertions.assertEquals("x", Stream.of("x").collect(toOptional()).get());
         try {
             Stream.of("x", "y").collect(toOptional());
-            Assert.fail();
+            Assertions.fail();
         }
         catch (IllegalStateException e) {
             // ok
@@ -34,10 +34,10 @@ public class ZeroOneCollectorsTest {
         catch (NoSuchElementException e) {
             // ok
         }
-        Assert.assertEquals("x", Stream.of("x").collect(onlyElement()));
+        Assertions.assertEquals("x", Stream.of("x").collect(onlyElement()));
         try {
             Stream.of("x", "y").collect(onlyElement());
-            Assert.fail();
+            Assertions.fail();
         }
         catch (IllegalStateException e) {
             // ok

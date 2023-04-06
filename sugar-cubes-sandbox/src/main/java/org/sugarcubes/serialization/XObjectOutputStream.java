@@ -26,8 +26,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.sugarcubes.builder.collection.SetBuilder;
 import org.sugarcubes.serialization.serializer.XSerializers;
 
 /**
@@ -44,27 +45,32 @@ public class XObjectOutputStream extends DataOutputStream {
     private final Map<Object, Integer> objects = new IdentityHashMap<>();
     private final Map<Object, Integer> immutables = new HashMap<>();
 
-    private final Set<Class<?>> immutableClasses = SetBuilder.<Class<?>>hashSet()
-        .addAll(new Class[] {
+    private final Set<Class<?>> immutableClasses = Stream.of(
+            BigDecimal.class,
+            BigInteger.class,
             Class.class,
-
-            Long.class, Double.class,
-
-            String.class,
-
-            BigInteger.class, BigDecimal.class,
-
-            Duration.class, Instant.class, LocalDate.class, LocalDateTime.class, LocalTime.class, MonthDay.class,
-            OffsetDateTime.class, OffsetTime.class, Period.class, Year.class, YearMonth.class,
-            ZonedDateTime.class, ZoneOffset.class,
-
-            URI.class, URL.class,
-
-            UUID.class,
-
+            Double.class,
+            Duration.class,
+            Instant.class,
+            LocalDate.class,
+            LocalDateTime.class,
+            LocalTime.class,
+            Long.class,
+            MonthDay.class,
+            OffsetDateTime.class,
+            OffsetTime.class,
             Pattern.class,
-        })
-        .build();
+            Period.class,
+            String.class,
+            URI.class,
+            URL.class,
+            UUID.class,
+            Year.class,
+            YearMonth.class,
+            ZonedDateTime.class,
+            ZoneOffset.class
+        )
+        .collect(Collectors.toSet());
 
     private boolean isImmutable(Object object) {
         return immutableClasses.contains(object.getClass());
@@ -109,6 +115,7 @@ public class XObjectOutputStream extends DataOutputStream {
                 return;
             }
         }
+
         throw new IllegalStateException();
     }
 

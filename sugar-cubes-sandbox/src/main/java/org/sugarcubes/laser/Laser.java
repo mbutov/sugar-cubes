@@ -29,7 +29,7 @@ public class Laser {
      */
     private static final Pattern LAMBDA_CLASS_NAME_PATTERN = Pattern.compile(".*\\$\\$Lambda\\$\\d+/\\d+$");
 
-    public static boolean isLambdaClass(Class cl) {
+    public static boolean isLambdaClass(Class<?> cl) {
         if (!LAMBDA_CLASS_NAME_PATTERN.matcher(cl.getName()).matches()) {
             return false;
         }
@@ -43,7 +43,7 @@ public class Laser {
         return true;
     }
 
-    public static Method findFunctionalInterfaceMethod(Class lambdaClass) {
+    public static Method findFunctionalInterfaceMethod(Class<?> lambdaClass) {
         if (Object.class.equals(lambdaClass.getSuperclass())) {
             List<Method> methods = Arrays.stream(lambdaClass.getInterfaces())
                 .map(Class::getMethods)

@@ -2,9 +2,10 @@ package org.sugarcubes.proxy;
 
 import java.io.File;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Maxim Butov
@@ -13,12 +14,12 @@ public class DexmakerProxyProviderTest extends AbstractProxyProviderTests {
 
     private DexmakerProxyProvider proxyProvider;
 
-    @Before
+    @BeforeEach
     public void before() {
         proxyProvider = new DexmakerProxyProvider();
     }
 
-    @After
+    @AfterEach
     public void after() {
         for (File file : proxyProvider.getDexCache().listFiles()) {
             file.delete();
@@ -32,20 +33,23 @@ public class DexmakerProxyProviderTest extends AbstractProxyProviderTests {
     }
 
     @Override
-    @Test(expected = Throwable.class)
+    @Test
     public void testClassProxy() throws Exception {
-        super.testClassProxy();
+        Assertions.assertThrows(Throwable.class, () ->
+            super.testClassProxy());
     }
 
     @Override
-    @Test(expected = Throwable.class)
+    @Test
     public void testFinalClass() {
-        super.testFinalClass();
+        Assertions.assertThrows(Throwable.class, () ->
+            super.testFinalClass());
     }
 
     @Override
-    @Test(expected = Throwable.class)
+    @Test
     public void testSerializable() {
-        super.testSerializable();
+        Assertions.assertThrows(Throwable.class, () ->
+            super.testSerializable());
     }
 }

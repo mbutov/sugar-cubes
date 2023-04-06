@@ -1,7 +1,7 @@
 package org.sugarcubes.builder;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 import static org.hamcrest.Matchers.is;
 
 /**
@@ -16,7 +16,7 @@ public class BuildersTest {
             .transform(x -> x + 1)
             .build();
 
-        Assert.assertThat(y, is(2));
+        MatcherAssert.assertThat(y, is(2));
 
     }
     

@@ -21,4 +21,9 @@ public class HardReference<T> extends WeakReference<T> {
         return referent;
     }
 
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+
 }

@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Maxim Butov
@@ -21,12 +21,12 @@ public class ListBuilderTest {
             .addAll("y", "z")
             .build();
 
-        Assert.assertTrue(list instanceof ArrayList);
-        Assert.assertEquals(Arrays.asList("x", "y", "z"), list);
+        Assertions.assertTrue(list instanceof ArrayList);
+        Assertions.assertEquals(Arrays.asList("x", "y", "z"), list);
 
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testUnmodifyableList() throws Exception {
 
         List<String> list = ListBuilder.<String>linkedList()
@@ -35,16 +35,16 @@ public class ListBuilderTest {
             .replace(Collections::unmodifiableList)
             .build();
 
-        Assert.assertEquals(Arrays.asList("x", "y", "z"), list);
+        Assertions.assertEquals(Arrays.asList("x", "y", "z"), list);
 
-        list.add("1");
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> list.add("1"));
 
     }
 
     @Test
     public void testArray() throws Exception {
         Integer[] array = ListBuilder.<Integer>arrayList().addAll(1, 2, 3, 4, 5).toArray(Integer[]::new);
-        Assert.assertArrayEquals(new Integer[] {1, 2, 3, 4, 5,}, array);
+        Assertions.assertArrayEquals(new Integer[] {1, 2, 3, 4, 5,}, array);
     }
 
 }

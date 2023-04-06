@@ -3,7 +3,8 @@ package org.sugarcubes.rex;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Maxim Butov
@@ -17,18 +18,22 @@ public class ExtraTest {
             .map(Throwable.class, RuntimeException::new);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testIllegalArgument() throws Exception {
-        Extra<Throwable, RuntimeException> map = new Extra<Throwable, RuntimeException>()
-            .map(Throwable.class, RuntimeException::new)
-            .map(IOException.class, RuntimeException::new);
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+            new Extra<Throwable, RuntimeException>()
+                .map(Throwable.class, RuntimeException::new)
+                .map(IOException.class, RuntimeException::new)
+        );
     }
 
-    @Test(expected = UncheckedIOException.class)
+    @Test
     public void testTranslator() throws Exception {
-        throw new Extra<Throwable, RuntimeException>()
-            .map(IOException.class, UncheckedIOException::new)
-            .apply(new IOException());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            throw new Extra<Throwable, RuntimeException>()
+                .map(IOException.class, UncheckedIOException::new)
+                .apply(new IOException());
+        });
     }
 
 }

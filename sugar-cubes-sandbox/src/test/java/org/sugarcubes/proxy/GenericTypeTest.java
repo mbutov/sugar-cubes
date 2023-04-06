@@ -3,8 +3,8 @@ package org.sugarcubes.proxy;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Maxim Butov
@@ -52,25 +52,26 @@ public class GenericTypeTest {
         assertEqualsIgnoreOrder(GenericType.create(Q.class, B.class).getInterfaces());
         assertEqualsIgnoreOrder(GenericType.create(R.class).getInterfaces());
 
-        Assert.assertTrue(GenericType.create(A.class).isAssignableFrom(R.class));
+        Assertions.assertTrue(GenericType.create(A.class).isAssignableFrom(R.class));
 
-        Assert.assertTrue(GenericType.create(P.class).isAssignableFrom(R.class));
-        Assert.assertTrue(GenericType.create(P.class).isAssignableFrom(Q.class));
-        Assert.assertFalse(GenericType.create(P.class).isAssignableFrom(D.class));
+        Assertions.assertTrue(GenericType.create(P.class).isAssignableFrom(R.class));
+        Assertions.assertTrue(GenericType.create(P.class).isAssignableFrom(Q.class));
+        Assertions.assertFalse(GenericType.create(P.class).isAssignableFrom(D.class));
 
-        Assert.assertTrue(GenericType.create(R.class).isOfType(P.class));
-        Assert.assertTrue(GenericType.create(Q.class).isOfType(P.class));
-        Assert.assertFalse(GenericType.create(D.class).isOfType(P.class));
+        Assertions.assertTrue(GenericType.create(R.class).isOfType(P.class));
+        Assertions.assertTrue(GenericType.create(Q.class).isOfType(P.class));
+        Assertions.assertFalse(GenericType.create(D.class).isOfType(P.class));
 
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testUnmodifiable() {
-        GenericType.create(A.class).unmodifiable().implementing(B.class);
+        Assertions.assertThrows(UnsupportedOperationException.class, () ->
+            GenericType.create(A.class).unmodifiable().implementing(B.class));
     }
 
     private <T> void assertEqualsIgnoreOrder(T[] actual, T... expected) {
-        Assert.assertEquals(new HashSet<T>(Arrays.asList(expected)), new HashSet<T>(Arrays.asList(actual)));
+        Assertions.assertEquals(new HashSet<T>(Arrays.asList(expected)), new HashSet<T>(Arrays.asList(actual)));
     }
 
 }

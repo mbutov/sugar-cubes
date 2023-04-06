@@ -3,12 +3,13 @@ package org.sugarcubes.check;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static org.sugarcubes.check.Checks.format;
 
 /**
- * todo: document it
+ *
  *
  * @author Maxim Butov
  */
@@ -46,13 +47,13 @@ public class Check<E extends Throwable> {
         check(condition, format(message, args));
     }
 
-    public <X> X check(X value, Function<X, Boolean> condition, Supplier<String> message) throws E {
-        check(condition.apply(value), message);
+    public <X> X check(X value, Predicate<X> predicate, Supplier<String> message) throws E {
+        check(predicate.test(value), message);
         return value;
     }
 
-    public <X> X check(X value, Function<X, Boolean> condition, String message, Object... args) throws E {
-        return check(value, condition, format(message, args));
+    public <X> X check(X value, Predicate<X> predicate, String message, Object... args) throws E {
+        return check(value, predicate, format(message, args));
     }
 
     public <X> X notNull(X value, Supplier<String> message) throws E {

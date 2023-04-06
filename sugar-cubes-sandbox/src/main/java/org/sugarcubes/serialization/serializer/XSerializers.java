@@ -1,5 +1,7 @@
 package org.sugarcubes.serialization.serializer;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
 
 import org.sugarcubes.builder.collection.MapBuilder;
@@ -26,6 +28,8 @@ public class XSerializers {
         .put(XTag.of(0x15), new XConstantSerializer<>((long) 0))
         .put(XTag.of(0x16), new XConstantSerializer<>((float) 0))
         .put(XTag.of(0x17), new XConstantSerializer<>((double) 0))
+        .put(XTag.of(0x18), new XConstantSerializer<>(BigInteger.ZERO))
+        .put(XTag.of(0x19), new XConstantSerializer<>(BigDecimal.ZERO))
 
         .put(XTag.of(0x20), new XConstantSerializer<>(true))
         .put(XTag.of(0x21), new XConstantSerializer<>((byte) 1))
@@ -35,6 +39,8 @@ public class XSerializers {
         .put(XTag.of(0x25), new XConstantSerializer<>((long) 1))
         .put(XTag.of(0x26), new XConstantSerializer<>((float) 1))
         .put(XTag.of(0x27), new XConstantSerializer<>((double) 1))
+        .put(XTag.of(0x28), new XConstantSerializer<>(BigInteger.ONE))
+        .put(XTag.of(0x29), new XConstantSerializer<>(BigDecimal.ONE))
 
         .put(XTag.of(0x31), new XConstantSerializer<>((byte) -1))
         .put(XTag.of(0x32), new XConstantSerializer<>((short) -1))
@@ -43,6 +49,8 @@ public class XSerializers {
         .put(XTag.of(0x35), new XConstantSerializer<>((long) -1))
         .put(XTag.of(0x36), new XConstantSerializer<>((float) -1))
         .put(XTag.of(0x37), new XConstantSerializer<>((double) -1))
+        .put(XTag.of(0x38), new XConstantSerializer<>(BigInteger.ONE.negate()))
+        .put(XTag.of(0x39), new XConstantSerializer<>(BigDecimal.ONE.negate()))
 
         .put(XTag.of(0x40), new XConstantSerializer<>(""))
         .put(XTag.of(0x41), new XStringSerializer())

@@ -4,8 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * todo: document it
@@ -42,7 +42,7 @@ public class XObjectInputOutputStreamTest {
 
         Y y2 = (Y) new XObjectInputStream(new ByteArrayInputStream(buffer.toByteArray())).readObject();
 
-        Assert.assertEquals(y1.x, y2.x);
+        Assertions.assertEquals(y1.x, y2.x);
 
     }
 

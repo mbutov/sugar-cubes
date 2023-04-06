@@ -3,8 +3,8 @@ package org.sugarcubes.cloner;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Maxim Butov
@@ -20,17 +20,16 @@ public class ObjenesisObjectFactoryTest {
 
     }
 
-    @Test(expected = NoClassDefFoundError.class)
+    @Test
     public void testNoObjenesis() throws Throwable {
 
         CustomClassLoader cl = new CustomClassLoader().disable("org.objenesis.").reload("org.sugarcubes.");
         Class<?> objenesisUtilsClass = cl.loadClass(ObjenesisUtils.class.getName());
         Method isObjenesisAvailableMethod = objenesisUtilsClass.getDeclaredMethod("isObjenesisAvailable");
 
-        Assert.assertEquals(false, isObjenesisAvailableMethod.invoke(null));
+        Assertions.assertEquals(false, isObjenesisAvailableMethod.invoke(null));
         Callable callable = (Callable) cl.loadClass(TestCase.class.getName()).newInstance();
-        callable.call();
-        
+        Assertions.assertThrows(NoClassDefFoundError.class, () -> callable.call());
     }
 
     @Test
